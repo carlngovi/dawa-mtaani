@@ -1,0 +1,12 @@
+<?php
+
+namespace App\DTOs;
+
+class Acknowledgement
+{
+    public function __construct(
+        public readonly bool $success,
+        public readonly string $reference,
+        public readonly ?string $message = null,
+    ) {}
+}
