@@ -48,9 +48,16 @@ class SystemSettingsSeeder extends Seeder
             // OFFLINE SYNC (Module 18)
             ['key' => 'sync_rate_limit_per_minute', 'value' => '1000'],
 
-            // B2C STORE (Module 16)
-            ['key' => 'reservation_window_minutes', 'value' => '15'],
-            ['key' => 'platform_fee_pct', 'value' => '5'],
+            // ONLINE STORE ELIGIBILITY (Module 15)
+            ['key' => 'min_pos_days', 'value' => '90'],
+            ['key' => 'max_variance_score', 'value' => '0.30'],
+            ['key' => 'search_cache_minutes', 'value' => '15'],
+
+            // ONLINE ORDER & FULFILMENT (Module 16)
+            ['key' => 'reservation_minutes', 'value' => '15'],
+            ['key' => 'platform_fee_pct', 'value' => '3.00'],
+            ['key' => 'partial_fulfilment', 'value' => 'true'],
+            ['key' => 'promo_stacking', 'value' => 'false'],
 
             // MONITORING & ALERTS (Module 28)
             ['key' => 'critical_escalation_minutes', 'value' => '15'],

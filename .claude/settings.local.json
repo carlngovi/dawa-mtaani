@@ -4,7 +4,9 @@
       "Bash(php artisan:*)",
       "Bash(npm install:*)",
       "Bash(npm run:*)",
-      "Bash(composer require:*)"
+      "Bash(composer require:*)",
+      "Bash(mysql -u root -e \"SELECT user, host FROM mysql.user WHERE user LIKE ''%dawa%'';\")",
+      "Bash(mysql -u root -e \"SHOW DATABASES LIKE ''dawa%'';\")"
     ]
   }
 }
