@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Web;
+
 use App\Http\Controllers\Controller;
 use App\Services\CurrencyConfig;
 use App\Services\PricingEngine;
@@ -14,8 +16,19 @@ class RetailCatalogueController extends Controller
         $user = Auth::user();
         $facilityId = $user->facility_id;
         $currency = CurrencyConfig::get();
-        $pricingEngine = app(PricingEngine::class);
-        $isOffNetwork = $pricingEngine->isOffNetwork($facilityId);
+
+        $isOffNetwork = false;
+        $favouriteIds = [];
+
+        if ($facilityId) {
+            $pricingEngine = app(PricingEngine::class);
+            $isOffNetwork = $pricingEngine->isOffNetwork($facilityId);
+
+            $favouriteIds = DB::table('facility_favourite_products')
+                ->where('facility_id', $facilityId)
+                ->pluck('product_id')
+                ->toArray();
+        }
 
         $query = DB::table('wholesale_price_lists as wpl')
             ->join('products as p', 'wpl.product_id', '=', 'p.id')
@@ -25,7 +38,8 @@ class RetailCatalogueController extends Controller
             ->where('p.is_active', true)
             ->where('wpl.effective_from', '<=', now()->toDateString())
             ->where(function ($q) {
-                $q->whereNull('wpl.expires_at')->orWhere('wpl.expires_at', '>=', now()->toDateString());
+                $q->whereNull('wpl.expires_at')
+                  ->orWhere('wpl.expires_at', '>=', now()->toDateString());
             })
             ->select([
                 'p.id as product_id', 'p.ulid', 'p.sku_code',
@@ -51,11 +65,10 @@ class RetailCatalogueController extends Controller
         $products = $query->paginate(24)->withQueryString();
 
         $categories = DB::table('products')
-            ->where('is_active', true)->distinct()
-            ->orderBy('therapeutic_category')->pluck('therapeutic_category');
-
-        $favouriteIds = DB::table('facility_favourite_products')
-            ->where('facility_id', $facilityId)->pluck('product_id')->toArray();
+            ->where('is_active', true)
+            ->distinct()
+            ->orderBy('therapeutic_category')
+            ->pluck('therapeutic_category');
 
         return view('retail.catalogue', compact(
             'products', 'categories', 'currency',

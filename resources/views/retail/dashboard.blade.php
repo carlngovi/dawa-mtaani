@@ -3,6 +3,12 @@
 @section('content')
 <div class="space-y-6">
 
+    @if(! $facility)
+        <div class="bg-amber-50 border border-amber-200 text-amber-800 text-sm px-4 py-3 rounded-lg">
+            ⚠ Your account is not linked to a facility yet. Contact your network administrator.
+        </div>
+    @else
+
     <div>
         <h1 class="text-2xl font-bold text-gray-900">{{ $facility->facility_name }}</h1>
         <p class="text-sm text-gray-500 mt-1">
@@ -89,11 +95,11 @@
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
                             {{ match($order->status) {
-                                'DELIVERED' => 'bg-green-100 text-green-700',
-                                'CANCELLED' => 'bg-red-100 text-red-700',
+                                'DELIVERED'  => 'bg-green-100 text-green-700',
+                                'CANCELLED'  => 'bg-red-100 text-red-700',
                                 'DISPATCHED' => 'bg-blue-100 text-blue-700',
-                                'PENDING' => 'bg-amber-100 text-amber-700',
-                                default => 'bg-gray-100 text-gray-600'
+                                'PENDING'    => 'bg-amber-100 text-amber-700',
+                                default      => 'bg-gray-100 text-gray-600'
                             } }}">{{ $order->status }}</span>
                     </td>
                     <td class="px-5 py-3 text-right text-gray-800">
@@ -109,6 +115,8 @@
             </tbody>
         </table>
     </div>
+
+    @endif
 
 </div>
 @endsection

@@ -1,10 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Route;
 
 // -------------------------------------------------------
-// Public
+// Root redirect
 // -------------------------------------------------------
 Route::get('/', function () {
     if (Auth::check()) {
@@ -22,10 +22,24 @@ Route::get('/', function () {
     return redirect('/login');
 });
 
+// Named dashboard route for Breeze compatibility
+Route::get('/dashboard', function () {
+    if (Auth::check()) {
+        $user = Auth::user();
+        if ($user->hasRole('network_admin') || $user->hasRole('network_field_agent')) {
+            return redirect('/admin/dashboard');
+        }
+        if ($user->hasRole('wholesale_facility')) {
+            return redirect('/wholesale/orders');
+        }
+    }
+    return redirect('/retail/dashboard');
+})->middleware('auth')->name('dashboard');
+
 // -------------------------------------------------------
-// Admin portal
+// Admin portal — auth only, role checked in controller
 // -------------------------------------------------------
-Route::middleware(['auth', 'role:network_admin|network_field_agent'])
+Route::middleware(['auth'])
     ->prefix('admin')
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\AdminDashboardController::class, 'index']);
@@ -36,18 +50,20 @@ Route::middleware(['auth', 'role:network_admin|network_field_agent'])
         Route::get('/disputes', [\App\Http\Controllers\Web\AdminDisputesController::class, 'index']);
         Route::get('/quality-flags', [\App\Http\Controllers\Web\AdminQualityFlagsController::class, 'index']);
         Route::get('/ppb-registry', [\App\Http\Controllers\Web\AdminPpbRegistryController::class, 'index']);
+        Route::post('/ppb-registry/upload', [\App\Http\Controllers\Web\AdminPpbRegistryController::class, 'upload']);
         Route::get('/monitoring', [\App\Http\Controllers\Web\AdminMonitoringController::class, 'index']);
         Route::get('/security', [\App\Http\Controllers\Web\AdminSecurityController::class, 'index']);
         Route::get('/audit-log', [\App\Http\Controllers\Web\AdminAuditLogController::class, 'index']);
         Route::get('/recruiter', [\App\Http\Controllers\Web\AdminRecruiterController::class, 'index']);
         Route::get('/dpa', [\App\Http\Controllers\Web\AdminDpaController::class, 'index']);
         Route::get('/reports', [\App\Http\Controllers\Web\AdminReportsController::class, 'index']);
+        Route::get('/credit', [\App\Http\Controllers\Web\AdminCreditController::class, 'index']);
     });
 
 // -------------------------------------------------------
-// Retail portal
+// Retail portal — auth only
 // -------------------------------------------------------
-Route::middleware(['auth', 'role:retail_facility|group_owner'])
+Route::middleware(['auth'])
     ->prefix('retail')
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\RetailDashboardController::class, 'index']);
@@ -63,9 +79,9 @@ Route::middleware(['auth', 'role:retail_facility|group_owner'])
     });
 
 // -------------------------------------------------------
-// Wholesale portal
+// Wholesale portal — auth only
 // -------------------------------------------------------
-Route::middleware(['auth', 'role:wholesale_facility'])
+Route::middleware(['auth'])
     ->prefix('wholesale')
     ->group(function () {
         Route::get('/orders', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'index']);

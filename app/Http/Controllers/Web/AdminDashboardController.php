@@ -12,6 +12,11 @@ class AdminDashboardController extends Controller
 {
     public function index(Request $request)
     {
+        $user = $request->user();
+        if (! $user->hasRole(['network_admin', 'network_field_agent'])) {
+            return redirect('/dashboard');
+        }
+
         $currency = CurrencyConfig::get();
         $today = Carbon::now('UTC')->toDateString();
 

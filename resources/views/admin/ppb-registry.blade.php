@@ -32,7 +32,7 @@
 
     <div class="bg-white rounded-xl border border-gray-200 p-5">
         <h3 class="text-sm font-semibold text-gray-700 mb-4">Upload New Registry CSV</h3>
-        <form action="/api/v1/admin/ppb-registry/upload" method="POST" enctype="multipart/form-data"
+        <form action="/admin/ppb-registry/upload" method="POST" enctype="multipart/form-data"
               class="flex items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".csv,.txt"

@@ -1,5 +1,7 @@
 <?php
+
 namespace App\Http\Controllers\Web;
+
 use App\Http\Controllers\Controller;
 use App\Services\CurrencyConfig;
 use Carbon\Carbon;
@@ -15,6 +17,18 @@ class RetailDashboardController extends Controller
         $currency = CurrencyConfig::get();
 
         $facility = DB::table('facilities')->where('id', $facilityId)->first();
+
+        if (! $facility) {
+            return view('retail.dashboard', [
+                'facility'        => null,
+                'currency'        => $currency,
+                'recentOrders'    => collect(),
+                'pendingDisputes' => 0,
+                'monthGmv'        => 0,
+                'totalOrders'     => 0,
+                'lowStockCount'   => 0,
+            ]);
+        }
 
         $recentOrders = DB::table('orders')
             ->where('retail_facility_id', $facilityId)
@@ -41,9 +55,10 @@ class RetailDashboardController extends Controller
             ->whereNull('deleted_at')
             ->count();
 
-        $lowStockCount = DB::table('facility_stock_levels')
-            ->where('facility_id', $facilityId)
-            ->whereRaw('current_quantity <= reorder_threshold')
+        // Use facility_stock_status table — no separate stock_levels table exists
+        $lowStockCount = DB::table('facility_stock_status')
+            ->where('wholesale_facility_id', $facilityId)
+            ->where('stock_status', 'LOW_STOCK')
             ->count();
 
         return view('retail.dashboard', compact(

@@ -156,6 +156,48 @@
         </div>
     @endif
 
+    {{-- Quick links --}}
+    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <a href="/admin/ppb-registry"
+           class="bg-white hover:bg-gray-50 border border-gray-200 rounded-xl p-5 transition-colors">
+            <p class="text-sm font-semibold text-gray-800">PPB Registry</p>
+            <p class="text-xs text-gray-400 mt-1">
+                Retail · Hospital · Wholesale · Manufacturer
+            </p>
+            @if($ppbIsStale)
+                <span class="inline-flex mt-2 px-2 py-0.5 rounded text-xs font-medium bg-amber-100 text-amber-700">
+                    Stale — upload needed
+                </span>
+            @else
+                <span class="inline-flex mt-2 px-2 py-0.5 rounded text-xs font-medium bg-green-100 text-green-700">
+                    Up to date
+                </span>
+            @endif
+        </a>
+        <a href="/admin/facilities?gps_pending=1"
+           class="bg-white hover:bg-gray-50 border border-gray-200 rounded-xl p-5 transition-colors">
+            <p class="text-sm font-semibold text-gray-800">GPS Pending</p>
+            <p class="text-xs text-gray-400 mt-1">Facilities without coordinates</p>
+            <p class="text-2xl font-bold {{ $gpsPendingCount > 0 ? 'text-amber-600' : 'text-green-700' }} mt-2">
+                {{ $gpsPendingCount }}
+            </p>
+        </a>
+        <a href="/admin/disputes"
+           class="bg-white hover:bg-gray-50 border border-gray-200 rounded-xl p-5 transition-colors">
+            <p class="text-sm font-semibold text-gray-800">Open Disputes</p>
+            <p class="text-xs text-gray-400 mt-1">Pending resolution</p>
+            <p class="text-2xl font-bold {{ $openDisputes > 0 ? 'text-red-600' : 'text-green-700' }} mt-2">
+                {{ $openDisputes }}
+            </p>
+        </a>
+        <a href="/admin/quality-flags"
+           class="bg-white hover:bg-gray-50 border border-gray-200 rounded-xl p-5 transition-colors">
+            <p class="text-sm font-semibold text-gray-800">Quality Flags</p>
+            <p class="text-xs text-gray-400 mt-1">Pharmacovigilance reports</p>
+            <p class="text-2xl font-bold text-gray-900 mt-2">→</p>
+        </a>
+    </div>
+
 </div>
 
 @endsection
