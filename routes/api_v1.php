@@ -215,3 +215,92 @@ Route::middleware(['auth:sanctum', 'role:wholesale_facility|network_admin'])->gr
     Route::post('/wholesale/stock-status', [\App\Http\Controllers\Api\V1\WholesaleStockController::class, 'bulkUpdate']);
     Route::get('/wholesale/performance', [\App\Http\Controllers\Api\V1\WholesaleStockController::class, 'performance']);
 });
+
+// -------------------------------------------------------
+// Module 5 — Network Coordination & Analytics Dashboard
+// -------------------------------------------------------
+Route::middleware(['auth:sanctum', 'role:network_admin|network_field_agent'])->group(function () {
+    Route::get('/network/dashboard/summary', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'summary']);
+    Route::get('/network/facilities', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'facilities']);
+    Route::get('/network/gmv', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'gmv']);
+    Route::get('/network/audit-log', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'auditLog']);
+    Route::get('/network/groups/{groupUlid}/performance', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'groupPerformance']);
+    Route::post('/network/facilities/{ulid}/flag', [\App\Http\Controllers\Api\V1\FacilityFlagController::class, 'store']);
+    Route::get('/network/flags', [\App\Http\Controllers\Api\V1\FacilityFlagController::class, 'index']);
+    Route::patch('/network/flags/{id}/resolve', [\App\Http\Controllers\Api\V1\FacilityFlagController::class, 'resolve']);
+});
+
+Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
+    Route::get('/network/credit-health', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'creditHealth']);
+    Route::get('/network/membership-comparison', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'membershipComparison']);
+    Route::post('/network/reports/export', [\App\Http\Controllers\Api\V1\NetworkDashboardController::class, 'export']);
+});
+
+// -------------------------------------------------------
+// Module 14 — Pharmacovigilance & Quality Reporting
+// -------------------------------------------------------
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/quality-flags', [\App\Http\Controllers\Api\V1\QualityFlagController::class, 'store'])->middleware('anonymise.flag');
+    Route::get('/quality-flags/my-flags', [\App\Http\Controllers\Api\V1\QualityFlagController::class, 'myFlags'])->middleware('anonymise.flag');
+});
+
+Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
+    Route::get('/admin/quality-flags', [\App\Http\Controllers\Api\V1\AdminQualityFlagController::class, 'index']);
+    Route::patch('/admin/quality-flags/{ulid}/review', [\App\Http\Controllers\Api\V1\AdminQualityFlagController::class, 'review']);
+    Route::post('/admin/quality-flags/{ulid}/confirm', [\App\Http\Controllers\Api\V1\AdminQualityFlagController::class, 'confirm']);
+    Route::post('/admin/quality-flags/{ulid}/dismiss', [\App\Http\Controllers\Api\V1\AdminQualityFlagController::class, 'dismiss']);
+});
+
+// -------------------------------------------------------
+// Module 22 — Recruiter Firm Module
+// -------------------------------------------------------
+Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
+    // Firm management
+    Route::get('/admin/recruiter/firms', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'index']);
+    Route::post('/admin/recruiter/firms', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'store']);
+    Route::patch('/admin/recruiter/firms/{id}', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'update']);
+    Route::get('/admin/recruiter/firms/{id}/ledger', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'ledger']);
+    Route::get('/admin/recruiter/firms/{id}/activations', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'activations']);
+    Route::patch('/admin/recruiter/activations/{id}/reconcile', [\App\Http\Controllers\Api\V1\RecruiterFirmController::class, 'reconcile']);
+
+    // Agent tree management
+    Route::get('/admin/recruiter/firms/{firmId}/agents', [\App\Http\Controllers\Api\V1\RecruiterAgentController::class, 'index']);
+    Route::post('/admin/recruiter/firms/{firmId}/agents', [\App\Http\Controllers\Api\V1\RecruiterAgentController::class, 'store']);
+    Route::patch('/admin/recruiter/agents/{id}', [\App\Http\Controllers\Api\V1\RecruiterAgentController::class, 'update']);
+    Route::patch('/admin/recruiter/agents/{id}/deactivate', [\App\Http\Controllers\Api\V1\RecruiterAgentController::class, 'deactivate']);
+});
+
+// -------------------------------------------------------
+// Module 23 — WhatsApp Ordering Integration
+// -------------------------------------------------------
+
+// Webhook — no auth, no CSRF, Meta IP whitelist only
+Route::match(['get', 'post'], '/whatsapp/webhook', [
+    \App\Http\Controllers\Api\V1\WhatsAppWebhookController::class, 'webhook'
+])->middleware('whatsapp.whitelist');
+
+// Status — network_admin only
+Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
+    Route::get('/whatsapp/status', [\App\Http\Controllers\Api\V1\WhatsAppWebhookController::class, 'status']);
+});
+
+// -------------------------------------------------------
+// Module 24 — Security Enhancement Layer
+// -------------------------------------------------------
+
+// MFA — authenticated users
+Route::middleware(['auth:sanctum'])->group(function () {
+    Route::post('/mfa/request', [\App\Http\Controllers\Api\V1\MfaController::class, 'requestOtp']);
+    Route::post('/mfa/verify', [\App\Http\Controllers\Api\V1\MfaController::class, 'verifyOtp']);
+    Route::post('/mfa/verify-backup', [\App\Http\Controllers\Api\V1\MfaController::class, 'verifyBackupCode']);
+    Route::post('/mfa/backup-codes/generate', [\App\Http\Controllers\Api\V1\MfaController::class, 'generateBackupCodes']);
+    Route::get('/mfa/backup-codes/count', [\App\Http\Controllers\Api\V1\MfaController::class, 'backupCodeCount']);
+});
+
+// Security events — network_admin only
+Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
+    Route::get('/admin/security/events', [\App\Http\Controllers\Api\V1\SecurityEventController::class, 'index']);
+    Route::patch('/admin/security/events/{id}/resolve', [\App\Http\Controllers\Api\V1\SecurityEventController::class, 'resolve']);
+    Route::get('/admin/security/summary', [\App\Http\Controllers\Api\V1\SecurityEventController::class, 'summary']);
+    Route::post('/admin/users/{id}/mfa/disable', [\App\Http\Controllers\Api\V1\AdminMfaController::class, 'disable']);
+});
