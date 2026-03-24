@@ -4,6 +4,7 @@ use App\Jobs\AnomalyDetectionJob;
 use App\Jobs\BaselineCalculationJob;
 use App\Jobs\DisputeSlaMonitorJob;
 use App\Jobs\JobAlertJob;
+use App\Jobs\NetworkSummaryRefreshJob;
 use App\Jobs\PriceListExpiryJob;
 use App\Jobs\PpbReverificationJob;
 use App\Jobs\RetentionEnforcementJob;
@@ -24,3 +25,4 @@ Schedule::job(new RetentionEnforcementJob)->dailyAt('02:00')->timezone('Africa/N
 Schedule::job(new PpbReverificationJob)->daily()->timezone('Africa/Nairobi');
 Schedule::job(new DisputeSlaMonitorJob)->everyThirtyMinutes();
 Schedule::job(new PriceListExpiryJob)->dailyAt('00:00')->timezone('Africa/Nairobi');
+Schedule::job(new NetworkSummaryRefreshJob)->everyFifteenMinutes();

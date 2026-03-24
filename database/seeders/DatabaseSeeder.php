@@ -14,6 +14,7 @@ class DatabaseSeeder extends Seeder
     {
         $this->call(RolesAndPermissionsSeeder::class);
         $this->call(SystemSettingsSeeder::class);
+        $this->call(WhatsAppTemplateSeeder::class);
         $this->call(DataRetentionPolicySeeder::class);
     }
 }
