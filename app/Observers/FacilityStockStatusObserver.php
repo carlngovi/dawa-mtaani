@@ -4,6 +4,7 @@ namespace App\Observers;
 
 use App\Services\BusinessMetricCollector;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 
@@ -11,6 +12,15 @@ class FacilityStockStatusObserver
 {
     public function updated($stockStatus): void
     {
+        // Invalidate store search cache on any stock change
+        try {
+            Cache::tags(['store_search'])->flush();
+        } catch (\Throwable $e) {
+            Log::warning('FacilityStockStatusObserver: failed to flush store_search cache', [
+                'error' => $e->getMessage(),
+            ]);
+        }
+
         $oldStatus = $stockStatus->getOriginal('stock_status');
         $newStatus = $stockStatus->stock_status;
 
