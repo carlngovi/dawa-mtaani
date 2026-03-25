@@ -19,7 +19,9 @@
       "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/app/Jobs/*.php)",
       "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/database/migrations/*.php)",
       "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/database/seeders/*.php)",
-      "Bash(composer show:*)"
+      "Bash(composer show:*)",
+      "Bash(composer install:*)",
+      "Bash(find /home/carlubnt -maxdepth 5 -iname *IEBC* -o -iname *PBB* -o -iname *PPB*)"
     ]
   }
 }

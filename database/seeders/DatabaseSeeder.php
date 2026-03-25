@@ -13,5 +13,8 @@ class DatabaseSeeder extends Seeder
         $this->call(SuperAdminSeeder::class);
         $this->call(WhatsAppTemplateSeeder::class);
         $this->call(DataRetentionPolicySeeder::class);
+        $this->call(KenyaGeographySeeder::class);
+        $this->call(ProductsSeeder::class);
+        $this->call(PpbRegistryCacheSeeder::class);
     }
 }
