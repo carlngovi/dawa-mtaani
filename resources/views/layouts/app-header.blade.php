@@ -18,7 +18,7 @@
                     <span class="absolute -translate-y-1/2 pointer-events-none left-4 top-1/2">
                         <svg class="fill-gray-500 dark:fill-gray-400" width="20" height="20" viewBox="0 0 20 20" fill="none"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z" fill=""/></svg>
                     </span>
-                    <input type="text" placeholder="Search..." class="h-11 w-full max-w-[280px] rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-4 text-sm text-gray-800 focus:border-blue-300 focus:outline-none focus:ring-2 focus:ring-blue-600/10 dark:border-gray-800 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-white/30"/>
+                    <input type="text" placeholder="Search..." class="h-11 w-full max-w-[280px] rounded-lg border border-gray-200 bg-transparent py-2.5 pl-12 pr-4 text-sm text-gray-800 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/10 dark:border-gray-800 dark:bg-white/5 dark:text-white/90 dark:placeholder:text-white/30"/>
                 </div>
             </div>
         </div>
@@ -35,8 +35,8 @@
 
             <div class="relative" x-data="{ open: false }" @click.away="open = false">
                 <button class="flex items-center gap-2 text-gray-700 dark:text-gray-400" @click.prevent="open = !open">
-                    <div class="h-9 w-9 rounded-full bg-blue-100 dark:bg-blue-900 flex items-center justify-center flex-shrink-0">
-                        <span class="text-sm font-bold text-blue-600 dark:text-blue-400">{{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}</span>
+                    <div class="h-9 w-9 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0">
+                        <span class="text-sm font-bold text-gray-900">{{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}</span>
                     </div>
                     <span class="hidden md:block font-medium text-sm">{{ Auth::user()->name ?? '' }}</span>
                     <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>

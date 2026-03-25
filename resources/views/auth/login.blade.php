@@ -8,10 +8,11 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         (function() {
-            const t = localStorage.getItem('theme') || (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
+            const t = localStorage.getItem('theme') ||
+                (window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light');
             if (t === 'dark') {
                 document.documentElement.classList.add('dark');
-                document.body.classList.add('dark', 'bg-gray-900');
+                document.body && document.body.classList.add('dark', 'bg-gray-900');
             }
         })();
     </script>
@@ -52,40 +53,49 @@
 
         {{-- Top logo bar --}}
         <div class="flex items-center gap-2 px-5 sm:px-8 pt-6 sm:pt-8">
-            <div class="h-8 w-8 rounded-lg bg-blue-600 flex items-center justify-center">
-                <span class="text-white font-bold text-sm">DM</span>
+            <div class="h-8 w-8 rounded-lg bg-yellow-400 flex items-center justify-center">
+                <span class="text-gray-900 font-bold text-sm">DM</span>
             </div>
-            <span class="text-lg font-bold text-gray-800 dark:text-white">Dawa Mtaani</span>
+            <span class="text-lg font-bold text-gray-900 dark:text-white">
+                Dawa<span class="text-yellow-400">Mtaani</span>
+            </span>
         </div>
 
         {{-- Form centered --}}
         <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 sm:px-8 py-8">
 
             <div class="mb-8">
-                <h1 class="text-2xl font-semibold text-gray-800 dark:text-white mb-2">
+                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
                     Sign in to your account
                 </h1>
                 <p class="text-sm text-gray-500 dark:text-gray-400">
-                    Enter your credentials to access the Dawa Mtaani portal
+                    Enter your credentials to access your portal
                 </p>
             </div>
 
-            {{-- Errors --}}
+            {{-- Error flash --}}
             @if ($errors->any())
-                <div class="mb-5 rounded-lg bg-red-50 border border-red-200 p-4 dark:bg-red-900/20 dark:border-red-800">
-                    <p class="text-sm text-red-600 dark:text-red-400">{{ $errors->first() }}</p>
-                </div>
+            <div class="alert-error mb-5">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ $errors->first() }}
+            </div>
             @endif
 
+            {{-- Status flash (invitation-only message etc.) --}}
             @if (session('status'))
-                <div class="mb-5 rounded-lg bg-green-50 border border-green-200 p-4 dark:bg-green-900/20 dark:border-green-800">
-                    <p class="text-sm text-green-600 dark:text-green-400">{{ session('status') }}</p>
-                </div>
+            <div class="alert-info mb-5">
+                <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
+                </svg>
+                {{ session('status') }}
+            </div>
             @endif
 
             {{-- Google OAuth --}}
             <a href="{{ route('auth.google') }}"
-               class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 shadow-sm hover:bg-gray-50 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 mb-6">
+               class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 mb-6">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.38a4.6 4.6 0 01-2 3.02v2.5h3.22c1.89-1.74 2.98-4.3 2.98-7.31z" fill="#4285F4"/>
                     <path d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.22-2.5c-.9.6-2.04.96-3.4.96-2.61 0-4.82-1.76-5.61-4.13H1.07v2.58A10 10 0 0010 20z" fill="#34A853"/>
@@ -101,19 +111,24 @@
                     <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="bg-white px-4 text-gray-400 dark:bg-gray-900 dark:text-gray-500">or sign in with email</span>
+                    <span class="bg-white px-4 text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                        or sign in with email
+                    </span>
                 </div>
             </div>
 
             {{-- Login form --}}
-            <form method="POST" action="{{ route('login') }}" x-data="{ showPassword: false, remember: false }">
+            <form method="POST" action="{{ route('login') }}"
+                  x-data="{ showPassword: false, remember: false, loading: false }"
+                  @submit="loading = true">
                 @csrf
 
                 <div class="space-y-5">
 
                     {{-- Email --}}
                     <div>
-                        <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">
+                        <label for="email"
+                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Email address <span class="text-red-500">*</span>
                         </label>
                         <input type="email"
@@ -123,12 +138,13 @@
                                required
                                autocomplete="email"
                                placeholder="you@example.com"
-                               class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-blue-600 @error('email') border-red-400 @enderror"/>
+                               class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-yellow-400 @error('email') border-red-400 @enderror"/>
                     </div>
 
                     {{-- Password with show/hide toggle --}}
                     <div>
-                        <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-400 mb-1.5">
+                        <label for="password"
+                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
                             Password <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -138,7 +154,7 @@
                                    required
                                    autocomplete="current-password"
                                    placeholder="Enter your password"
-                                   class="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-blue-400 focus:outline-none focus:ring-2 focus:ring-blue-500/10 dark:border-gray-700 dark:bg-gray-900 dark:text-white/90 dark:placeholder:text-white/30 dark:focus:border-blue-600 @error('password') border-red-400 @enderror"/>
+                                   class="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-yellow-400 @error('password') border-red-400 @enderror"/>
                             <button type="button"
                                     @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
@@ -161,11 +177,13 @@
                                        name="remember"
                                        class="sr-only"
                                        @change="remember = !remember"/>
-                                <div :class="remember ? 'border-blue-600 bg-blue-600' : 'border-gray-300 bg-transparent dark:border-gray-600'"
+                                <div :class="remember
+                                        ? 'border-yellow-400 bg-yellow-400'
+                                        : 'border-gray-300 bg-transparent dark:border-gray-600'"
                                      class="flex h-5 w-5 items-center justify-center rounded-md border-[1.5px] transition-colors">
                                     <span :class="remember ? 'opacity-100' : 'opacity-0'" class="transition-opacity">
                                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
-                                            <path d="M10 3L4.75 8.25L2 5.5" stroke="white" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
+                                            <path d="M10 3L4.75 8.25L2 5.5" stroke="#111827" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/>
                                         </svg>
                                     </span>
                                 </div>
@@ -173,28 +191,37 @@
                             Keep me logged in
                         </label>
                         <a href="{{ route('password.request') }}"
-                           class="text-sm text-blue-600 hover:text-blue-700 dark:text-blue-400 dark:hover:text-blue-300">
+                           class="text-sm text-yellow-600 hover:text-yellow-700 dark:text-yellow-400 dark:hover:text-yellow-300 font-medium">
                             Forgot password?
                         </a>
                     </div>
 
                     {{-- Submit --}}
                     <button type="submit"
-                            class="flex w-full items-center justify-center rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 transition-colors dark:focus:ring-offset-gray-900">
-                        Sign in
+                            :disabled="loading"
+                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors dark:focus:ring-offset-gray-900 disabled:opacity-70">
+                        <svg x-show="loading" class="animate-spin h-4 w-4 text-gray-900" fill="none" viewBox="0 0 24 24" style="display:none;">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
+                        <span x-text="loading ? 'Signing in...' : 'Sign in'">Sign in</span>
                     </button>
 
                 </div>
             </form>
 
+            <p class="mt-6 text-center text-xs text-gray-400 dark:text-gray-600">
+                Access is by invitation only.
+                Contact your network administrator to request access.
+            </p>
         </div>
     </div>
 
     {{-- ===== RIGHT — Brand panel ===== --}}
-    <div class="relative hidden lg:flex lg:w-1/2 bg-gray-950 dark:bg-white/5 items-center justify-center overflow-hidden">
+    <div class="relative hidden lg:flex lg:w-1/2 bg-gray-950 items-center justify-center overflow-hidden">
 
-        {{-- Grid pattern background --}}
-        <div class="absolute inset-0 opacity-10">
+        {{-- Grid pattern --}}
+        <div class="absolute inset-0 opacity-[0.04]">
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
                 <defs>
                     <pattern id="grid" width="40" height="40" patternUnits="userSpaceOnUse">
@@ -205,44 +232,54 @@
             </svg>
         </div>
 
-        {{-- Glowing orbs --}}
-        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-blue-600 rounded-full opacity-10 blur-3xl"></div>
-        <div class="absolute bottom-1/4 right-1/4 w-48 h-48 bg-blue-400 rounded-full opacity-10 blur-3xl"></div>
+        {{-- Yellow glow orbs --}}
+        <div class="absolute top-1/4 left-1/4 w-72 h-72 bg-yellow-400 rounded-full opacity-[0.06] blur-3xl"></div>
+        <div class="absolute bottom-1/4 right-1/4 w-56 h-56 bg-yellow-300 rounded-full opacity-[0.05] blur-3xl"></div>
 
         {{-- Content --}}
         <div class="relative z-10 flex flex-col items-center text-center px-12 max-w-sm">
-            <div class="h-16 w-16 rounded-2xl bg-blue-600 flex items-center justify-center mb-6 shadow-lg">
-                <span class="text-white font-bold text-2xl">DM</span>
+
+            <div class="h-16 w-16 rounded-2xl bg-yellow-400 flex items-center justify-center mb-6 shadow-2xl">
+                <span class="text-gray-900 font-bold text-2xl">DM</span>
             </div>
 
-            <h2 class="text-2xl font-bold text-white mb-4">Dawa Mtaani</h2>
+            <h2 class="text-2xl font-bold text-white mb-1">Dawa Mtaani</h2>
+            <p class="text-yellow-400 text-xs font-semibold tracking-widest uppercase mb-6">
+                Quality, Affordably
+            </p>
 
             <p class="text-gray-400 text-sm leading-relaxed mb-8">
-                Kenya's pharmacy network platform connecting retail pharmacies, hospitals, and wholesale distributors — built for speed, transparency, and compliance.
+                Kenya's pharmacy network platform — connecting retail pharmacies,
+                hospitals, and wholesale distributors built for speed,
+                transparency, and PPB compliance.
             </p>
 
             {{-- Feature pills --}}
-            <div class="flex flex-wrap justify-center gap-2">
-                @foreach(['Network Orders', 'PPB Verified', 'Credit Engine', 'WhatsApp Ordering', 'Kenya DPA Compliant'] as $feature)
-                <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-medium text-gray-300 border border-white/10">
+            <div class="flex flex-wrap justify-center gap-2 mb-10">
+                @foreach([
+                    'Network Orders', 'PPB Verified', 'Credit Engine',
+                    'WhatsApp Ordering', 'Kenya DPA Compliant', 'M-Pesa Integrated'
+                ] as $feature)
+                <span class="inline-flex items-center rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-gray-400 border border-white/10">
                     {{ $feature }}
                 </span>
                 @endforeach
             </div>
 
-            {{-- Stats with count-up animation --}}
-            <div class="mt-10 grid grid-cols-3 gap-6 w-full" x-data="countUp()" x-init="start()">
+            {{-- Stats --}}
+            <div class="grid grid-cols-3 gap-6 w-full border-t border-white/10 pt-8"
+                 x-data="countUp()" x-init="start()">
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-white" x-text="counts[0] + '+'"></p>
-                    <p class="text-xs text-gray-400 mt-1">Facilities</p>
+                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[0] + '+'"></p>
+                    <p class="text-xs text-gray-500 mt-1">Pharmacies</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-white" x-text="counts[1] + '+'"></p>
-                    <p class="text-xs text-gray-400 mt-1">Products</p>
+                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[1]"></p>
+                    <p class="text-xs text-gray-500 mt-1">SKUs</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-white" x-text="counts[2]"></p>
-                    <p class="text-xs text-gray-400 mt-1">Portals</p>
+                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[2]"></p>
+                    <p class="text-xs text-gray-500 mt-1">Counties</p>
                 </div>
             </div>
         </div>
@@ -250,11 +287,10 @@
 
 </div>
 
-{{-- Floating dark mode toggle --}}
-<div class="fixed right-6 bottom-6 z-50">
+{{-- Dark mode toggle --}}
+<div class="fixed right-6 bottom-6 z-50" x-data>
     <button @click.prevent="$store.theme.toggle()"
-            x-data
-            class="bg-blue-600 hover:bg-blue-700 inline-flex h-14 w-14 items-center justify-center rounded-full text-white shadow-lg transition-colors">
+            class="bg-yellow-400 hover:bg-yellow-300 inline-flex h-12 w-12 items-center justify-center rounded-full text-gray-900 shadow-lg transition-colors">
         <svg class="hidden dark:block w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
@@ -267,20 +303,17 @@
 <script>
 function countUp() {
     return {
-        targets: [11, 25, 3],
-        counts: [0, 0, 0],
+        targets: [210, 49, 3],
+        counts:  [0,   0,  0],
         start() {
-            // Delay slightly so the page has rendered
             setTimeout(() => {
                 this.targets.forEach((target, i) => {
-                    const duration = 1800;
-                    const steps = 60;
-                    const stepTime = duration / steps;
-                    let current = 0;
-                    const increment = target / steps;
-
-                    const timer = setInterval(() => {
-                        current += increment;
+                    const steps    = 60;
+                    const stepTime = 1800 / steps;
+                    let current    = 0;
+                    const inc      = target / steps;
+                    const timer    = setInterval(() => {
+                        current += inc;
                         if (current >= target) {
                             this.counts[i] = target;
                             clearInterval(timer);
@@ -291,7 +324,7 @@ function countUp() {
                 });
             }, 400);
         }
-    }
+    };
 }
 </script>
 

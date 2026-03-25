@@ -21,7 +21,8 @@
       "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/database/seeders/*.php)",
       "Bash(composer show:*)",
       "Bash(composer install:*)",
-      "Bash(find /home/carlubnt -maxdepth 5 -iname *IEBC* -o -iname *PBB* -o -iname *PPB*)"
+      "Bash(find /home/carlubnt -maxdepth 5 -iname *IEBC* -o -iname *PBB* -o -iname *PPB*)",
+      "Bash(find /home/carlubnt -maxdepth 5 -iname *expanded*50* -o -iname *50_sku* -o -iname *expanded*sku*)"
     ]
   }
 }

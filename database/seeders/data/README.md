@@ -9,6 +9,7 @@ Place the following CSV files in this directory before running the seeders:
 | PPB_Hospitals.csv | PpbRegistryCacheSeeder | ~1,220 |
 | PBB_Manufacturer.csv | PpbRegistryCacheSeeder | ~19 |
 | Kenya_IEBC_Administrative_Units.csv | KenyaGeographySeeder | ~1,450 |
+| expanded_50_skus_seed.csv | ProductsSeeder | 49 |
 
 CSV files are excluded from git. Copy them from the project data folder
 before running: php artisan db:seed --class=PpbRegistryCacheSeeder

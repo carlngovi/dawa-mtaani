@@ -13,7 +13,10 @@ class AdminDashboardController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        if (! $user->hasRole(['network_admin', 'network_field_agent'])) {
+        if (! $user->hasAnyRole([
+            'network_admin', 'admin', 'super_admin', 'technical_admin',
+            'assistant_admin', 'admin_support', 'network_field_agent',
+        ])) {
             return redirect('/dashboard');
         }
 
