@@ -4,7 +4,12 @@
       "Bash(php artisan:*)",
       "Bash(composer dump-autoload:*)",
       "Bash(php -l app/Http/Controllers/Web/AdminFacilitiesController.php)",
-      "Bash(git stash:*)"
+      "Bash(git stash:*)",
+      "Bash(grep -rl \"coming soon\\\\|Coming Soon\\\\|Phase 2\\\\|launches in\\\\|not yet\\\\|placeholder\\\\|TODO\\\\|stub\" resources/views/ --include=*.blade.php)",
+      "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/admin/ --include=*.blade.php)",
+      "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/retail/ --include=*.blade.php)",
+      "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/wholesale/ --include=*.blade.php)",
+      "Bash(php artisan tinker --execute=\":*)"
     ]
   }
 }
