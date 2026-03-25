@@ -2,11 +2,9 @@
   "permissions": {
     "allow": [
       "Bash(php artisan:*)",
-      "Bash(npm install:*)",
-      "Bash(npm run:*)",
-      "Bash(composer require:*)",
-      "Bash(mysql -u root -e \"SELECT user, host FROM mysql.user WHERE user LIKE ''%dawa%'';\")",
-      "Bash(mysql -u root -e \"SHOW DATABASES LIKE ''dawa%'';\")"
+      "Bash(composer dump-autoload:*)",
+      "Bash(php -l app/Http/Controllers/Web/AdminFacilitiesController.php)",
+      "Bash(git stash:*)"
     ]
   }
 }

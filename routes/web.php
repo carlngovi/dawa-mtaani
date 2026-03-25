@@ -10,6 +10,22 @@ Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::cla
 Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
 
 // -------------------------------------------------------
+// Public invitation accept routes (no auth needed)
+// -------------------------------------------------------
+Route::get('/register/accept/{token}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'showAccept'])->name('invitation.accept');
+Route::post('/register/accept/{token}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'acceptStore'])->name('invitation.accept.store');
+
+// -------------------------------------------------------
+// Block public registration — invitation only
+// -------------------------------------------------------
+Route::get('register', function () {
+    return redirect('/login')->with('status', 'Registration is by invitation only. Contact your network administrator.');
+})->name('register');
+Route::post('register', function () {
+    return redirect('/login')->with('status', 'Registration is by invitation only.');
+});
+
+// -------------------------------------------------------
 // Root redirect
 // -------------------------------------------------------
 Route::get('/', function () {
@@ -74,6 +90,9 @@ Route::middleware(['auth'])
         Route::get('/customers', [\App\Http\Controllers\Web\AdminCustomersController::class, 'index']);
         Route::get('/notifications', [\App\Http\Controllers\Web\AdminNotificationsController::class, 'index']);
         Route::get('/settings', [\App\Http\Controllers\Web\AdminSettingsController::class, 'index']);
+        Route::get('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'index']);
+        Route::post('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'store']);
+        Route::delete('/invitations/{id}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'destroy']);
     });
 
 // -------------------------------------------------------
