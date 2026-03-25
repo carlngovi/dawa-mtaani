@@ -4,24 +4,26 @@ namespace App\Providers;
 
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
-use Laravel\Telescope\IncomingEntry;
-use Laravel\Telescope\Telescope;
-use Laravel\Telescope\TelescopeApplicationServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
+class TelescopeServiceProvider extends ServiceProvider
 {
     /**
      * Register any application services.
      */
     public function register(): void
     {
+        if (! class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class)) {
+            return;
+        }
+
         // Telescope::night();
 
         $this->hideSensitiveRequestDetails();
 
         $isLocal = $this->app->environment('local');
 
-        Telescope::filter(function (IncomingEntry $entry) use ($isLocal) {
+        \Laravel\Telescope\Telescope::filter(function (\Laravel\Telescope\IncomingEntry $entry) use ($isLocal) {
             return $isLocal ||
                    $entry->isReportableException() ||
                    $entry->isFailedRequest() ||
@@ -29,6 +31,18 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
                    $entry->isScheduledTask() ||
                    $entry->hasMonitoredTag();
         });
+    }
+
+    /**
+     * Bootstrap any application services.
+     */
+    public function boot(): void
+    {
+        if (! class_exists(\Laravel\Telescope\TelescopeApplicationServiceProvider::class)) {
+            return;
+        }
+
+        $this->gate();
     }
 
     /**
@@ -40,9 +54,9 @@ class TelescopeServiceProvider extends TelescopeApplicationServiceProvider
             return;
         }
 
-        Telescope::hideRequestParameters(['_token']);
+        \Laravel\Telescope\Telescope::hideRequestParameters(['_token']);
 
-        Telescope::hideRequestHeaders([
+        \Laravel\Telescope\Telescope::hideRequestHeaders([
             'cookie',
             'x-csrf-token',
             'x-xsrf-token',
