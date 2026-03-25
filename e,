@@ -1,0 +1,38 @@
+[90m= [39m[34;4mApp\Models\CreditTranche[39;24m {#8160
+    [34mulid[39m: [34;4mSymfony\Component\Uid\Ulid[39;24m {#8084
+      [34mtoBase58[39m: [32m"[39m[32m1CZPUsVqWrGLXmmt47qfPA[39m[32m"[39m,
+      [34mtoRfc4122[39m: [32m"[39m[32m019d241a-db18-76ab-2e9e-8aa737cf27dd[39m[32m"[39m,
+      [34mtime[39m: [32m"[39m[32m2026-03-25 08:27:13.048 UTC[39m[32m"[39m,
+    },
+    [34mname[39m: [32m"[39m[32mStarter Tranche[39m[32m"[39m,
+    [34mentry_amount[39m: [35m10000[39m,
+    [34mceiling_amount[39m: [35m50000[39m,
+    [34mis_fixed[39m: [36mfalse[39m,
+    [34mapproval_pathway[39m: [32m"[39m[32mAUTOMATIC[39m[32m"[39m,
+    [34mproduct_restriction_scope[39m: [36mnull[39m,
+    [34meffective_from[39m: [32m"[39m[32m2026-03-25 00:00:00[39m[32m"[39m,
+    [34mis_active[39m: [36mtrue[39m,
+    [34mcreated_by[39m: [35m1[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-03-25 08:27:13[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-03-25 08:27:13[39m[32m"[39m,
+    [34mid[39m: [35m2[39m,
+  }
+[90m= [39m[34;4mApp\Models\CreditTranche[39;24m {#8160
+    [34mulid[39m: [34;4mSymfony\Component\Uid\Ulid[39;24m {#8084
+      [34mtoBase58[39m: [32m"[39m[32m1CZPUsVqWrGLXmmt47qfPA[39m[32m"[39m,
+      [34mtoRfc4122[39m: [32m"[39m[32m019d241a-db18-76ab-2e9e-8aa737cf27dd[39m[32m"[39m,
+      [34mtime[39m: [32m"[39m[32m2026-03-25 08:27:13.048 UTC[39m[32m"[39m,
+    },
+    [34mname[39m: [32m"[39m[32mStarter Tranche[39m[32m"[39m,
+    [34mentry_amount[39m: [35m10000[39m,
+    [34mceiling_amount[39m: [35m50000[39m,
+    [34mis_fixed[39m: [36mfalse[39m,
+    [34mapproval_pathway[39m: [32m"[39m[32mAUTOMATIC[39m[32m"[39m,
+    [34mproduct_restriction_scope[39m: [36mnull[39m,
+    [34meffective_from[39m: [32m"[39m[32m2026-03-25 00:00:00[39m[32m"[39m,
+    [34mis_active[39m: [36mtrue[39m,
+    [34mcreated_by[39m: [35m1[39m,
+    [34mupdated_at[39m: [32m"[39m[32m2026-03-25 08:27:13[39m[32m"[39m,
+    [34mcreated_at[39m: [32m"[39m[32m2026-03-25 08:27:13[39m[32m"[39m,
+    [34mid[39m: [35m2[39m,
+  }

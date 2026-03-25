@@ -10,7 +10,13 @@ use App\Services\Integrations\AfricasTalkingService;
 use App\Services\Integrations\IMBankingService;
 use App\Services\Integrations\PpbRegistryFileService;
 use App\Services\Integrations\SgaLogisticsService;
+use App\Models\CreditTier;
+use App\Models\CreditTranche;
+use App\Models\CreditTrancheParty;
 use App\Models\FacilityStockStatus;
+use App\Observers\CreditTierObserver;
+use App\Observers\CreditTrancheObserver;
+use App\Observers\CreditTranchePartyObserver;
 use App\Observers\FacilityStockStatusObserver;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider;
@@ -43,6 +49,9 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         FacilityStockStatus::observe(FacilityStockStatusObserver::class);
+        CreditTranche::observe(CreditTrancheObserver::class);
+        CreditTier::observe(CreditTierObserver::class);
+        CreditTrancheParty::observe(CreditTranchePartyObserver::class);
 
         $carbon = \Carbon\Carbon::class;
         $carbon::macro('toEAT', function () {

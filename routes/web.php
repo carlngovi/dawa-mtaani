@@ -79,7 +79,12 @@ Route::middleware(['auth'])
         Route::get('/recruiter', [\App\Http\Controllers\Web\AdminRecruiterController::class, 'index']);
         Route::get('/dpa', [\App\Http\Controllers\Web\AdminDpaController::class, 'index']);
         Route::get('/reports', [\App\Http\Controllers\Web\AdminReportsController::class, 'index']);
-        Route::get('/credit', [\App\Http\Controllers\Web\AdminCreditController::class, 'index']);
+        Route::get('/credit', [\App\Http\Controllers\Web\AdminCreditController::class, 'index'])->name('admin.credit.index');
+        Route::post('/credit/tranches', [\App\Http\Controllers\Web\AdminCreditController::class, 'storeTranche'])->name('admin.credit.tranches.store');
+        Route::patch('/credit/tranches/{tranche}/toggle', [\App\Http\Controllers\Web\AdminCreditController::class, 'toggleTranche'])->name('admin.credit.tranches.toggle');
+        Route::post('/credit/tranches/{tranche}/parties', [\App\Http\Controllers\Web\AdminCreditController::class, 'storeParty'])->name('admin.credit.parties.store');
+        Route::post('/credit/tranches/{tranche}/tiers', [\App\Http\Controllers\Web\AdminCreditController::class, 'storeTier'])->name('admin.credit.tiers.store');
+        Route::post('/credit/progression', [\App\Http\Controllers\Web\AdminCreditController::class, 'storeProgressionRule'])->name('admin.credit.progression.store');
         Route::get('/products', [\App\Http\Controllers\Web\AdminProductsController::class, 'index']);
         Route::get('/categories', [\App\Http\Controllers\Web\AdminCategoriesController::class, 'index']);
         Route::get('/wallets', [\App\Http\Controllers\Web\AdminWalletsController::class, 'index']);
@@ -106,7 +111,7 @@ Route::middleware(['auth'])
         Route::get('/orders', [\App\Http\Controllers\Web\RetailOrdersController::class, 'index']);
         Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\RetailOrdersController::class, 'show']);
         Route::get('/favourites', [\App\Http\Controllers\Web\RetailFavouritesController::class, 'index']);
-        Route::get('/credit', [\App\Http\Controllers\Web\RetailCreditController::class, 'index']);
+        Route::get('/credit', [\App\Http\Controllers\Web\RetailCreditController::class, 'index'])->name('retail.credit.index');
         Route::get('/lpo', [\App\Http\Controllers\Web\RetailLpoController::class, 'index']);
         Route::get('/quality-flags', [\App\Http\Controllers\Web\RetailQualityFlagsController::class, 'index']);
         Route::get('/pos', [\App\Http\Controllers\Web\RetailPosController::class, 'index']);
