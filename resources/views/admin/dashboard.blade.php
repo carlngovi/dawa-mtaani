@@ -36,7 +36,7 @@
     @endif
 
     {{-- KPI cards --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <p class="text-sm text-gray-500">Orders today</p>
             <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($todaySummary?->total_orders ?? 0) }}</p>
@@ -63,7 +63,7 @@
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <h3 class="text-sm font-semibold text-gray-700 mb-4">Network facilities</h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <p class="text-xs text-gray-400">Orders</p>
                     <p class="text-xl font-bold text-gray-800">{{ number_format($networkSummary?->total_orders ?? 0) }}</p>
@@ -78,7 +78,7 @@
         </div>
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <h3 class="text-sm font-semibold text-gray-700 mb-4">Off-network facilities</h3>
-            <div class="grid grid-cols-2 gap-4">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                     <p class="text-xs text-gray-400">Orders</p>
                     <p class="text-xl font-bold text-gray-800">{{ number_format($offNetworkSummary?->total_orders ?? 0) }}</p>
@@ -96,11 +96,11 @@
     {{-- Recent orders --}}
     <div class="bg-white rounded-xl border border-gray-200">
         <div class="px-5 py-4 border-b border-gray-100 flex items-center justify-between">
-            <h3 class="text-sm font-semibold text-gray-700">Recent orders (last 24h)</h3>
+            <h3 class="text-sm font-semibold text-gray-700">Recent orders</h3>
             <a href="/admin/orders" class="text-xs text-green-700 hover:underline">View all</a>
         </div>
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[640px]">
                 <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
                         <th class="px-5 py-3 text-left">Ref</th>
@@ -157,7 +157,7 @@
     @endif
 
     {{-- Quick links --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="/admin/ppb-registry"
            class="bg-white hover:bg-gray-50 border border-gray-200 rounded-xl p-5 transition-colors">
             <p class="text-sm font-semibold text-gray-800">PPB Registry</p>

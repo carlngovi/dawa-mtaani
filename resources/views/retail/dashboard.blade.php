@@ -28,7 +28,7 @@
     @endif
 
     {{-- KPIs --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-5">
             <p class="text-xs text-gray-400">Orders this month</p>
             <p class="text-3xl font-bold text-gray-900 mt-1">{{ number_format($totalOrders) }}</p>
@@ -54,7 +54,7 @@
     </div>
 
     {{-- Quick actions --}}
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <a href="/retail/catalogue" class="bg-green-700 hover:bg-green-800 text-white rounded-xl p-5 text-center transition-colors">
             <p class="text-2xl mb-1">🛒</p>
             <p class="text-sm font-medium">Order Medicines</p>

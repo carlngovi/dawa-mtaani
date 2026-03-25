@@ -5,7 +5,7 @@
 
     <h1 class="text-2xl font-bold text-gray-900">Facility Flags</h1>
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-400">Open Flags</p>
             <p class="text-2xl font-bold {{ $stats['open'] > 0 ? 'text-amber-600' : 'text-gray-900' }}">

@@ -53,7 +53,6 @@ class AdminDashboardController extends Controller
         // Recent orders (last 24h)
         $recentOrders = DB::table('orders as o')
             ->join('facilities as f', 'o.retail_facility_id', '=', 'f.id')
-            ->where('o.created_at', '>=', Carbon::now('UTC')->subHours(24))
             ->whereNull('o.deleted_at')
             ->select(['o.ulid', 'o.status', 'o.total_amount', 'o.created_at', 'f.facility_name', 'f.county'])
             ->orderBy('o.created_at', 'desc')

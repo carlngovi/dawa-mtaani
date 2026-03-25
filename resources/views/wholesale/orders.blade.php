@@ -5,7 +5,7 @@
 
     <h1 class="text-2xl font-bold text-gray-900">Order Queue</h1>
 
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-400">Pending</p>
             <p class="text-2xl font-bold {{ $stats['pending'] > 0 ? 'text-amber-600' : 'text-gray-900' }}">{{ $stats['pending'] }}</p>
@@ -35,16 +35,16 @@
     </form>
 
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[900px]">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                 <tr>
                     <th class="px-5 py-3 text-left">Ref</th>
                     <th class="px-5 py-3 text-left">Retail Facility</th>
-                    <th class="px-5 py-3 text-left">County</th>
+                    <th class="px-5 py-3 text-left hidden md:table-cell">County</th>
                     <th class="px-5 py-3 text-left">Status</th>
-                    <th class="px-5 py-3 text-left">Channel</th>
+                    <th class="px-5 py-3 text-left hidden md:table-cell">Channel</th>
                     <th class="px-5 py-3 text-right">Amount</th>
-                    <th class="px-5 py-3 text-left">Date</th>
+                    <th class="px-5 py-3 text-left hidden md:table-cell">Date</th>
                     <th class="px-5 py-3 text-left">Action</th>
                 </tr>
             </thead>
@@ -56,7 +56,7 @@
                         <p class="font-medium text-gray-800">{{ $order->retail_name }}</p>
                         <p class="text-xs text-gray-400">{{ $order->ward }}</p>
                     </td>
-                    <td class="px-5 py-3 text-gray-500">{{ $order->county }}</td>
+                    <td class="px-5 py-3 text-gray-500 hidden md:table-cell">{{ $order->county }}</td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
                             {{ match($order->status) {
@@ -68,7 +68,7 @@
                                 default => 'bg-gray-100 text-gray-600'
                             } }}">{{ $order->status }}</span>
                     </td>
-                    <td class="px-5 py-3 text-xs text-gray-400">{{ $order->source_channel }}</td>
+                    <td class="px-5 py-3 text-xs text-gray-400 hidden md:table-cell">{{ $order->source_channel }}</td>
                     <td class="px-5 py-3 text-right font-medium text-gray-800">
                         {{ $currency['symbol'] }} {{ number_format($order->total_amount, $currency['decimal_places']) }}
                     </td>

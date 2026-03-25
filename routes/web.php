@@ -4,6 +4,12 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
 // -------------------------------------------------------
+// Google OAuth
+// -------------------------------------------------------
+Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('auth.google');
+Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+
+// -------------------------------------------------------
 // Root redirect
 // -------------------------------------------------------
 Route::get('/', function () {
@@ -58,6 +64,16 @@ Route::middleware(['auth'])
         Route::get('/dpa', [\App\Http\Controllers\Web\AdminDpaController::class, 'index']);
         Route::get('/reports', [\App\Http\Controllers\Web\AdminReportsController::class, 'index']);
         Route::get('/credit', [\App\Http\Controllers\Web\AdminCreditController::class, 'index']);
+        Route::get('/products', [\App\Http\Controllers\Web\AdminProductsController::class, 'index']);
+        Route::get('/categories', [\App\Http\Controllers\Web\AdminCategoriesController::class, 'index']);
+        Route::get('/wallets', [\App\Http\Controllers\Web\AdminWalletsController::class, 'index']);
+        Route::get('/bank-accounts', [\App\Http\Controllers\Web\AdminBankAccountsController::class, 'index']);
+        Route::get('/payments', [\App\Http\Controllers\Web\AdminPaymentsController::class, 'index']);
+        Route::get('/inventory', [\App\Http\Controllers\Web\AdminInventoryController::class, 'index']);
+        Route::get('/sales', [\App\Http\Controllers\Web\AdminSalesController::class, 'index']);
+        Route::get('/customers', [\App\Http\Controllers\Web\AdminCustomersController::class, 'index']);
+        Route::get('/notifications', [\App\Http\Controllers\Web\AdminNotificationsController::class, 'index']);
+        Route::get('/settings', [\App\Http\Controllers\Web\AdminSettingsController::class, 'index']);
     });
 
 // -------------------------------------------------------

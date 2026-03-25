@@ -1,3 +1,60 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+/* ── Responsive base resets ── */
+*, *::before, *::after { box-sizing: border-box; }
+html { -webkit-text-size-adjust: 100%; }
+img, video, svg { max-width: 100%; height: auto; }
+table { width: 100%; }
+
+@layer components {
+    .menu-item {
+        @apply relative flex items-center w-full gap-3 px-3 py-2 font-medium rounded-lg text-sm;
+    }
+    .menu-item-active {
+        @apply bg-blue-50 text-blue-600;
+    }
+    .menu-item-inactive {
+        @apply text-gray-700 hover:bg-gray-100;
+    }
+    .menu-item-icon-active {
+        @apply text-blue-600;
+    }
+    .menu-item-icon-inactive {
+        @apply text-gray-500;
+    }
+    .menu-dropdown-item {
+        @apply text-sm relative flex items-center gap-3 rounded-lg px-3 py-2.5 font-medium;
+    }
+    .menu-dropdown-item-active {
+        @apply bg-blue-50 text-blue-600;
+    }
+    .menu-dropdown-item-inactive {
+        @apply text-gray-700 hover:bg-gray-100;
+    }
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    .no-scrollbar {
+        -ms-overflow-style: none;
+        scrollbar-width: none;
+    }
+
+    /* Responsive helpers */
+    .stat-grid { @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4; }
+    .stat-grid-3 { @apply grid grid-cols-1 sm:grid-cols-3 gap-4; }
+    .page-header { @apply flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-6; }
+    .form-row { @apply grid grid-cols-1 sm:grid-cols-2 gap-4; }
+    .section-card { @apply bg-white rounded-xl border border-gray-200 overflow-hidden; }
+    .content-area { @apply p-4 md:p-6 space-y-6; }
+    .cell-truncate { @apply max-w-[160px] truncate; }
+}
+
+.dark .menu-item-active { @apply bg-blue-900/20 text-blue-400; }
+.dark .menu-item-inactive { @apply text-gray-300 hover:bg-white/5; }
+.dark .menu-item-icon-active { @apply text-blue-400; }
+.dark .menu-item-icon-inactive { @apply text-gray-400; }
+.dark .menu-dropdown-item-active { @apply bg-blue-900/20 text-blue-400; }
+.dark .menu-dropdown-item-inactive { @apply text-gray-300 hover:bg-white/5; }
+.dark .section-card { @apply bg-gray-900 border-gray-800; }

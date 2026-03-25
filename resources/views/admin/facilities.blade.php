@@ -12,7 +12,7 @@
         </a>
     </div>
 
-    <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-400">Total</p>
             <p class="text-2xl font-bold text-gray-900">{{ number_format($stats['total']) }}</p>
@@ -67,7 +67,7 @@
 
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
         <div class="overflow-x-auto">
-            <table class="w-full text-sm">
+            <table class="w-full text-sm min-w-[900px]">
                 <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                     <tr>
                         <th class="px-5 py-3 text-left">Facility</th>

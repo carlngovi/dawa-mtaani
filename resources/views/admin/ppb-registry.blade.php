@@ -33,7 +33,7 @@
     <div class="bg-white rounded-xl border border-gray-200 p-5">
         <h3 class="text-sm font-semibold text-gray-700 mb-4">Upload New Registry CSV</h3>
         <form action="/admin/ppb-registry/upload" method="POST" enctype="multipart/form-data"
-              class="flex items-center gap-3">
+              class="flex flex-col sm:flex-row items-start sm:items-center gap-3">
             @csrf
             <input type="file" name="file" accept=".csv,.txt"
                    class="text-sm text-gray-600 file:mr-3 file:py-2 file:px-4
@@ -53,7 +53,7 @@
         <div class="px-5 py-4 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-gray-700">Upload History</h3>
         </div>
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[640px]">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                 <tr>
                     <th class="px-5 py-3 text-left">File</th>

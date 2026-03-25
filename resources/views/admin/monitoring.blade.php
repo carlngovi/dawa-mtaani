@@ -39,7 +39,7 @@
         <div class="px-5 py-4 border-b border-gray-100">
             <h3 class="text-sm font-semibold text-gray-700">Scheduled Job Health</h3>
         </div>
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[640px]">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                 <tr>
                     <th class="px-5 py-3 text-left">Job</th>

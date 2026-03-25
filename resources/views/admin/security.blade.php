@@ -25,7 +25,7 @@
     </div>
 
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[900px]">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                 <tr>
                     <th class="px-5 py-3 text-left">Event</th>

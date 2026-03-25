@@ -5,7 +5,7 @@
 
     <h1 class="text-2xl font-bold text-gray-900">Pharmacovigilance</h1>
 
-    <div class="grid grid-cols-3 gap-4">
+    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-white rounded-xl border border-gray-200 p-4">
             <p class="text-xs text-gray-400">Open</p>
             <p class="text-2xl font-bold {{ $stats['open'] > 0 ? 'text-amber-600' : 'text-gray-900' }}">{{ $stats['open'] }}</p>
@@ -21,7 +21,7 @@
     </div>
 
     <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <table class="w-full text-sm">
+        <table class="w-full text-sm min-w-[640px]">
             <thead class="bg-gray-50 text-xs text-gray-500 uppercase">
                 <tr>
                     <th class="px-5 py-3 text-left">Product</th>

@@ -58,8 +58,8 @@
             </div>
 
             <div class="flex items-center gap-2 mb-3">
-                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded">{{ $product->therapeutic_category }}</span>
-                <span class="text-xs text-gray-400">{{ $product->unit_size }}</span>
+                <span class="text-xs bg-gray-100 text-gray-500 px-2 py-0.5 rounded hidden sm:inline-flex">{{ $product->therapeutic_category }}</span>
+                <span class="text-xs text-gray-400 hidden sm:inline">{{ $product->unit_size }}</span>
             </div>
 
             <div class="flex items-center justify-between mb-3">
