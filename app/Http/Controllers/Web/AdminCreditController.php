@@ -19,7 +19,7 @@ class AdminCreditController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (! $user->hasRole(['network_admin', 'system'])) abort(403);
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
 
         $currency = CurrencyConfig::get();
         $tranches = CreditTranche::with(['activeParties', 'activeTiers'])->orderBy('id')->get();
@@ -34,7 +34,7 @@ class AdminCreditController extends Controller
 
     public function storeTranche(Request $request)
     {
-        if (! Auth::user()->hasRole(['network_admin'])) abort(403);
+        if (! Auth::user()->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
         $validated = $request->validate([
             'name' => 'required|string|max:100', 'entry_amount' => 'required|numeric|min:0',
             'ceiling_amount' => 'nullable|numeric|min:0', 'is_fixed' => 'boolean',
@@ -57,14 +57,14 @@ class AdminCreditController extends Controller
 
     public function toggleTranche(Request $request, CreditTranche $tranche)
     {
-        if (! Auth::user()->hasRole(['network_admin'])) abort(403);
+        if (! Auth::user()->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
         $tranche->update(['is_active' => ! $tranche->is_active]);
         return back()->with('success', 'Tranche ' . ($tranche->is_active ? 'activated' : 'deactivated') . '.');
     }
 
     public function storeParty(Request $request, CreditTranche $tranche)
     {
-        if (! Auth::user()->hasRole(['network_admin'])) abort(403);
+        if (! Auth::user()->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
         $validated = $request->validate([
             'party_name' => 'required|string|max:255', 'party_type' => 'required|string|max:100',
             'banking_party_binding' => 'nullable|string|max:255',
@@ -76,7 +76,7 @@ class AdminCreditController extends Controller
 
     public function storeTier(Request $request, CreditTranche $tranche)
     {
-        if (! Auth::user()->hasRole(['network_admin'])) abort(403);
+        if (! Auth::user()->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
         $validated = $request->validate([
             'name' => 'required|string|max:100', 'product_scope_description' => 'required|string',
             'unlock_threshold_pct' => 'required|numeric|min:0|max:100',
@@ -96,7 +96,7 @@ class AdminCreditController extends Controller
 
     public function storeProgressionRule(Request $request)
     {
-        if (! Auth::user()->hasRole(['network_admin'])) abort(403);
+        if (! Auth::user()->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
         $validated = $request->validate([
             'label' => 'required|string|max:100', 'max_days_to_qualify' => 'required|integer|min:1',
             'progression_rate_pct' => 'required|numeric|min:0|max:100',

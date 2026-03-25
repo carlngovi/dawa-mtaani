@@ -1,56 +1,47 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class CreditTranche extends Model
 {
-    use Auditable;
+    use SoftDeletes;
 
     protected $fillable = [
         'ulid', 'name', 'entry_amount', 'ceiling_amount', 'is_fixed',
-        'approval_pathway', 'product_restriction_scope', 'is_active',
-        'effective_from', 'created_by',
+        'approval_pathway', 'product_restriction_scope',
+        'effective_from', 'effective_to', 'is_active', 'created_by',
     ];
 
     protected $casts = [
-        'product_restriction_scope' => 'array',
-        'is_fixed'    => 'boolean',
-        'is_active'   => 'boolean',
-        'entry_amount'   => 'decimal:2',
-        'ceiling_amount' => 'decimal:2',
-        'effective_from' => 'date',
+        'entry_amount'               => 'decimal:2',
+        'ceiling_amount'             => 'decimal:2',
+        'is_fixed'                   => 'boolean',
+        'is_active'                  => 'boolean',
+        'product_restriction_scope'  => 'array',
+        'effective_from'             => 'date',
+        'effective_to'               => 'date',
     ];
 
-    public function parties(): HasMany
+    public function parties()
     {
         return $this->hasMany(CreditTrancheParty::class, 'tranche_id');
     }
 
-    public function tiers(): HasMany
-    {
-        return $this->hasMany(CreditTier::class, 'tranche_id')->orderBy('sort_order');
-    }
-
-    public function activeTiers(): HasMany
-    {
-        return $this->tiers()->where('is_active', true);
-    }
-
-    public function activeParties(): HasMany
+    public function activeParties()
     {
         return $this->parties()->where('is_active', true);
     }
 
-    public function balances(): HasMany
+    public function tiers()
     {
-        return $this->hasMany(FacilityTrancheBalance::class, 'tranche_id');
+        return $this->hasMany(CreditTier::class, 'tranche_id')->orderBy('sort_order');
     }
 
-    public function events(): HasMany
+    public function activeTiers()
     {
-        return $this->hasMany(CreditEvent::class, 'tranche_id');
+        return $this->tiers()->where('is_active', true);
     }
 }

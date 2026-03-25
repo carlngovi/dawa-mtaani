@@ -1,58 +1,132 @@
 <?php
+
 namespace App\Http\Controllers\Web;
+
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Carbon\Carbon;
+use App\Services\RoleAssignmentService;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Str;
 
+/**
+ * AdminInvitationController
+ *
+ * Manages the invitation-only registration system.
+ * Only network_admin / admin / super_admin can create invitations.
+ * Invitees register via a signed token URL — no public registration.
+ */
 class AdminInvitationController extends Controller
 {
     public function index()
     {
-        if (!request()->user()->hasRole(['network_admin'])) return redirect('/admin/dashboard');
-        $invitations = DB::table('user_invitations as i')->join('users as u','i.invited_by','=','u.id')->leftJoin('facilities as f','i.facility_id','=','f.id')->select(['i.*','u.name as invited_by_name','f.facility_name'])->orderByDesc('i.created_at')->paginate(30);
-        $roles = ['network_admin'=>'Network Admin','network_field_agent'=>'Field Agent','retail_facility'=>'Retail Facility','wholesale_facility'=>'Wholesale Facility'];
-        $facilities = DB::table('facilities')->whereNull('deleted_at')->where('facility_status','ACTIVE')->orderBy('facility_name')->get(['id','facility_name','ppb_facility_type']);
-        return view('admin.invitations', compact('invitations','roles','facilities'));
+        $user = Auth::user();
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin'])) {
+            abort(403);
+        }
+
+        $invitations = DB::table('invitations')
+            ->orderByDesc('created_at')
+            ->get();
+
+        return view('admin.invitations', compact('invitations'));
     }
 
     public function store(Request $request)
     {
-        if (!$request->user()->hasRole(['network_admin'])) return redirect('/admin/dashboard');
-        $request->validate(['email'=>'required|email|unique:users,email|unique:user_invitations,email','name'=>'required|string|max:100','intended_role'=>'required|string','facility_id'=>'nullable|exists:facilities,id']);
+        $user = Auth::user();
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin'])) {
+            abort(403);
+        }
+
+        $validated = $request->validate([
+            'email'      => 'required|email|unique:users,email',
+            'role'       => 'required|string|in:retail_facility,wholesale_facility,logistics_facility,group_owner,network_field_agent,sales_rep,admin_support,assistant_admin,shared_accountant,admin',
+            'facility_id' => 'nullable|exists:facilities,id',
+        ]);
+
         $token = Str::random(64);
-        DB::table('user_invitations')->insert(['email'=>strtolower($request->email),'token'=>$token,'name'=>$request->name,'intended_role'=>$request->intended_role,'facility_id'=>$request->facility_id,'invited_by'=>$request->user()->id,'expires_at'=>Carbon::now('UTC')->addDays(7),'created_at'=>Carbon::now('UTC'),'updated_at'=>Carbon::now('UTC')]);
-        return redirect('/admin/invitations')->with('success','Invitation created. Share this link: '.url('/register/accept/'.$token));
+
+        DB::table('invitations')->insert([
+            'email'       => $validated['email'],
+            'role'        => $validated['role'],
+            'facility_id' => $validated['facility_id'] ?? null,
+            'token'       => $token,
+            'invited_by'  => $user->id,
+            'created_at'  => now(),
+            'expires_at'  => now()->addDays(7),
+        ]);
+
+        // In production: dispatch a mail job with the acceptance URL.
+        // URL format: /register/accept/{token}
+        // For now: flash the link so admin can copy it manually.
+        $acceptUrl = url('/register/accept/' . $token);
+
+        return back()->with('success', "Invitation created. Acceptance link: {$acceptUrl}");
     }
 
-    public function destroy(Request $request, $id)
+    public function destroy(int $id)
     {
-        if (!$request->user()->hasRole(['network_admin'])) return redirect('/admin/dashboard');
-        DB::table('user_invitations')->where('id',$id)->delete();
-        return redirect('/admin/invitations')->with('success','Invitation revoked.');
+        $user = Auth::user();
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin'])) {
+            abort(403);
+        }
+
+        DB::table('invitations')->where('id', $id)->delete();
+
+        return back()->with('success', 'Invitation deleted.');
     }
 
-    public function showAccept($token)
+    public function showAccept(string $token)
     {
-        $invitation = DB::table('user_invitations')->where('token',$token)->whereNull('accepted_at')->where('expires_at','>',Carbon::now('UTC'))->first();
-        if (!$invitation) return redirect('/login')->withErrors(['email'=>'This invitation link is invalid or has expired.']);
-        return view('auth.accept-invitation', compact('invitation','token'));
+        $invitation = DB::table('invitations')
+            ->where('token', $token)
+            ->where('expires_at', '>', now())
+            ->whereNull('accepted_at')
+            ->first();
+
+        if (! $invitation) {
+            return redirect('/login')->with('status', 'This invitation is invalid or has expired.');
+        }
+
+        return view('auth.register', compact('invitation', 'token'));
     }
 
-    public function acceptStore(Request $request, $token)
+    public function acceptStore(Request $request, string $token)
     {
-        $invitation = DB::table('user_invitations')->where('token',$token)->whereNull('accepted_at')->where('expires_at','>',Carbon::now('UTC'))->first();
-        if (!$invitation) return redirect('/login')->withErrors(['email'=>'This invitation link is invalid or has expired.']);
-        $request->validate(['password'=>'required|string|min:8|confirmed']);
-        $user = User::create(['name'=>$invitation->name,'email'=>$invitation->email,'password'=>Hash::make($request->password),'facility_id'=>$invitation->facility_id,'is_active'=>true]);
-        $user->assignRole($invitation->intended_role);
-        DB::table('user_invitations')->where('id',$invitation->id)->update(['accepted_at'=>Carbon::now('UTC'),'updated_at'=>Carbon::now('UTC')]);
-        auth()->login($user);
-        if ($user->hasRole(['network_admin','network_field_agent'])) return redirect('/admin/dashboard');
-        if ($user->hasRole('wholesale_facility')) return redirect('/wholesale/orders');
-        return redirect('/retail/dashboard');
+        $invitation = DB::table('invitations')
+            ->where('token', $token)
+            ->where('expires_at', '>', now())
+            ->whereNull('accepted_at')
+            ->first();
+
+        if (! $invitation) {
+            return redirect('/login')->with('status', 'This invitation is invalid or has expired.');
+        }
+
+        $validated = $request->validate([
+            'name'     => 'required|string|max:255',
+            'password' => 'required|string|min:8|confirmed',
+        ]);
+
+        $userModel = User::create([
+            'name'        => $validated['name'],
+            'email'       => $invitation->email,
+            'password'    => Hash::make($validated['password']),
+            'facility_id' => $invitation->facility_id,
+        ]);
+
+        $userModel->syncRoles([$invitation->role]);
+
+        DB::table('invitations')
+            ->where('token', $token)
+            ->update(['accepted_at' => now()]);
+
+        auth()->login($userModel);
+
+        return redirect('/dashboard');
     }
 }

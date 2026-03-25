@@ -1,36 +1,34 @@
 <?php
+
 namespace App\Observers;
 
 use App\Models\CreditTrancheParty;
-use App\Models\CreditConfigChangelog;
-use App\Services\CurrencyConfig;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Validation\ValidationException;
 
+/**
+ * Enforces business rule: active party risk_percentages on a tranche must sum to 100.
+ * Throws a ValidationException if violated — caught by the controller and returned
+ * as a user-facing error.
+ */
 class CreditTranchePartyObserver
 {
-    public function saved(CreditTrancheParty $party): void
+    public function saving(CreditTrancheParty $party): void
     {
-        foreach ($party->getChanges() as $field => $newValue) {
-            if (in_array($field, ['updated_at', 'created_at'])) continue;
-
-            CreditConfigChangelog::create([
-                'changed_by'   => Auth::id() ?? 1,
-                'model_type'   => CreditTrancheParty::class,
-                'model_id'     => $party->id,
-                'field_name'   => $field,
-                'value_before' => $party->getOriginal($field),
-                'value_after'  => $newValue,
-            ]);
+        if (! $party->is_active) {
+            return; // Inactive parties excluded from the sum check
         }
 
-        CurrencyConfig::clearCache();
-        Cache::forget('credit_engine_config');
-    }
+        $existingSum = CreditTrancheParty::where('tranche_id', $party->tranche_id)
+            ->where('is_active', true)
+            ->when($party->exists, fn ($q) => $q->where('id', '!=', $party->id))
+            ->sum('risk_percentage');
 
-    public function deleted(CreditTrancheParty $party): void
-    {
-        CurrencyConfig::clearCache();
-        Cache::forget('credit_engine_config');
+        $newTotal = $existingSum + $party->risk_percentage;
+
+        if ($newTotal > 100) {
+            throw ValidationException::withMessages([
+                'risk_percentage' => "Adding this party's risk % ({$party->risk_percentage}) would bring the tranche total to {$newTotal}%. Maximum is 100%.",
+            ]);
+        }
     }
 }

@@ -9,7 +9,17 @@
       "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/admin/ --include=*.blade.php)",
       "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/retail/ --include=*.blade.php)",
       "Bash(grep -rL \"table\\\\|form\\\\|grid\\\\|chart\\\\|@forelse\\\\|@foreach\" resources/views/wholesale/ --include=*.blade.php)",
-      "Bash(php artisan tinker --execute=\":*)"
+      "Bash(php artisan tinker --execute=\":*)",
+      "Bash(grep -E \"GET.*/$|dashboard\")",
+      "Bash(python3:*)",
+      "Read(//tmp/**)",
+      "Bash(node:*)",
+      "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/app/Models/*.php)",
+      "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/app/Services/*.php)",
+      "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/app/Jobs/*.php)",
+      "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/database/migrations/*.php)",
+      "Bash(ls /home/carlubnt/Dawa/dawa-mtaani/database/seeders/*.php)",
+      "Bash(composer show:*)"
     ]
   }
 }

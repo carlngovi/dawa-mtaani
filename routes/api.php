@@ -40,3 +40,13 @@ Route::prefix('store')->group(function () {
     Route::get('/products/{productId}/custody-chain', [CustodyChainController::class, 'show']);
     Route::post('/counterfeit-reports', [CustodyChainController::class, 'report']);
 });
+
+// ── Token auth (Sanctum) ───────────────────────────────────────────────
+// Public — no auth required to issue a token
+Route::post('/v1/auth/token', [\App\Http\Controllers\Api\V1\AuthTokenController::class, 'issue']);
+
+// Protected — requires valid token
+Route::middleware('auth:sanctum')->group(function () {
+    Route::delete('/v1/auth/token', [\App\Http\Controllers\Api\V1\AuthTokenController::class, 'revoke']);
+    Route::get('/v1/auth/me', [\App\Http\Controllers\Api\V1\AuthTokenController::class, 'me']);
+});

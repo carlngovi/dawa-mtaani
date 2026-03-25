@@ -1,40 +1,55 @@
 <?php
+
 namespace App\Models;
 
-use App\Models\Traits\Auditable;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FacilityCreditAccount extends Model
 {
-    use Auditable;
-
     protected $fillable = [
-        'facility_id', 'account_status', 'suspended_at', 'suspended_reason',
+        'facility_id', 'tranche_id', 'account_status',
+        'approved_at', 'suspended_at', 'suspension_reason',
+        'next_assessment_due',
     ];
 
     protected $casts = [
-        'suspended_at' => 'datetime',
+        'approved_at'          => 'datetime',
+        'suspended_at'         => 'datetime',
+        'next_assessment_due'  => 'date',
     ];
 
-    public function facility(): BelongsTo
+    public function facility()
     {
         return $this->belongsTo(Facility::class);
     }
 
-    public function balances(): HasMany
+    public function tranche()
     {
-        return $this->hasMany(FacilityTrancheBalance::class, 'facility_id', 'facility_id');
+        return $this->belongsTo(CreditTranche::class, 'tranche_id');
     }
 
-    public function isActive(): bool
+    public function trancheBalances()
     {
-        return $this->account_status === 'ACTIVE';
+        return $this->hasMany(FacilityTrancheBalance::class, 'credit_account_id');
     }
 
-    public function isSuspended(): bool
+    public function events()
     {
-        return $this->account_status === 'SUSPENDED';
+        return $this->hasMany(CreditEvent::class, 'credit_account_id');
+    }
+
+    public function scopeActive($query)
+    {
+        return $query->where('account_status', 'ACTIVE');
+    }
+
+    public function scopeSuspended($query)
+    {
+        return $query->where('account_status', 'SUSPENDED');
+    }
+
+    public function scopePendingAssessment($query)
+    {
+        return $query->where('account_status', 'PENDING_ASSESSMENT');
     }
 }

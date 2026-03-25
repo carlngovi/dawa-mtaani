@@ -4,31 +4,27 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
+return new class extends Migration {
     public function up(): void
     {
         Schema::create('credit_events', function (Blueprint $table) {
             $table->id();
-            $table->char('ulid', 26)->unique();
-            $table->foreignId('facility_id')->constrained('facilities');
-            $table->foreignId('tranche_id')->constrained('credit_tranches');
-            $table->foreignId('tier_id')->nullable()->constrained('credit_tiers');
-            $table->foreignId('order_id')->nullable()->constrained('orders');
+            $table->foreignId('credit_account_id')->constrained('facility_credit_accounts')->cascadeOnDelete();
+            $table->foreignId('tier_id')->nullable()->constrained('credit_tiers')->nullOnDelete();
             $table->enum('event_type', [
-                'DRAW', 'REPAYMENT', 'PROGRESSION', 'TIER_UNLOCK',
-                'SUSPENSION', 'REINSTATEMENT', 'RETURN_DISTRIBUTION'
+                'DRAW', 'REPAYMENT', 'ALLOCATION', 'SUSPENSION',
+                'REINSTATEMENT', 'PROGRESSION', 'ADJUSTMENT'
             ]);
-            $table->decimal('amount', 12, 2);
-            $table->decimal('balance_before', 12, 2);
-            $table->decimal('balance_after', 12, 2);
-            $table->json('notes')->nullable();
-            $table->timestamp('created_at')->useCurrent();
+            $table->decimal('amount', 15, 2);
+            $table->decimal('running_balance', 15, 2);
+            $table->string('reference', 100)->nullable();
+            $table->unsignedBigInteger('triggered_by')->nullable();
+            $table->text('notes')->nullable();
+            $table->timestamp('occurred_at');
+            $table->index(['credit_account_id', 'occurred_at']);
+            $table->index('event_type');
         });
     }
 
-    public function down(): void
-    {
-        Schema::dropIfExists('credit_events');
-    }
+    public function down(): void { Schema::dropIfExists('credit_events'); }
 };

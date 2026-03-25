@@ -16,52 +16,23 @@ Route::get('/register/accept/{token}', [\App\Http\Controllers\Web\AdminInvitatio
 Route::post('/register/accept/{token}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'acceptStore'])->name('invitation.accept.store');
 
 // -------------------------------------------------------
-// Block public registration — invitation only
-// -------------------------------------------------------
-Route::get('register', function () {
-    return redirect('/login')->with('status', 'Registration is by invitation only. Contact your network administrator.');
-})->name('register');
-Route::post('register', function () {
-    return redirect('/login')->with('status', 'Registration is by invitation only.');
-});
-
-// -------------------------------------------------------
-// Root redirect
+// Root redirect — uses RoleRedirectController for 14-role RBAC
 // -------------------------------------------------------
 Route::get('/', function () {
-    if (Auth::check()) {
-        $user = Auth::user();
-        if ($user->hasRole('network_admin') || $user->hasRole('network_field_agent')) {
-            return redirect('/admin/dashboard');
-        }
-        if ($user->hasRole('wholesale_facility')) {
-            return redirect('/wholesale/orders');
-        }
-        if ($user->hasRole('retail_facility') || $user->hasRole('group_owner')) {
-            return redirect('/retail/dashboard');
-        }
+    if (! Auth::check()) {
+        return redirect('/login');
     }
-    return redirect('/login');
+    return App\Http\Controllers\Web\RoleRedirectController::redirectForUser(Auth::user());
 });
 
-// Named dashboard route for Breeze compatibility
 Route::get('/dashboard', function () {
-    if (Auth::check()) {
-        $user = Auth::user();
-        if ($user->hasRole('network_admin') || $user->hasRole('network_field_agent')) {
-            return redirect('/admin/dashboard');
-        }
-        if ($user->hasRole('wholesale_facility')) {
-            return redirect('/wholesale/orders');
-        }
-    }
-    return redirect('/retail/dashboard');
+    return App\Http\Controllers\Web\RoleRedirectController::redirectForUser(Auth::user());
 })->middleware('auth')->name('dashboard');
 
 // -------------------------------------------------------
 // Admin portal — auth only, role checked in controller
 // -------------------------------------------------------
-Route::middleware(['auth'])
+Route::middleware(['auth', 'portal', 'financial.timeout'])
     ->prefix('admin')
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\AdminDashboardController::class, 'index']);
@@ -95,6 +66,8 @@ Route::middleware(['auth'])
         Route::get('/customers', [\App\Http\Controllers\Web\AdminCustomersController::class, 'index']);
         Route::get('/notifications', [\App\Http\Controllers\Web\AdminNotificationsController::class, 'index']);
         Route::get('/settings', [\App\Http\Controllers\Web\AdminSettingsController::class, 'index']);
+        Route::get('/registrations', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'index']);
+        Route::get('/placers', [\App\Http\Controllers\Web\AdminPlacersController::class, 'index']);
         Route::get('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'index']);
         Route::post('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'store']);
         Route::delete('/invitations/{id}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'destroy']);
@@ -103,7 +76,7 @@ Route::middleware(['auth'])
 // -------------------------------------------------------
 // Retail portal — auth only
 // -------------------------------------------------------
-Route::middleware(['auth'])
+Route::middleware(['auth', 'portal'])
     ->prefix('retail')
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\RetailDashboardController::class, 'index']);
@@ -121,13 +94,91 @@ Route::middleware(['auth'])
 // -------------------------------------------------------
 // Wholesale portal — auth only
 // -------------------------------------------------------
-Route::middleware(['auth'])
+Route::middleware(['auth', 'portal', 'financial.timeout'])
     ->prefix('wholesale')
     ->group(function () {
         Route::get('/orders', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'index']);
         Route::get('/price-lists', [\App\Http\Controllers\Web\WholesalePriceListsController::class, 'index']);
         Route::get('/stock', [\App\Http\Controllers\Web\WholesaleStockController::class, 'index']);
         Route::get('/performance', [\App\Http\Controllers\Web\WholesalePerformanceController::class, 'index']);
+        Route::get('/dispatch', [\App\Http\Controllers\Web\WholesaleDispatchController::class, 'index']);
+        Route::get('/disputes', [\App\Http\Controllers\Web\WholesaleDisputesController::class, 'index']);
+        Route::get('/settlement', [\App\Http\Controllers\Web\WholesaleSettlementController::class, 'index']);
     });
+
+// ── Network field agent portal ────────────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('field')->group(function () {
+    Route::get('/pharmacies', [\App\Http\Controllers\Web\FieldPharmaciesController::class, 'index']);
+    Route::get('/register', [\App\Http\Controllers\Web\FieldRegisterController::class, 'index']);
+    Route::get('/gps/{ulid?}', [\App\Http\Controllers\Web\FieldGpsController::class, 'index']);
+    Route::get('/mystery-shop', [\App\Http\Controllers\Web\FieldMysteryShopController::class, 'index']);
+    Route::get('/disputes', [\App\Http\Controllers\Web\FieldDisputesController::class, 'index']);
+});
+
+// ── Sales rep portal ──────────────────────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('rep')->group(function () {
+    Route::get('/pharmacies', [\App\Http\Controllers\Web\RepPharmaciesController::class, 'index']);
+    Route::get('/pharmacies/{ulid}', [\App\Http\Controllers\Web\RepPharmaciesController::class, 'show']);
+    Route::get('/summary', [\App\Http\Controllers\Web\RepSummaryController::class, 'index']);
+});
+
+// ── Logistics facility portal (SGA) ───────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('logistics')->group(function () {
+    Route::get('/deliveries', [\App\Http\Controllers\Web\LogisticsDeliveriesController::class, 'index']);
+    Route::get('/routes', [\App\Http\Controllers\Web\LogisticsRoutesController::class, 'index']);
+    Route::get('/disputes', [\App\Http\Controllers\Web\LogisticsDisputesController::class, 'index']);
+    Route::get('/invoices', [\App\Http\Controllers\Web\LogisticsInvoicesController::class, 'index']);
+});
+
+// ── Group owner portal ────────────────────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('group')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Web\GroupDashboardController::class, 'index']);
+    Route::get('/order', [\App\Http\Controllers\Web\GroupOrderController::class, 'index']);
+    Route::get('/credit', [\App\Http\Controllers\Web\GroupCreditController::class, 'index']);
+    Route::get('/placers', [\App\Http\Controllers\Web\GroupPlacersController::class, 'index']);
+    Route::get('/orders', [\App\Http\Controllers\Web\GroupOrderHistoryController::class, 'index']);
+});
+
+// ── Shared accountant portal ──────────────────────────────────────────────
+Route::middleware(['auth', 'portal', 'financial.timeout'])->prefix('finance')->group(function () {
+    Route::get('/settlement', [\App\Http\Controllers\Web\FinanceSettlementController::class, 'index']);
+    Route::get('/credit', [\App\Http\Controllers\Web\FinanceCreditController::class, 'index']);
+    Route::get('/sweeps', [\App\Http\Controllers\Web\FinanceSweepsController::class, 'index']);
+    Route::get('/payroll', [\App\Http\Controllers\Web\FinancePayrollController::class, 'index']);
+});
+
+// ── Admin support portal (Tier 4 read-only) ───────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('support')->group(function () {
+    Route::get('/tickets', [\App\Http\Controllers\Web\SupportTicketsController::class, 'index']);
+    Route::get('/facilities', [\App\Http\Controllers\Web\SupportFacilitiesController::class, 'index']);
+    Route::get('/orders', [\App\Http\Controllers\Web\SupportOrdersController::class, 'index']);
+});
+
+// ── Assistant admin portal (Tier 3) ──────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('assistant')->group(function () {
+    Route::get('/dashboard', [\App\Http\Controllers\Web\AssistantDashboardController::class, 'index']);
+});
+
+// ── Super admin portal (Tier 1) ───────────────────────────────────────────
+Route::middleware(['auth', 'portal', 'financial.timeout'])->prefix('super')->group(function () {
+    Route::get('/settings', [\App\Http\Controllers\Web\SuperSettingsController::class, 'index']);
+    Route::post('/settings', [\App\Http\Controllers\Web\SuperSettingsController::class, 'update']);
+    Route::get('/roles', [\App\Http\Controllers\Web\SuperRolesController::class, 'index']);
+    Route::get('/fees', [\App\Http\Controllers\Web\SuperFeesController::class, 'index']);
+    Route::get('/t0-approvals', [\App\Http\Controllers\Web\SuperT0ApprovalsController::class, 'index']);
+    Route::post('/t0-approvals/{id}/confirm', [\App\Http\Controllers\Web\SuperT0ApprovalsController::class, 'confirm']);
+    Route::post('/t0-approvals/{id}/reject', [\App\Http\Controllers\Web\SuperT0ApprovalsController::class, 'reject']);
+    Route::get('/design-fee', [\App\Http\Controllers\Web\SuperDesignFeeController::class, 'index']);
+    Route::post('/design-fee/{tranche}/release', [\App\Http\Controllers\Web\SuperDesignFeeController::class, 'release']);
+});
+
+// ── Technical admin portal (Tier 0) ───────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('tech')->group(function () {
+    Route::get('/diagnostics', [\App\Http\Controllers\Web\TechDiagnosticsController::class, 'index']);
+    Route::post('/query', [\App\Http\Controllers\Web\TechDiagnosticsController::class, 'query']);
+    Route::get('/jobs', [\App\Http\Controllers\Web\TechJobsController::class, 'index']);
+    Route::get('/write', [\App\Http\Controllers\Web\TechWriteController::class, 'index']);
+    Route::get('/incidents', [\App\Http\Controllers\Web\TechIncidentsController::class, 'index']);
+});
 
 require __DIR__.'/auth.php';

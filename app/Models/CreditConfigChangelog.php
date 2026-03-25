@@ -1,25 +1,25 @@
 <?php
+
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 class CreditConfigChangelog extends Model
 {
+    public $timestamps = false;
+
     protected $table = 'credit_config_changelog';
 
-    const UPDATED_AT = null;
-
     protected $fillable = [
-        'changed_by', 'model_type', 'model_id',
-        'field_name', 'value_before', 'value_after',
+        'entity_type', 'entity_id', 'field_name',
+        'old_value', 'new_value', 'changed_by', 'changed_at', 'reason',
     ];
 
     protected $casts = [
         'changed_at' => 'datetime',
     ];
 
-    public function changedByUser(): BelongsTo
+    public function changedByUser()
     {
         return $this->belongsTo(User::class, 'changed_by');
     }
