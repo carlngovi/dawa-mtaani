@@ -34,6 +34,21 @@ class CurrencyConfig
         });
     }
 
+    public static function symbol(): string
+    {
+        return self::get()['symbol'];
+    }
+
+    public static function isoCode(): string
+    {
+        return self::get()['iso_code'];
+    }
+
+    public static function decimalPlaces(): int
+    {
+        return self::get()['decimal_places'];
+    }
+
     public static function format(float $amount): string
     {
         $config = self::get();
