@@ -56,6 +56,9 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\AdminDashboardController::class, 'index']);
         Route::get('/facilities', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'index']);
+        Route::get('/facilities/retail', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'retail']);
+        Route::get('/facilities/wholesale', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'wholesale']);
+        Route::get('/facilities/hospitals', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'hospitals']);
         Route::get('/facilities/{ulid}', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'show']);
         Route::get('/orders', [\App\Http\Controllers\Web\AdminOrdersController::class, 'index']);
         Route::get('/flags', [\App\Http\Controllers\Web\AdminFlagsController::class, 'index']);
