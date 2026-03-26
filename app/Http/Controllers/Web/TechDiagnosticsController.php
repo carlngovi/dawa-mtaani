@@ -3,25 +3,73 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Services\CurrencyConfig;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-/**
- * TechDiagnosticsController
- *
- * technical_admin, diagnostics and gated SQL query
- * Controller is a stub — business logic to be wired by Datanav.
- */
 class TechDiagnosticsController extends Controller
 {
     public function index()
     {
-        return view('placeholder', [
-            'portalTitle'    => 'Diagnostics',
-            'portalSubtitle' => 'System diagnostics — read-only. Gated write requires super_admin confirmation.',
-        ]);
+        $user = Auth::user();
+        if (! $user->hasAnyRole(['technical_admin', 'super_admin'])) {
+            return redirect('/dashboard');
+        }
+
+        $integrations = [];
+        $checks = [
+            'M-Pesa Daraja' => fn() => DB::table('system_settings')->where('key', 'MPESA_SHORTCODE')->exists(),
+            'I&M Bank API'  => fn() => DB::table('system_settings')->where('key', 'BANK_API_URL')->exists(),
+            'SGA Courier'   => fn() => DB::table('system_settings')->where('key', 'SGA_WEBHOOK_SECRET')->exists(),
+            'WhatsApp API'  => fn() => DB::table('system_settings')->where('key', 'WHATSAPP_API_TOKEN')->exists(),
+            'PPB Registry'  => fn() => DB::table('ppb_registry_cache')->exists(),
+            'Redis'         => function () {
+                try {
+                    Cache::store('redis')->put('healthcheck', 1, 1);
+                    return true;
+                } catch (\Exception $e) {
+                    return false;
+                }
+            },
+            'Queue Worker'  => fn() => DB::table('jobs')->count() !== null,
+        ];
+        foreach ($checks as $name => $check) {
+            try {
+                $integrations[$name] = $check() ? 'OK' : 'WARN';
+            } catch (\Exception $e) {
+                $integrations[$name] = 'ERROR';
+            }
+        }
+
+        $queueDepth   = DB::table('jobs')->count();
+        $failedJobs   = DB::table('failed_jobs')->count();
+        $queryResults = session('query_results');
+        $querySQL     = session('query_sql');
+
+        return view('tech.diagnostics', compact(
+            'integrations', 'queueDepth', 'failedJobs', 'queryResults', 'querySQL'
+        ));
     }
+
     public function query(Request $request)
     {
-        return response()->json(["status" => "stub"]);
+        if (! Auth::user()->hasRole('technical_admin')) abort(403);
+
+        $sql = trim($request->input('sql', ''));
+        if (! preg_match('/^\s*SELECT\s/i', $sql)) {
+            return back()->with('error',
+                'Only SELECT queries are permitted. Write operations require a T0 approval request at /tech/write.');
+        }
+        try {
+            $results = DB::select(DB::raw($sql));
+            session(['query_results' => $results, 'query_sql' => $sql]);
+        } catch (\Exception $e) {
+            return back()->with('error', 'Query error: ' . $e->getMessage());
+        }
+        return back();
     }
 }

@@ -210,10 +210,49 @@
                 </div>
             </form>
 
-            <p class="mt-6 text-center text-xs text-gray-400 dark:text-gray-600">
-                Access is by invitation only.
-                Contact your network administrator to request access.
-            </p>
+            {{-- Sign-up section --}}
+            <div class="relative mt-8 mb-2">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                </div>
+                <div class="relative flex justify-center text-sm">
+                    <span class="bg-white px-4 text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                        Don't have an account?
+                    </span>
+                </div>
+            </div>
+
+            <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
+                {{-- Card 1 — Register Pharmacy --}}
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center hover:border-yellow-400 transition-colors">
+                    <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-900/20">
+                        <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Register your Pharmacy</h3>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">For pharmacy owners &amp; operators</p>
+                    <a href="{{ route('register.facility') }}"
+                       class="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white px-4 py-2 text-xs font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors w-full">
+                        Get Started
+                    </a>
+                </div>
+
+                {{-- Card 2 — Patient --}}
+                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center hover:border-yellow-400 transition-colors">
+                    <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-900/20">
+                        <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                        </svg>
+                    </div>
+                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">I'm a Patient</h3>
+                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Order medicines from nearby pharmacies</p>
+                    <a href="{{ route('register.patient') }}"
+                       class="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white px-4 py-2 text-xs font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors w-full">
+                        Continue with Phone
+                    </a>
+                </div>
+            </div>
         </div>
     </div>
 

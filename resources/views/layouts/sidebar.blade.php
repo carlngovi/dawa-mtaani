@@ -9,6 +9,26 @@
     $isRetail     = $user && $user->hasRole('retail_facility');
     $isFieldAgent = $user && $user->hasRole('network_field_agent');
     $isSalesRep   = $user && $user->hasRole('sales_rep');
+    $isFinance    = $user && $user->hasRole('shared_accountant');
+    $isSupport    = $user && $user->hasRole('admin_support');
+    $isAssistant  = $user && $user->hasRole('assistant_admin');
+    $isSuperAdmin = $user && $user->hasRole('super_admin');
+    $isTechAdmin  = $user && $user->hasRole('technical_admin');
+    $isPatient    = $user && $user->hasRole('patient');
+
+    $logoHref = $isTechAdmin   ? '/tech/diagnostics'
+              : ($isSuperAdmin ? '/super/settings'
+              : ($isAssistant  ? '/assistant/dashboard'
+              : ($isSupport    ? '/support/tickets'
+              : ($isFinance    ? '/finance/settlement'
+              : ($isAdmin      ? '/admin/dashboard'
+              : ($isWholesale  ? '/wholesale/orders'
+              : ($isLogistics  ? '/logistics/deliveries'
+              : ($isFieldAgent ? '/field/pharmacies'
+              : ($isSalesRep   ? '/rep/pharmacies'
+              : ($isGroupOwner ? '/group/dashboard'
+              : ($isPatient    ? '/store'
+              : '/retail/dashboard')))))))))));
 @endphp
 
 <aside id="sidebar"
@@ -39,7 +59,7 @@
     {{-- Logo --}}
     <div class="pt-7 pb-6 flex border-b border-gray-800"
          :class="(!$store.sidebar.isExpanded && !$store.sidebar.isHovered && !$store.sidebar.isMobileOpen) ? 'xl:justify-center' : 'justify-start'">
-        <a href="{{ $isAdmin ? '/admin/dashboard' : ($isWholesale ? '/wholesale/orders' : ($isLogistics ? '/logistics/deliveries' : ($isFieldAgent ? '/field/pharmacies' : ($isSalesRep ? '/rep/pharmacies' : ($isGroupOwner ? '/group/dashboard' : '/retail/dashboard'))))) }}"
+        <a href="{{ $logoHref }}"
            class="flex items-center gap-3">
             <div class="h-9 w-9 rounded-lg bg-yellow-400 flex items-center justify-center flex-shrink-0">
                 <span class="text-gray-900 font-bold text-sm tracking-tight">DM</span>
@@ -80,8 +100,32 @@
                     @include('layouts.sidebar-sections.sales-rep')
                 @endif
 
+                @if($isFinance)
+                    @include('layouts.sidebar-sections.finance')
+                @endif
+
+                @if($isSupport)
+                    @include('layouts.sidebar-sections.support')
+                @endif
+
+                @if($isAssistant)
+                    @include('layouts.sidebar-sections.assistant')
+                @endif
+
+                @if($isSuperAdmin)
+                    @include('layouts.sidebar-sections.super-admin')
+                @endif
+
+                @if($isTechAdmin)
+                    @include('layouts.sidebar-sections.tech-admin')
+                @endif
+
                 @if($isAdmin)
                     @include('layouts.sidebar-sections.admin')
+                @endif
+
+                @if($isPatient)
+                    @include('layouts.sidebar-sections.patient')
                 @endif
 
             </ul>

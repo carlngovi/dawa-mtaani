@@ -35,8 +35,8 @@
     <div x-show="cartCount > 0"
          class="bg-green-700 text-white rounded-xl px-5 py-3 flex items-center justify-between">
         <span class="text-sm font-medium" x-text="cartCount + ' item(s) in cart'"></span>
-        <a href="/retail/orders" class="text-sm bg-white text-green-700 px-4 py-1.5 rounded-lg font-medium hover:bg-green-50">
-            Review Order
+        <a href="/retail/basket" class="text-sm bg-white text-green-700 px-4 py-1.5 rounded-lg font-medium hover:bg-green-50">
+            Review Order →
         </a>
     </div>
 
@@ -80,7 +80,7 @@
                        id="qty_{{ $product->price_list_id }}"
                        class="w-20 px-3 py-2 border border-gray-300 rounded-lg text-sm text-center
                               focus:outline-none focus:ring-2 focus:ring-green-500">
-                <button onclick="addToCart({{ $product->product_id }}, {{ $product->price_list_id }}, '{{ $product->generic_name }}')"
+                <button onclick="addToCart({{ $product->product_id }}, {{ $product->price_list_id }}, '{{ addslashes($product->generic_name) }}', {{ $product->unit_price }})"
                         class="flex-1 bg-green-700 hover:bg-green-800 text-white text-sm py-2 rounded-lg transition-colors">
                     Add to Order
                 </button>
@@ -104,14 +104,14 @@ function catalogue() {
     }
 }
 
-function addToCart(productId, priceListId, name) {
+function addToCart(productId, priceListId, name, unitPrice) {
     const qty = parseInt(document.getElementById('qty_' + priceListId).value) || 1;
     let cart = JSON.parse(localStorage.getItem('dm_cart') || '[]');
     const existing = cart.findIndex(i => i.price_list_id === priceListId);
     if (existing >= 0) {
         cart[existing].quantity += qty;
     } else {
-        cart.push({ product_id: productId, price_list_id: priceListId, name: name, quantity: qty, payment_type: 'CASH' });
+        cart.push({ product_id: productId, price_list_id: priceListId, name: name, unit_price: unitPrice, quantity: qty, payment_type: 'CASH' });
     }
     localStorage.setItem('dm_cart', JSON.stringify(cart));
     localStorage.setItem('dm_cart_count', cart.length);

@@ -3,21 +3,28 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Services\CurrencyConfig;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-/**
- * TechWriteController
- *
- * technical_admin, gated write tool
- * Controller is a stub — business logic to be wired by Datanav.
- */
 class TechWriteController extends Controller
 {
     public function index()
     {
-        return view('placeholder', [
-            'portalTitle'    => 'Gated Write',
-            'portalSubtitle' => 'Incident-response write tool. Every operation requires Tier 1 sign-off.',
-        ]);
+        $user = Auth::user();
+        if (! $user->hasRole('technical_admin')) {
+            return redirect('/dashboard');
+        }
+        $pendingApprovals = 0;
+        if (Schema::hasTable('t0_approval_requests')) {
+            $pendingApprovals = DB::table('t0_approval_requests')
+                ->where('status', 'PENDING')
+                ->count();
+        }
+        return view('tech.write', compact('pendingApprovals'));
     }
 }

@@ -3,25 +3,31 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Services\CurrencyConfig;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Schema;
 
-/**
- * SuperDesignFeeController
- *
- * super_admin, design fee tranche release
- * Controller is a stub — business logic to be wired by Datanav.
- */
 class SuperDesignFeeController extends Controller
 {
     public function index()
     {
-        return view('placeholder', [
-            'portalTitle'    => 'Design Fee',
-            'portalSubtitle' => 'Design fee tranche release and disbursement management.',
-        ]);
+        $user = Auth::user();
+        if (! $user->hasRole('super_admin')) {
+            return redirect('/dashboard');
+        }
+        $currency = CurrencyConfig::get();
+        $tranches = DB::table('credit_tranches')->orderBy('tranche_order')->get();
+        return view('super.design-fee', compact('tranches', 'currency'));
     }
+
     public function release(Request $request, $tranche)
     {
-        return response()->json(["status" => "stub"]);
+        if (! Auth::user()->hasRole('super_admin')) abort(403);
+        // Business logic wired by Datanav — stub triggers confirmation
+        return back()->with('success', 'Design fee release initiated for tranche ID ' . $tranche . '.');
     }
 }

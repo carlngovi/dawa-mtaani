@@ -3,10 +3,9 @@
 namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\RoleRedirectController;
 use App\Models\User;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Facades\Socialite;
 
 class GoogleAuthController extends Controller
@@ -21,28 +20,130 @@ class GoogleAuthController extends Controller
         try {
             $googleUser = Socialite::driver('google')->user();
         } catch (\Exception $e) {
-            return redirect('/login')->withErrors(['email' => 'Google login failed. Please try again.']);
+            return redirect()->route('login')->with('status', 'Google sign-in failed. Please try again.');
         }
 
-        $user = User::where('email', $googleUser->getEmail())->first();
+        // Lookup by google_id first, then fall back to email
+        $user = User::where('google_id', $googleUser->getId())->first()
+             ?? User::where('email', $googleUser->getEmail())->first();
 
         if (! $user) {
-            return redirect('/login')->withErrors([
-                'email' => 'No account found for ' . $googleUser->getEmail() . '. Please contact your administrator.',
+            return redirect()->route('login')->with(
+                'status',
+                'No account found for this Google address. Contact your administrator.'
+            );
+        }
+
+        // Link Google profile if not yet set
+        if (! $user->google_id) {
+            $user->update([
+                'google_id'        => $googleUser->getId(),
+                'google_avatar'    => $googleUser->getAvatar(),
+                'google_linked_at' => now(),
             ]);
         }
 
-        Auth::login($user, true);
+        Auth::login($user, remember: true);
 
-        $user->update(['last_login_at' => now('UTC')]);
+        return RoleRedirectController::redirectForUser($user);
+    }
 
-        // Redirect based on role
-        if ($user->hasRole(['network_admin', 'network_field_agent'])) {
-            return redirect('/admin/dashboard');
+    public function facilityRedirect()
+    {
+        session(['google_intent' => 'facility_registration']);
+
+        return Socialite::driver('google')
+            ->redirectUrl(route('auth.google.facility.callback'))
+            ->redirect();
+    }
+
+    public function facilityCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')
+                ->redirectUrl(route('auth.google.facility.callback'))
+                ->user();
+        } catch (\Exception $e) {
+            return redirect()->route('register.facility')
+                ->with('status', 'Google sign-in failed. Please try again.');
         }
-        if ($user->hasRole('wholesale_facility')) {
-            return redirect('/wholesale/orders');
+
+        if (User::where('email', $googleUser->getEmail())->exists()) {
+            return redirect()->route('register.facility')->withErrors([
+                'email' => 'An account with this Google address already exists. Please sign in.',
+            ]);
         }
-        return redirect('/retail/dashboard');
+
+        session(['google_prefill' => [
+            'name'      => $googleUser->getName(),
+            'email'     => $googleUser->getEmail(),
+            'google_id' => $googleUser->getId(),
+            'avatar'    => $googleUser->getAvatar(),
+        ]]);
+
+        return redirect()->route('register.facility');
+    }
+
+    public function patientRedirect()
+    {
+        session(['google_intent' => 'patient_registration']);
+
+        return Socialite::driver('google')
+            ->redirectUrl(route('auth.google.patient.callback'))
+            ->redirect();
+    }
+
+    public function patientCallback()
+    {
+        try {
+            $googleUser = Socialite::driver('google')
+                ->redirectUrl(route('auth.google.patient.callback'))
+                ->user();
+        } catch (\Exception $e) {
+            return redirect()->route('register.patient')
+                ->with('status', 'Google sign-up failed. Please try again.');
+        }
+
+        $existingUser = User::where('email', $googleUser->getEmail())->first();
+
+        if ($existingUser) {
+            if ($existingUser->hasRole('patient')) {
+                if (! $existingUser->google_id) {
+                    $existingUser->update([
+                        'google_id'        => $googleUser->getId(),
+                        'google_avatar'    => $googleUser->getAvatar(),
+                        'google_linked_at' => now(),
+                    ]);
+                }
+
+                Auth::login($existingUser, remember: true);
+
+                return redirect('/store');
+            }
+
+            return redirect()->route('login')->withErrors([
+                'email' => 'An account with this email already exists. Please sign in.',
+            ]);
+        }
+
+        $user = \Illuminate\Support\Facades\DB::transaction(function () use ($googleUser) {
+            $user = User::create([
+                'name'              => $googleUser->getName(),
+                'email'             => $googleUser->getEmail(),
+                'google_id'         => $googleUser->getId(),
+                'google_avatar'     => $googleUser->getAvatar(),
+                'google_linked_at'  => now(),
+                'email_verified_at' => now(),
+                'password'          => null,
+            ]);
+
+            $user->assignRole('patient');
+
+            return $user;
+        });
+
+        Auth::login($user, remember: true);
+
+        return redirect('/store');
     }
 }

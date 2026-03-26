@@ -6,8 +6,27 @@ use Illuminate\Support\Facades\Route;
 // -------------------------------------------------------
 // Google OAuth
 // -------------------------------------------------------
-Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('auth.google');
-Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+Route::middleware('guest')->group(function () {
+    Route::get('/auth/google', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'redirect'])->name('auth.google');
+    Route::get('/auth/google/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'callback'])->name('auth.google.callback');
+
+    // Facility (retail_facility) self-registration
+    Route::get('/register/facility', [\App\Http\Controllers\Auth\FacilityRegistrationController::class, 'create'])->name('register.facility');
+    Route::post('/register/facility', [\App\Http\Controllers\Auth\FacilityRegistrationController::class, 'store'])->name('register.facility.store');
+    Route::get('/register/facility/pending', [\App\Http\Controllers\Auth\FacilityRegistrationController::class, 'pending'])->name('register.facility.pending');
+
+    // Google OAuth for facility registration
+    Route::get('/auth/google/facility', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'facilityRedirect'])->name('auth.google.facility');
+    Route::get('/auth/google/facility/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'facilityCallback'])->name('auth.google.facility.callback');
+
+    // Patient registration
+    Route::get('/register/patient', [\App\Http\Controllers\Auth\PatientRegistrationController::class, 'create'])->name('register.patient');
+    Route::post('/register/patient', [\App\Http\Controllers\Auth\PatientRegistrationController::class, 'store'])->name('register.patient.store');
+
+    // Google OAuth for patient registration
+    Route::get('/auth/google/patient', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'patientRedirect'])->name('auth.google.patient');
+    Route::get('/auth/google/patient/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'patientCallback'])->name('auth.google.patient.callback');
+});
 
 // -------------------------------------------------------
 // Public invitation accept routes (no auth needed)
@@ -67,6 +86,11 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
         Route::get('/notifications', [\App\Http\Controllers\Web\AdminNotificationsController::class, 'index']);
         Route::get('/settings', [\App\Http\Controllers\Web\AdminSettingsController::class, 'index']);
         Route::get('/registrations', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'index']);
+        Route::get('/registrations/{ulid}', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'show']);
+        Route::post('/registrations/{ulid}/approve', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'approve']);
+        Route::post('/registrations/{ulid}/activate', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'activate']);
+        Route::post('/registrations/{ulid}/reject', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'reject']);
+        Route::post('/registrations/{ulid}/verify-ppb', [\App\Http\Controllers\Web\AdminRegistrationsController::class, 'verifyPpb']);
         Route::get('/placers', [\App\Http\Controllers\Web\AdminPlacersController::class, 'index']);
         Route::get('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'index']);
         Route::post('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'store']);
@@ -81,8 +105,11 @@ Route::middleware(['auth', 'portal'])
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\RetailDashboardController::class, 'index']);
         Route::get('/catalogue', [\App\Http\Controllers\Web\RetailCatalogueController::class, 'index']);
+        Route::get('/basket', [\App\Http\Controllers\Web\RetailOrdersController::class, 'basket']);
         Route::get('/orders', [\App\Http\Controllers\Web\RetailOrdersController::class, 'index']);
+        Route::post('/orders', [\App\Http\Controllers\Web\RetailOrdersController::class, 'store']);
         Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\RetailOrdersController::class, 'show']);
+        Route::post('/orders/{ulid}/dispute', [\App\Http\Controllers\Web\RetailOrdersController::class, 'raiseDispute']);
         Route::get('/favourites', [\App\Http\Controllers\Web\RetailFavouritesController::class, 'index']);
         Route::get('/credit', [\App\Http\Controllers\Web\RetailCreditController::class, 'index'])->name('retail.credit.index');
         Route::get('/lpo', [\App\Http\Controllers\Web\RetailLpoController::class, 'index']);
@@ -98,6 +125,11 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
     ->prefix('wholesale')
     ->group(function () {
         Route::get('/orders', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'index']);
+        Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'show']);
+        Route::post('/orders/{ulid}/confirm', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'confirm']);
+        Route::post('/orders/{ulid}/pack', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'pack']);
+        Route::post('/orders/{ulid}/dispatch', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'dispatch']);
+        Route::post('/orders/bulk-dispatch', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'bulkDispatch']);
         Route::get('/price-lists', [\App\Http\Controllers\Web\WholesalePriceListsController::class, 'index']);
         Route::get('/stock', [\App\Http\Controllers\Web\WholesaleStockController::class, 'index']);
         Route::get('/performance', [\App\Http\Controllers\Web\WholesalePerformanceController::class, 'index']);
@@ -170,6 +202,17 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])->prefix('super')->gro
     Route::post('/t0-approvals/{id}/reject', [\App\Http\Controllers\Web\SuperT0ApprovalsController::class, 'reject']);
     Route::get('/design-fee', [\App\Http\Controllers\Web\SuperDesignFeeController::class, 'index']);
     Route::post('/design-fee/{tranche}/release', [\App\Http\Controllers\Web\SuperDesignFeeController::class, 'release']);
+});
+
+// ── Patient portal (B2C store) ────────────────────────────────────────────
+Route::middleware(['auth', 'portal'])->prefix('store')->group(function () {
+    Route::get('/', [\App\Http\Controllers\Web\StoreBrowseController::class, 'index']);
+    Route::get('/orders', [\App\Http\Controllers\Web\StoreOrdersController::class, 'index']);
+    Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\StoreOrdersController::class, 'show']);
+    Route::get('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'index']);
+    Route::post('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'store']);
+    Route::get('/{facilityUlid}', [\App\Http\Controllers\Web\StoreBrowseController::class, 'storefront'])->name('store.storefront');
+    Route::get('/{facilityUlid}/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkout'])->name('store.checkout');
 });
 
 // ── Technical admin portal (Tier 0) ───────────────────────────────────────

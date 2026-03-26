@@ -1,30 +1,46 @@
 <?php
+
 namespace App\Http\Controllers\Web;
+
 use App\Http\Controllers\Controller;
+use App\Services\CreditEngineService;
 use App\Services\CurrencyConfig;
+use App\Services\OrderPlacementService;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class RetailOrdersController extends Controller
 {
     public function index(Request $request)
     {
         $facilityId = Auth::user()->facility_id;
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
         $currency = CurrencyConfig::get();
 
-        $orders = DB::table('orders')
+        $query = DB::table('orders')
             ->where('retail_facility_id', $facilityId)
             ->whereNull('deleted_at')
-            ->orderBy('created_at', 'desc')
-            ->paginate(20);
+            ->when($request->filled('status'), fn($q) => $q->where('status', $request->status))
+            ->orderBy('created_at', 'desc');
 
-        return view('retail.orders', compact('orders', 'currency'));
+        $orders = $query->paginate(20)->withQueryString();
+
+        $counts = [
+            'pending'    => DB::table('orders')->where('retail_facility_id', $facilityId)->whereNull('deleted_at')->where('status', 'PENDING')->count(),
+            'active'     => DB::table('orders')->where('retail_facility_id', $facilityId)->whereNull('deleted_at')->whereIn('status', ['CONFIRMED','PACKED','DISPATCHED'])->count(),
+            'delivered'  => DB::table('orders')->where('retail_facility_id', $facilityId)->whereNull('deleted_at')->where('status', 'DELIVERED')->whereMonth('created_at', now()->month)->count(),
+        ];
+
+        return view('retail.orders', compact('orders', 'currency', 'counts'));
     }
 
     public function show(Request $request, string $ulid)
     {
         $facilityId = Auth::user()->facility_id;
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
         $currency = CurrencyConfig::get();
 
         $order = DB::table('orders')
@@ -33,15 +49,220 @@ class RetailOrdersController extends Controller
             ->whereNull('deleted_at')
             ->first();
 
-        if (! $order) abort(404);
+        abort_if(! $order, 404);
 
         $lines = DB::table('order_lines as ol')
             ->join('products as p', 'ol.product_id', '=', 'p.id')
             ->join('facilities as wf', 'ol.wholesale_facility_id', '=', 'wf.id')
             ->where('ol.order_id', $order->id)
-            ->select(['ol.*', 'p.generic_name', 'p.sku_code', 'wf.facility_name as supplier_name'])
+            ->select(['ol.*', 'p.generic_name', 'p.brand_name', 'p.sku_code', 'p.unit_size', 'wf.facility_name as supplier_name'])
             ->get();
 
-        return view('retail.order-show', compact('order', 'lines', 'currency'));
+        $courier = DB::table('courier_assignments')
+            ->where('order_id', $order->id)
+            ->first();
+
+        $delivery = DB::table('delivery_confirmations')
+            ->where('order_id', $order->id)
+            ->first();
+
+        $dispute = DB::table('delivery_disputes')
+            ->where('delivery_confirmation_id', $delivery->id ?? 0)
+            ->first();
+
+        // Can raise dispute: delivered within 48h and no existing dispute
+        $canDispute = $order->status === 'DELIVERED'
+            && $delivery
+            && $delivery->delivered_at
+            && Carbon::parse($delivery->delivered_at)->addHours(48)->isFuture()
+            && ! $dispute;
+
+        return view('retail.order-show', compact('order', 'lines', 'currency', 'courier', 'delivery', 'dispute', 'canDispute'));
+    }
+
+    public function basket()
+    {
+        $facilityId = Auth::user()->facility_id;
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
+        $currency = CurrencyConfig::get();
+
+        $facility = DB::table('facilities')->where('id', $facilityId)->first();
+
+        // Credit position
+        $creditAvailable = 0;
+        $creditAccount = DB::table('facility_credit_accounts')
+            ->where('facility_id', $facilityId)
+            ->where('account_status', 'ACTIVE')
+            ->first();
+
+        if ($creditAccount) {
+            $balances = DB::table('facility_tranche_balances')
+                ->where('credit_account_id', $creditAccount->id)
+                ->get();
+            $creditAvailable = $balances->sum('available_amount');
+        }
+
+        $isNetworkMember = ($facility->network_membership ?? '') === 'NETWORK';
+
+        return view('retail.basket', compact('currency', 'facility', 'creditAvailable', 'isNetworkMember'));
+    }
+
+    public function store(Request $request)
+    {
+        $user = Auth::user();
+        $facilityId = $user->facility_id;
+        abort_unless($user->hasRole('retail_facility'), 403);
+
+        $facility = DB::table('facilities')->where('id', $facilityId)->first();
+
+        if (! $facility || $facility->facility_status !== 'ACTIVE') {
+            return back()->with('error', 'Your account is not active. Contact support.');
+        }
+
+        if ($facility->ppb_licence_status === 'EXPIRED') {
+            return back()->with('error', 'Your PPB licence has expired. Renew before placing orders.');
+        }
+
+        $request->validate([
+            'items'          => 'required|array|min:1',
+            'items.*.product_id'    => 'required|integer',
+            'items.*.price_list_id' => 'required|integer',
+            'items.*.quantity'      => 'required|integer|min:1',
+            'items.*.payment_type'  => 'required|in:CREDIT,CASH,OFF_NETWORK_CASH',
+            'order_type'     => 'required|in:STANDARD,LPO',
+            'notes'          => 'nullable|string|max:1000',
+        ]);
+
+        // Build lines for OrderPlacementService
+        $lines = collect($request->items)->map(fn($item) => [
+            'product_id'          => $item['product_id'],
+            'price_list_id'       => $item['price_list_id'],
+            'quantity'            => $item['quantity'],
+            'payment_type'        => $item['payment_type'],
+            'tranche_id'          => $item['tranche_id'] ?? null,
+            'tier_id'             => $item['tier_id'] ?? null,
+            'delivery_facility_id'=> $item['delivery_facility_id'] ?? null,
+        ])->toArray();
+
+        try {
+            $result = app(OrderPlacementService::class)->placeOrder(
+                facilityId: $facilityId,
+                placedByUserId: $user->id,
+                lines: $lines,
+                orderType: $request->order_type,
+                sourceChannel: 'WEB',
+                notes: $request->notes,
+            );
+
+            DB::table('audit_logs')->insert([
+                'facility_id'    => $facilityId,
+                'user_id'        => $user->id,
+                'action'         => 'ORDER_PLACED',
+                'model_type'     => 'App\Models\Order',
+                'model_id'       => $result['order_id'],
+                'payload_after'  => json_encode(['ulid' => $result['ulid'], 'total' => $result['total_amount']]),
+                'ip_address'     => $request->ip(),
+                'user_agent'     => $request->userAgent(),
+                'created_at'     => now(),
+            ]);
+
+            try {
+                if ($facility->phone) {
+                    $this->sendSms($facility->phone,
+                        "Your order " . substr($result['ulid'], -8) . " for KES " . number_format($result['total_amount'], 2) . " has been placed and is awaiting confirmation from NILA."
+                    );
+                }
+            } catch (\Throwable $e) {
+                Log::warning('SMS failed after order placement', ['error' => $e->getMessage()]);
+            }
+
+            return redirect("/retail/orders/{$result['ulid']}")
+                ->with('success', "Order placed successfully! Reference: " . substr($result['ulid'], -8));
+
+        } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\InvalidArgumentException $e) {
+            return back()->with('error', $e->getMessage());
+        } catch (\Throwable $e) {
+            Log::error('Order placement failed', ['error' => $e->getMessage()]);
+            return back()->with('error', 'Order could not be placed. Please try again.');
+        }
+    }
+
+    public function raiseDispute(Request $request, string $ulid)
+    {
+        $facilityId = Auth::user()->facility_id;
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
+
+        $order = DB::table('orders')
+            ->where('ulid', $ulid)
+            ->where('retail_facility_id', $facilityId)
+            ->where('status', 'DELIVERED')
+            ->whereNull('deleted_at')
+            ->first();
+
+        abort_if(! $order, 404);
+
+        $delivery = DB::table('delivery_confirmations')
+            ->where('order_id', $order->id)
+            ->first();
+
+        if (! $delivery || ! $delivery->delivered_at) {
+            return back()->with('error', 'No delivery confirmation found for this order.');
+        }
+
+        if (Carbon::parse($delivery->delivered_at)->addHours(48)->isPast()) {
+            return back()->with('error', 'Dispute window has expired (48 hours after delivery).');
+        }
+
+        $existingDispute = DB::table('delivery_disputes')
+            ->where('delivery_confirmation_id', $delivery->id)
+            ->exists();
+
+        if ($existingDispute) {
+            return back()->with('error', 'A dispute has already been raised for this order.');
+        }
+
+        $request->validate([
+            'reason'      => 'required|in:MISSING_ITEMS,DAMAGED_GOODS,WRONG_ITEMS,SHORT_DELIVERY,OTHER',
+            'notes'       => 'required|string|min:20|max:2000',
+        ]);
+
+        DB::transaction(function () use ($delivery, $request, $facilityId) {
+            DB::table('delivery_disputes')->insert([
+                'delivery_confirmation_id' => $delivery->id,
+                'raised_by'       => Auth::id(),
+                'raised_at'       => now(),
+                'reason'          => $request->reason,
+                'notes'           => $request->notes,
+                'status'          => 'OPEN',
+                'sla_deadline_at' => now()->addHours(24),
+                'sla_breached'    => false,
+                'created_at'      => now(),
+                'updated_at'      => now(),
+            ]);
+
+            DB::table('audit_logs')->insert([
+                'facility_id'    => $facilityId,
+                'user_id'        => Auth::id(),
+                'action'         => 'DISPUTE_RAISED',
+                'model_type'     => 'App\Models\Order',
+                'model_id'       => DB::table('orders')->where('id', $delivery->order_id)->value('id'),
+                'payload_after'  => json_encode(['reason' => $request->reason]),
+                'ip_address'     => $request->ip(),
+                'user_agent'     => $request->userAgent(),
+                'created_at'     => now(),
+            ]);
+        });
+
+        return back()->with('success', 'Dispute raised successfully. Our team will respond within 24 hours.');
+    }
+
+    private function sendSms(string $phone, string $message): void
+    {
+        if (class_exists(\AfricasTalking\SDK::class)) {
+            $at = new \AfricasTalking\SDK(config('services.africastalking.username'), config('services.africastalking.api_key'));
+            $at->sms()->send(['to' => $phone, 'message' => $message]);
+        }
     }
 }
