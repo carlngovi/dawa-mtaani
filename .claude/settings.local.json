@@ -52,7 +52,10 @@
       "Bash(else echo:*)",
       "Bash(fi)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git merge:*)",
+      "Bash(echo \"Conflicted files: $?\")",
+      "Bash(find app:*)"
     ]
   }
 }

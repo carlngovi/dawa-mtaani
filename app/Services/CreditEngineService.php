@@ -153,6 +153,21 @@ class CreditEngineService
     }
 
     /**
+     * Process a repayment from a RepaymentRecord ID.
+     * Called by MpesaRepaymentService after a successful M-Pesa callback.
+     */
+    public function processRepayment(int $repaymentId): void
+    {
+        $repayment = \App\Models\RepaymentRecord::with('order')->findOrFail($repaymentId);
+
+        $this->repayCredit(
+            facilityId: $repayment->facility_id,
+            amount:     (float) $repayment->amount_paid,
+            reference:  $repayment->mpesa_reference ?? "REPAYMENT-{$repaymentId}",
+        );
+    }
+
+    /**
      * Suspend a facility's credit account. Logs reason. Used by payment
      * escalation and admin manual override.
      */
