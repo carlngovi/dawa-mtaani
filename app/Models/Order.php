@@ -73,4 +73,10 @@ class Order extends Model
     {
         return $this->copay_status !== 'NOT_REQUIRED';
     }
+
+    public function getCopayAmountAttribute(): float
+    {
+        // Co-pay is the cash portion of a mixed credit/cash order
+        return (float) ($this->cash_amount ?? 0);
+    }
 }

@@ -1,5 +1,8 @@
 <?php
 
+use App\Http\Controllers\Payments\PaymentCallbackController;
+use App\Http\Controllers\Payments\PaymentInstructionController;
+use App\Http\Controllers\Payments\RetryPaymentController;
 use App\Http\Controllers\Store\BasketController;
 use App\Http\Controllers\Store\CustodyChainController;
 use App\Http\Controllers\Store\OrderController;
@@ -39,6 +42,31 @@ Route::prefix('store')->group(function () {
     // -------------------------------------------------------
     Route::get('/products/{productId}/custody-chain', [CustodyChainController::class, 'show']);
     Route::post('/counterfeit-reports', [CustodyChainController::class, 'report']);
+});
+
+// -------------------------------------------------------
+// Module 7 — Payment Trigger (B2B)
+// -------------------------------------------------------
+
+// Safaricom callbacks — no auth, IP whitelist middleware only
+Route::prefix('payments')->group(function () {
+    Route::post('/mpesa/callback', [PaymentCallbackController::class, 'copayCallback'])
+        ->middleware('mpesa.whitelist');
+    Route::post('/mpesa/repayment-callback', [PaymentCallbackController::class, 'repaymentCallback'])
+        ->middleware('mpesa.whitelist');
+});
+
+// Authenticated payment routes
+Route::prefix('payments')->middleware('auth:sanctum')->group(function () {
+    // Retry co-pay STK push (pharmacy portal)
+    Route::post('/retry/{orderUlid}', [RetryPaymentController::class, 'retry']);
+
+    // Payment instructions (network_admin only)
+    Route::get('/instructions', [PaymentInstructionController::class, 'index']);
+    Route::patch('/instructions/{id}/manual-process', [PaymentInstructionController::class, 'manualProcess']);
+
+    // Repayment records (facility scoped)
+    Route::get('/repayments', [PaymentInstructionController::class, 'repayments']);
 });
 
 // ── Token auth (Sanctum) ───────────────────────────────────────────────
