@@ -83,6 +83,9 @@ class StoreBrowseController extends Controller
             'email'                 => 'required|email|max:255',
             'delivery_address'      => 'required|string|max:500',
             'delivery_instructions' => 'nullable|string|max:1000',
+            'delivery_lat'          => 'nullable|numeric',
+            'delivery_lng'          => 'nullable|numeric',
+            'delivery_place_id'     => 'nullable|string|max:255',
         ]);
 
         $user  = Auth::user();
@@ -119,6 +122,9 @@ class StoreBrowseController extends Controller
                 'customer_email'        => $request->email,
                 'delivery_address'      => $request->delivery_address,
                 'delivery_instructions' => $request->delivery_instructions,
+                'delivery_lat'          => $request->delivery_lat,
+                'delivery_lng'          => $request->delivery_lng,
+                'delivery_place_id'     => $request->delivery_place_id,
                 'created_at'            => now(),
                 'updated_at'            => now(),
             ]);
@@ -187,44 +193,125 @@ class StoreBrowseController extends Controller
         return view('store.payment-pending', compact('order', 'currency'));
     }
 
+    public function orderStatus(string $ulid)
+    {
+        $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        abort_if(! $order, 404);
+
+        // If still pending and has checkout ID, query Safaricom
+        if ($order->status === 'PAYMENT_PENDING' && $order->mpesa_checkout_request_id) {
+            try {
+                $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
+                $result = $mpesa->queryTransactionStatus($order->mpesa_checkout_request_id);
+                $resultCode = (int) ($result['ResultCode'] ?? -1);
+
+                if ($resultCode === 0) {
+                    DB::table('patient_orders')->where('ulid', $ulid)->update([
+                        'status' => 'CONFIRMED', 'mpesa_receipt_number' => $result['ResultDesc'] ?? 'CONFIRMED',
+                        'paid_at' => now(), 'updated_at' => now(),
+                    ]);
+                    return response()->json(['paid' => true, 'failed' => false, 'status' => 'CONFIRMED', 'receipt' => $result['ResultDesc'] ?? null, 'redirect_url' => '/store/orders']);
+                }
+
+                if (in_array($resultCode, [1, 17, 1032, 1037, 2001])) {
+                    $reason = match ($resultCode) {
+                        1    => 'Insufficient M-Pesa balance.',
+                        17   => 'Transaction limit exceeded.',
+                        1032 => 'Payment was cancelled by user.',
+                        1037 => 'M-Pesa prompt timed out. Please try again.',
+                        2001 => 'Incorrect M-Pesa PIN entered.',
+                        default => $result['ResultDesc'] ?? 'Payment failed.',
+                    };
+                    DB::table('patient_orders')->where('ulid', $ulid)->update([
+                        'status' => 'PAYMENT_FAILED', 'rejection_reason' => $reason, 'updated_at' => now(),
+                    ]);
+                    return response()->json(['paid' => false, 'failed' => true, 'status' => 'PAYMENT_FAILED', 'failure_reason' => $reason]);
+                }
+            } catch (\Throwable $e) {
+                // Query failed — return current DB state, don't crash
+                \Illuminate\Support\Facades\Log::warning('STK query failed in orderStatus', ['ulid' => $ulid, 'error' => $e->getMessage()]);
+            }
+
+            // Refresh order after possible update
+            $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        }
+
+        $paid   = in_array($order->status, ['CONFIRMED', 'READY', 'COLLECTED']) || ! empty($order->mpesa_receipt_number);
+        $failed = $order->status === 'PAYMENT_FAILED';
+
+        return response()->json([
+            'paid'           => $paid,
+            'failed'         => $failed,
+            'status'         => $order->status,
+            'receipt'        => $order->mpesa_receipt_number ?? null,
+            'failure_reason' => $order->rejection_reason ?? null,
+            'redirect_url'   => $paid ? '/store/orders' : null,
+        ]);
+    }
+
     public function checkPayment(Request $request, string $ulid)
     {
         $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
         abort_if(! $order, 404);
 
-        // If already confirmed, return immediately
+        // Already confirmed
         if (in_array($order->status, ['CONFIRMED', 'READY', 'COLLECTED'])) {
-            return response()->json(['paid' => true, 'status' => $order->status, 'receipt' => $order->mpesa_receipt_number]);
+            return response()->json(['paid' => true, 'failed' => false, 'status' => $order->status, 'receipt' => $order->mpesa_receipt_number]);
         }
 
-        // Query Safaricom for the STK push result
+        // Already failed (set by callback)
+        if ($order->status === 'PAYMENT_FAILED') {
+            return response()->json([
+                'paid'    => false,
+                'failed'  => true,
+                'status'  => 'PAYMENT_FAILED',
+                'message' => $order->payment_failure_reason ?? $order->rejection_reason ?? 'Payment failed. Please try again.',
+            ]);
+        }
+
         if (! $order->mpesa_checkout_request_id) {
-            return response()->json(['paid' => false, 'status' => $order->status, 'message' => 'No checkout request ID found.']);
+            return response()->json(['paid' => false, 'failed' => false, 'status' => $order->status, 'message' => 'Waiting for M-Pesa...']);
         }
 
+        // Query Safaricom directly
         try {
-            $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
+            $mpesa  = app(\App\Services\Integrations\MpesaDarajaService::class);
             $result = $mpesa->queryTransactionStatus($order->mpesa_checkout_request_id);
+            $resultCode = (int) ($result['ResultCode'] ?? -1);
 
-            \Illuminate\Support\Facades\Log::info('STK Query result', ['ulid' => $ulid, 'result' => $result]);
-
-            $resultCode = $result['ResultCode'] ?? -1;
-
-            if ((int) $resultCode === 0) {
-                // Payment successful — update order
+            if ($resultCode === 0) {
                 DB::table('patient_orders')->where('ulid', $ulid)->update([
-                    'status' => 'CONFIRMED',
-                    'mpesa_receipt_number' => 'STK_QUERY_CONFIRMED',
-                    'paid_at' => now(),
-                    'updated_at' => now(),
+                    'status'              => 'CONFIRMED',
+                    'mpesa_receipt_number' => $result['ResultDesc'] ?? 'CONFIRMED',
+                    'paid_at'             => now(),
+                    'updated_at'          => now(),
                 ]);
-                return response()->json(['paid' => true, 'status' => 'CONFIRMED', 'receipt' => 'STK_QUERY_CONFIRMED']);
-            } else {
-                return response()->json(['paid' => false, 'status' => $order->status, 'message' => $result['ResultDesc'] ?? 'Payment not yet confirmed.']);
+                return response()->json(['paid' => true, 'failed' => false, 'status' => 'CONFIRMED']);
             }
+
+            $failReason = match ($resultCode) {
+                1    => 'Insufficient M-Pesa balance.',
+                17   => 'M-Pesa transaction limit exceeded.',
+                1032 => 'Payment was cancelled.',
+                1037 => 'M-Pesa prompt timed out.',
+                2001 => 'Incorrect M-Pesa PIN.',
+                default => $result['ResultDesc'] ?? 'Payment not yet confirmed.',
+            };
+
+            // Permanent failures — update order status
+            if (in_array($resultCode, [1, 17, 1032, 2001])) {
+                DB::table('patient_orders')->where('ulid', $ulid)->update([
+                    'status'           => 'PAYMENT_FAILED',
+                    'rejection_reason' => $failReason,
+                    'updated_at'       => now(),
+                ]);
+                return response()->json(['paid' => false, 'failed' => true, 'status' => 'PAYMENT_FAILED', 'message' => $failReason]);
+            }
+
+            return response()->json(['paid' => false, 'failed' => false, 'status' => $order->status, 'message' => $failReason]);
+
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::warning('STK Query failed', ['ulid' => $ulid, 'error' => $e->getMessage()]);
-            return response()->json(['paid' => false, 'status' => $order->status, 'message' => 'Unable to check status. Try again.']);
+            return response()->json(['paid' => false, 'failed' => false, 'status' => $order->status, 'message' => 'Checking payment status...']);
         }
     }
 

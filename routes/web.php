@@ -217,6 +217,7 @@ Route::middleware(['auth', 'portal'])->prefix('store')->group(function () {
     Route::get('/basket', [\App\Http\Controllers\Web\StoreBrowseController::class, 'basket'])->name('store.basket');
     Route::post('/basket/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'patientCheckout'])->name('store.basket.checkout');
     Route::get('/orders/{ulid}/pending', [\App\Http\Controllers\Web\StoreBrowseController::class, 'paymentPending'])->name('store.payment-pending');
+    Route::get('/orders/{ulid}/payment-status', [\App\Http\Controllers\Web\StoreBrowseController::class, 'orderStatus'])->name('store.order.status');
     Route::post('/orders/{ulid}/check-payment', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkPayment'])->name('store.check-payment');
     Route::get('/{facilityUlid}', [\App\Http\Controllers\Web\StoreBrowseController::class, 'storefront'])->name('store.storefront');
     Route::get('/{facilityUlid}/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkout'])->name('store.checkout');

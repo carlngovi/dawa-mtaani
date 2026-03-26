@@ -46,7 +46,7 @@
 </head>
 <body class="h-full bg-gray-900">
 
-<div class="relative flex h-screen w-full flex-col lg:flex-row">
+<div class="relative flex min-h-screen w-full flex-col lg:flex-row">
 
     {{-- ===== LEFT — Login Form ===== --}}
     <div class="flex w-full flex-1 flex-col lg:w-1/2">
@@ -256,8 +256,9 @@
         </div>
     </div>
 
-    {{-- ===== RIGHT — Brand panel ===== --}}
-    <div class="relative hidden lg:flex lg:w-1/2 bg-gray-950 items-center justify-center overflow-hidden">
+    {{-- ===== RIGHT — Brand panel (always dark) ===== --}}
+    <div class="hidden lg:flex lg:w-1/2 sticky top-0 h-screen items-center justify-center overflow-hidden"
+         style="background-color: #030712 !important;">
 
         {{-- Grid pattern --}}
         <div class="absolute inset-0 opacity-[0.04]">
@@ -283,13 +284,13 @@
             </div>
 
             <h2 class="text-3xl font-bold mb-1">
-                <span class="text-white">Dawa</span><span class="text-yellow-400">Mtaani</span>
+                <span style="color: #ffffff !important;">Dawa</span><span style="color: #facc15 !important;">Mtaani</span>
             </h2>
-            <p class="text-yellow-400 text-xs font-semibold tracking-widest uppercase mb-6">
+            <p class="text-xs font-semibold tracking-widest uppercase mb-6" style="color: #facc15 !important;">
                 Quality, Affordably
             </p>
 
-            <p class="text-gray-300 text-sm leading-relaxed mb-8">
+            <p class="text-sm leading-relaxed mb-8" style="color: #d1d5db !important;">
                 Kenya's pharmacy network platform — connecting retail pharmacies,
                 hospitals, and wholesale distributors built for speed,
                 transparency, and PPB compliance.
@@ -301,26 +302,26 @@
                     'Network Orders', 'PPB Verified', 'Credit Engine',
                     'WhatsApp Ordering', 'Kenya DPA Compliant', 'M-Pesa Integrated'
                 ] as $feature)
-                <span class="inline-flex items-center rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300 border border-gray-700">
+                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium" style="background:#1f2937 !important; color:#d1d5db !important; border:1px solid #374151 !important;">
                     {{ $feature }}
                 </span>
                 @endforeach
             </div>
 
             {{-- Stats --}}
-            <div class="grid grid-cols-3 gap-6 w-full border-t border-gray-700 pt-8"
+            <div class="grid grid-cols-3 gap-6 w-full pt-8" style="border-top: 1px solid #374151 !important;"
                  x-data="countUp()" x-init="start()">
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[0] + '+'"></p>
-                    <p class="text-xs text-gray-400 mt-1">Pharmacies</p>
+                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[0] + '+'"></p>
+                    <p class="text-xs mt-1" style="color: #9ca3af !important;">Pharmacies</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[1]"></p>
-                    <p class="text-xs text-gray-400 mt-1">SKUs</p>
+                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[1]"></p>
+                    <p class="text-xs mt-1" style="color: #9ca3af !important;">SKUs</p>
                 </div>
                 <div class="text-center">
-                    <p class="text-2xl font-bold text-yellow-400" x-text="counts[2]"></p>
-                    <p class="text-xs text-gray-400 mt-1">Counties</p>
+                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[2]"></p>
+                    <p class="text-xs mt-1" style="color: #9ca3af !important;">Counties</p>
                 </div>
             </div>
         </div>

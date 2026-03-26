@@ -91,7 +91,6 @@
                     <label class="block text-xs text-gray-400 mb-1.5">Delivery Address *</label>
                     <textarea x-model="deliveryAddress" rows="2" placeholder="House/Apartment No, Street, Area, Town"
                               class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2.5 text-sm placeholder-gray-500 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 outline-none resize-none"></textarea>
-                    <p class="text-xs text-gray-500 mt-1">Include building name, floor, or landmark to help delivery</p>
                 </div>
 
                 <div>
@@ -135,12 +134,22 @@ function patientBasket() {
         items: [], count: 0, total: 0,
         firstName: '', lastName: '', email: '',
         deliveryAddress: '', deliveryInstructions: '',
+        deliveryLat: '', deliveryLng: '', deliveryPlaceId: '',
         phone: '', placing: false, error: null,
         KEY: 'dm_patient_cart',
 
         init() {
             this.load();
             window.addEventListener('cart-updated', () => this.load());
+            window.addEventListener('address-selected', (e) => {
+                this.deliveryAddress = e.detail.address;
+                this.deliveryLat = e.detail.lat;
+                this.deliveryLng = e.detail.lng;
+                this.deliveryPlaceId = e.detail.place_id;
+            });
+            window.addEventListener('address-typed', (e) => {
+                if (!this.deliveryLat) this.deliveryAddress = e.detail.address;
+            });
         },
 
         load() {
@@ -212,6 +221,9 @@ function patientBasket() {
                         email: this.email,
                         delivery_address: this.deliveryAddress,
                         delivery_instructions: this.deliveryInstructions || null,
+                        delivery_lat: this.deliveryLat || null,
+                        delivery_lng: this.deliveryLng || null,
+                        delivery_place_id: this.deliveryPlaceId || null,
                     })
                 });
                 const data = await res.json();

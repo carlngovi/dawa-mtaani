@@ -136,5 +136,10 @@
             </div>
         </div>
     </div>
+    {{-- Google Maps for logistics routes only --}}
+    @if(config('services.google_maps.key') && request()->is('logistics/routes*'))
+    <script>function initGoogleMaps() { window.dispatchEvent(new Event('google-maps-loaded')); }</script>
+    <script async defer src="https://maps.googleapis.com/maps/api/js?key={{ config('services.google_maps.key') }}&callback=initGoogleMaps"></script>
+    @endif
 </body>
 </html>

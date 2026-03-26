@@ -294,14 +294,16 @@ class RetailOrdersController extends Controller
 
         abort_if(! $order, 404);
 
-        $paid = $order->mpesa_receipt_number !== null
-             || in_array($order->status, ['CONFIRMED', 'PACKED', 'DISPATCHED', 'DELIVERED']);
+        $paid   = $order->mpesa_receipt_number !== null
+                || in_array($order->status, ['CONFIRMED', 'PACKED', 'DISPATCHED', 'DELIVERED']);
+        $failed = $order->copay_status === 'FAILED' || $order->status === 'PAYMENT_FAILED';
 
         return response()->json([
             'paid'         => $paid,
-            'status'       => $order->copay_status ?? $order->status,
+            'failed'       => $failed,
+            'status'       => $order->status,
             'receipt'      => $order->mpesa_receipt_number,
-            'order_status' => $order->status,
+            'message'      => $order->payment_failure_reason,
             'redirect_url' => $paid ? "/retail/orders/{$ulid}" : null,
         ]);
     }
