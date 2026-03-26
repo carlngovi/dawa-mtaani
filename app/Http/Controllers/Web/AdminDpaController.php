@@ -8,7 +8,9 @@ class AdminDpaController extends Controller
 {
     public function index(Request $request)
     {
-        if (! $request->user()->hasRole(['network_admin'])) return redirect('/admin/dashboard');
+        abort_unless($request->user()->hasAnyRole([
+            'network_admin', 'admin', 'super_admin', 'technical_admin', 'assistant_admin',
+        ]), 403);
 
         $deletionRequests = DB::table('data_deletion_requests')->orderByDesc('created_at')->paginate(20, ['*'], 'delete_page');
         $exportRequests = DB::table('data_export_requests')->orderByDesc('created_at')->paginate(20, ['*'], 'export_page');

@@ -75,4 +75,25 @@ class RetailCatalogueController extends Controller
             'favouriteIds', 'isOffNetwork', 'facilityId'
         ));
     }
+
+    public function cart()
+    {
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
+        $currency = CurrencyConfig::get();
+
+        $allProducts = DB::table('wholesale_price_lists as wpl')
+            ->join('products as p', 'wpl.product_id', '=', 'p.id')
+            ->where('wpl.is_active', true)
+            ->where('p.is_active', true)
+            ->where('wpl.stock_status', '!=', 'OUT_OF_STOCK')
+            ->select([
+                'p.id', 'p.generic_name', 'p.brand_name', 'p.sku_code',
+                'p.unit_size', 'wpl.id as price_list_id',
+                'wpl.unit_price', 'wpl.stock_status',
+            ])
+            ->orderBy('p.generic_name')
+            ->get();
+
+        return view('retail.cart', compact('allProducts', 'currency'));
+    }
 }

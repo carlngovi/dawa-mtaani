@@ -24,8 +24,10 @@ class RetailCreditController extends Controller
         $currency = CurrencyConfig::get();
         $account = FacilityCreditAccount::where('facility_id', $user->facility_id)->first();
 
-        $balances = FacilityTrancheBalance::with(['tranche.activeTiers'])
-            ->where('facility_id', $user->facility_id)->get();
+        $balances = $account
+            ? FacilityTrancheBalance::with(['tranche.activeTiers'])
+                ->where('credit_account_id', $account->id)->get()
+            : collect();
 
         $trancheCards = $balances->map(function ($balance) use ($currency) {
             $tranche = $balance->tranche;
@@ -57,8 +59,10 @@ class RetailCreditController extends Controller
             ];
         })->filter()->values();
 
-        $recentEvents = CreditEvent::where('facility_id', $user->facility_id)
-            ->orderByDesc('created_at')->limit(20)->get();
+        $recentEvents = $account
+            ? CreditEvent::where('credit_account_id', $account->id)
+                ->orderByDesc('occurred_at')->limit(20)->get()
+            : collect();
 
         $healthStatus = 'ON_TRACK';
         $healthMessage = 'Your credit is in good standing.';

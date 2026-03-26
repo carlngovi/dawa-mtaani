@@ -8,11 +8,11 @@
     {{-- Pharmacy header --}}
     <div class="flex items-start justify-between">
         <div>
-            <a href="/store" class="text-xs text-green-700 hover:underline mb-2 inline-block">← Back to Store</a>
-            <h1 class="text-2xl font-bold text-gray-900">
+            <a href="/store" class="text-xs text-green-400 hover:underline mb-2 inline-block">← Back to Store</a>
+            <h1 class="text-2xl font-bold text-white">
                 {{ $eligible->branding_mode === 'DAWA_MTAANI' ? 'Dawa Mtaani' : $facility->facility_name }}
             </h1>
-            <p class="text-sm text-gray-500 mt-0.5">{{ $facility->county }}</p>
+            <p class="text-sm text-gray-400 mt-0.5">{{ $facility->county }}</p>
         </div>
         @if($eligible->is_network_member)
             @include('store.components.supply-chain-badge', [
@@ -26,7 +26,7 @@
 
     {{-- Flash messages --}}
     @if(session('error'))
-    <div class="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
         {{ session('error') }}
     </div>
     @endif
@@ -35,20 +35,20 @@
     <div>
         <input type="text" x-model="filterText"
                placeholder="Search within this pharmacy..."
-               class="w-full px-4 py-2.5 border border-gray-300 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+               class="w-full px-4 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
     </div>
 
     {{-- Category tabs --}}
     @if($categories->isNotEmpty())
     <div class="flex gap-2 flex-wrap">
         <button @click="filterCategory = ''"
-                :class="filterCategory === '' ? 'bg-green-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                :class="filterCategory === '' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors">
             All
         </button>
         @foreach($categories as $cat)
         <button @click="filterCategory = '{{ addslashes($cat) }}'"
-                :class="filterCategory === '{{ addslashes($cat) }}' ? 'bg-green-700 text-white' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'"
+                :class="filterCategory === '{{ addslashes($cat) }}' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors">
             {{ $cat }}
         </button>
@@ -59,27 +59,27 @@
     {{-- Product grid --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @foreach($products as $product)
-        <div class="bg-white rounded-xl border border-gray-200 p-4 flex flex-col"
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 flex flex-col"
              x-show="matchesFilter('{{ addslashes($product->generic_name) }}', '{{ addslashes($product->brand_name ?? '') }}', '{{ addslashes($product->therapeutic_category ?? '') }}')"
              :class="inBasket({{ $product->product_id }}) ? 'ring-2 ring-green-400' : ''">
             <div class="flex-1">
-                <h3 class="text-sm font-semibold text-gray-800">{{ $product->generic_name }}</h3>
+                <h3 class="text-sm font-semibold text-gray-200">{{ $product->generic_name }}</h3>
                 @if($product->brand_name)
                     <p class="text-xs text-gray-400 mt-0.5">{{ $product->brand_name }}</p>
                 @endif
-                <p class="text-xs text-gray-500 mt-1">{{ $product->unit_size }}</p>
+                <p class="text-xs text-gray-400 mt-1">{{ $product->unit_size }}</p>
             </div>
-            <div class="mt-3 pt-3 border-t border-gray-100 space-y-2">
+            <div class="mt-3 pt-3 border-t border-gray-700 space-y-2">
                 <div class="flex items-center justify-between">
-                    <span class="text-sm font-semibold text-gray-800">
+                    <span class="text-sm font-semibold text-gray-200">
                         {{ $currency['symbol'] }} {{ number_format($product->unit_price, $currency['decimal_places']) }}
                     </span>
                     @php
                         $stockBadge = match($product->stock_status) {
-                            'IN_STOCK'     => 'bg-green-100 text-green-700',
-                            'LOW_STOCK'    => 'bg-amber-100 text-amber-700',
-                            'OUT_OF_STOCK' => 'bg-gray-100 text-gray-500',
-                            default        => 'bg-gray-100 text-gray-500',
+                            'IN_STOCK'     => 'bg-green-900/30 text-green-400',
+                            'LOW_STOCK'    => 'bg-amber-900/30 text-amber-400',
+                            'OUT_OF_STOCK' => 'bg-gray-100 text-gray-400',
+                            default        => 'bg-gray-100 text-gray-400',
                         };
                     @endphp
                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $stockBadge }}">
@@ -89,16 +89,16 @@
 
                 @if($product->stock_status !== 'OUT_OF_STOCK')
                 <div class="flex items-center gap-2">
-                    <div class="flex items-center border border-gray-300 rounded-lg">
+                    <div class="flex items-center border border-gray-600 rounded-lg">
                         <button @click="decQty({{ $product->product_id }})"
-                                class="px-2.5 py-1.5 text-gray-500 hover:bg-gray-100 rounded-l-lg text-sm">-</button>
+                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-100 rounded-l-lg text-sm">-</button>
                         <span class="w-8 text-center text-sm font-medium" x-text="getQty({{ $product->product_id }})"></span>
                         <button @click="incQty({{ $product->product_id }})"
-                                class="px-2.5 py-1.5 text-gray-500 hover:bg-gray-100 rounded-r-lg text-sm">+</button>
+                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-100 rounded-r-lg text-sm">+</button>
                     </div>
                     <button @click="addToBasket({{ $product->product_id }}, '{{ addslashes($product->generic_name) }}', {{ $product->unit_price }})"
                             :disabled="adding === {{ $product->product_id }}"
-                            class="flex-1 px-3 py-1.5 bg-green-700 text-white rounded-lg text-xs font-medium hover:bg-green-800 transition-colors disabled:opacity-50">
+                            class="flex-1 px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50">
                         <span x-show="adding !== {{ $product->product_id }} && !justAdded.includes({{ $product->product_id }})">Add to Basket</span>
                         <span x-show="adding === {{ $product->product_id }}">
                             <svg class="h-4 w-4 animate-spin inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -117,7 +117,7 @@
     </div>
 
     @if($products->isEmpty())
-    <div class="bg-white rounded-xl border border-gray-200 p-12 text-center">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-12 text-center">
         <p class="text-gray-400 text-sm">No products available at this pharmacy</p>
     </div>
     @endif
@@ -127,13 +127,13 @@
 
     {{-- Sticky bottom bar (mobile) --}}
     <div x-show="basketItems.length > 0" x-cloak
-         class="fixed bottom-0 left-0 right-0 z-30 bg-white border-t border-gray-200 px-4 py-3 flex items-center justify-between xl:hidden">
+         class="fixed bottom-0 left-0 right-0 z-30 bg-gray-800 border-t border-gray-700 px-4 py-3 flex items-center justify-between xl:hidden">
         <div>
-            <p class="text-sm font-semibold text-gray-800" x-text="'Basket (' + basketCount + ' items)'"></p>
-            <p class="text-xs text-gray-500" x-text="subtotal"></p>
+            <p class="text-sm font-semibold text-gray-200" x-text="'Basket (' + basketCount + ' items)'"></p>
+            <p class="text-xs text-gray-400" x-text="subtotal"></p>
         </div>
         <button @click="open = true"
-                class="px-4 py-2 bg-green-700 text-white rounded-lg text-sm font-medium hover:bg-green-800">
+                class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-yellow-500">
             View Basket
         </button>
     </div>

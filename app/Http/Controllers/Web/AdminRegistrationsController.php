@@ -12,8 +12,8 @@ use Illuminate\Support\Facades\Log;
 
 class AdminRegistrationsController extends Controller
 {
-    private const WRITE_ROLES = ['assistant_admin', 'admin', 'super_admin', 'technical_admin'];
-    private const READ_ROLES  = ['assistant_admin', 'admin', 'super_admin', 'technical_admin', 'admin_support'];
+    private const WRITE_ROLES = ['network_admin', 'assistant_admin', 'admin', 'super_admin', 'technical_admin'];
+    private const READ_ROLES  = ['network_admin', 'assistant_admin', 'admin', 'super_admin', 'technical_admin', 'admin_support'];
 
     public function index(Request $request)
     {

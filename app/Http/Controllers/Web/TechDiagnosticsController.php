@@ -22,11 +22,16 @@ class TechDiagnosticsController extends Controller
 
         $integrations = [];
         $checks = [
-            'M-Pesa Daraja' => fn() => DB::table('system_settings')->where('key', 'MPESA_SHORTCODE')->exists(),
+            'M-Pesa Daraja' => function () {
+                $key = config('daraja.consumer_key');
+                $env = config('daraja.env', 'sandbox');
+                if (empty($key)) return false;
+                return strtoupper($env) . ' - CONFIGURED';
+            },
             'I&M Bank API'  => fn() => DB::table('system_settings')->where('key', 'BANK_API_URL')->exists(),
             'SGA Courier'   => fn() => DB::table('system_settings')->where('key', 'SGA_WEBHOOK_SECRET')->exists(),
             'WhatsApp API'  => fn() => DB::table('system_settings')->where('key', 'WHATSAPP_API_TOKEN')->exists(),
-            'PPB Registry'  => fn() => DB::table('ppb_registry_cache')->exists(),
+            'PPB Registry'  => fn() => Schema::hasTable('ppb_registry_cache') && DB::table('ppb_registry_cache')->exists(),
             'Redis'         => function () {
                 try {
                     Cache::store('redis')->put('healthcheck', 1, 1);
@@ -35,18 +40,26 @@ class TechDiagnosticsController extends Controller
                     return false;
                 }
             },
-            'Queue Worker'  => fn() => DB::table('jobs')->count() !== null,
+            'Queue Worker'  => fn() => config('queue.default') !== 'sync',
         ];
         foreach ($checks as $name => $check) {
             try {
-                $integrations[$name] = $check() ? 'OK' : 'WARN';
+                $result = $check();
+                if (is_string($result)) {
+                    $integrations[$name] = $result;
+                } else {
+                    $integrations[$name] = $result ? 'OK' : 'WARN';
+                }
             } catch (\Exception $e) {
                 $integrations[$name] = 'ERROR';
             }
         }
 
-        $queueDepth   = DB::table('jobs')->count();
-        $failedJobs   = DB::table('failed_jobs')->count();
+        $queueDepth = match(config('queue.default')) {
+            'database' => Schema::hasTable('jobs') ? DB::table('jobs')->count() : 0,
+            default    => 0,
+        };
+        $failedJobs = Schema::hasTable('failed_jobs') ? DB::table('failed_jobs')->count() : 0;
         $queryResults = session('query_results');
         $querySQL     = session('query_sql');
 

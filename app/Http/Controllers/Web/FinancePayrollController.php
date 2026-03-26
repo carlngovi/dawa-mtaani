@@ -33,14 +33,14 @@ class FinancePayrollController extends Controller
             $commissions = DB::table('recruiter_ledger_entries as rl')
                 ->join('recruiter_agents as ra', 'rl.agent_id', '=', 'ra.id')
                 ->join('recruiter_firms as rf',  'ra.firm_id',  '=', 'rf.id')
-                ->select(['rl.id', 'rl.amount', 'rl.status', 'rl.created_at',
+                ->select(['rl.id', 'rl.amount_kes', 'rl.entry_type', 'rl.created_at',
                           'ra.agent_name', 'rf.firm_name'])
                 ->orderBy('rl.created_at', 'desc')
                 ->paginate(20);
 
             $unpaidTotal = DB::table('recruiter_ledger_entries')
-                ->where('status', 'UNPAID')
-                ->sum('amount');
+                ->where('entry_type', 'COMMISSION')
+                ->sum('amount_kes');
         }
 
         return view('finance.payroll', compact('commissions', 'unpaidTotal', 'currency'));

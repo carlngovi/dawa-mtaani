@@ -5,8 +5,8 @@
 <div x-data="{ expanded: false }" class="inline-block">
     {{-- Badge --}}
     <button @click="expanded = !expanded"
-            class="inline-flex items-center gap-1.5 rounded-full bg-green-50 px-3 py-1.5 text-sm font-medium text-green-700 ring-1 ring-green-200 hover:bg-green-100 transition">
-        <svg class="h-4 w-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            class="inline-flex items-center gap-1.5 rounded-full bg-green-900/20 px-3 py-1.5 text-sm font-medium text-green-400 ring-1 ring-green-200 hover:bg-green-900/30 transition">
+        <svg class="h-4 w-4 text-green-400" fill="currentColor" viewBox="0 0 20 20">
             <path fill-rule="evenodd" d="M10 1l2.928 1.382 3.09.476.952 3.008L18.856 8.5l-.954 3.01-.95 3.007-3.09.478L10 16.377l-2.862-1.382-3.09-.478-.95-3.008L2.144 8.5l.954-3.009.95-3.008 3.09-.476L10 1z" clip-rule="evenodd"/>
             <path fill="#fff" d="M13.707 7.293a1 1 0 00-1.414 0L9 10.586 7.707 9.293a1 1 0 10-1.414 1.414l2 2a1 1 0 001.414 0l4-4a1 1 0 000-1.414z"/>
         </svg>
@@ -17,7 +17,7 @@
     </button>
 
     {{-- Expanded timeline panel --}}
-    <div x-show="expanded" x-collapse class="mt-3 rounded-xl border border-green-200 bg-white p-4 shadow-sm">
+    <div x-show="expanded" x-collapse class="mt-3 rounded-xl border border-green-800 bg-gray-800 p-4 shadow-sm">
         <ol class="relative border-l-2 border-green-300 ml-3 space-y-6">
             @foreach ($chain as $event)
                 <li class="ml-6">
@@ -28,10 +28,10 @@
                         </svg>
                     </span>
 
-                    <h4 class="text-sm font-semibold text-gray-900">{{ $event['label'] }}</h4>
+                    <h4 class="text-sm font-semibold text-white">{{ $event['label'] }}</h4>
 
                     @if (! empty($event['actor']))
-                        <p class="text-sm text-gray-600">{{ $event['actor'] }}</p>
+                        <p class="text-sm text-gray-400">{{ $event['actor'] }}</p>
                     @endif
 
                     @if (! empty($event['licence']))
@@ -53,13 +53,13 @@
 
         {{-- PPB licence info --}}
         @if ($facilityPpbLicence)
-            <div class="mt-4 flex items-center gap-2 rounded-lg bg-gray-50 px-3 py-2 text-sm">
-                <span class="text-gray-500">PPB Licence:</span>
+            <div class="mt-4 flex items-center gap-2 rounded-lg bg-gray-900/50 px-3 py-2 text-sm">
+                <span class="text-gray-400">PPB Licence:</span>
                 <span class="font-medium">{{ $facilityPpbLicence }}</span>
                 <span @class([
                     'ml-auto rounded-full px-2 py-0.5 text-xs font-semibold',
-                    'bg-green-100 text-green-700' => $facilityPpbStatus === 'VALID',
-                    'bg-red-100 text-red-700'     => in_array($facilityPpbStatus, ['EXPIRED', 'SUSPENDED']),
+                    'bg-green-900/30 text-green-400' => $facilityPpbStatus === 'VALID',
+                    'bg-red-900/30 text-red-400'     => in_array($facilityPpbStatus, ['EXPIRED', 'SUSPENDED']),
                 ])>{{ $facilityPpbStatus }}</span>
             </div>
         @endif

@@ -1,6 +1,7 @@
 @props(['href', 'label', 'icon'])
 <li>
     <a href="{{ $href }}"
+       @click="if(window.innerWidth < 1280) $store.sidebar.closeMobile()"
        class="menu-item group"
        :class="[
            act('{{ ltrim($href, '/') }}') ? 'menu-item-active' : 'menu-item-inactive',

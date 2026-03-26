@@ -34,7 +34,7 @@ class GroupOrderHistoryController extends Controller
 
         $orders = DB::table('orders as o')
             ->join('facilities as f', 'o.retail_facility_id', '=', 'f.id')
-            ->join('users as u',      'o.placer_user_id',     '=', 'u.id')
+            ->leftJoin('users as u',  'o.placed_by_user_id',  '=', 'u.id')
             ->whereIn('o.retail_facility_id', $outletIds)
             ->whereNull('o.deleted_at')
             ->when($request->filled('outlet'), fn($q) => $q->where('f.ulid', $request->outlet))

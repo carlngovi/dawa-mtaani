@@ -5,7 +5,7 @@
 @section('content')
 <div class="page-header">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white tracking-tight">
+        <h1 class="text-2xl font-bold text-gray-900 dark:text-white dark:text-white tracking-tight">
             {{ $portalTitle }}
         </h1>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
@@ -25,7 +25,7 @@
         </svg>
     </div>
     <div>
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white">
+        <h2 class="text-lg font-semibold text-gray-900 dark:text-white dark:text-white">
             {{ $portalTitle }} is under construction
         </h2>
         <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md mx-auto">

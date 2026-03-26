@@ -48,23 +48,23 @@
 
     {{-- Header --}}
     <div>
-        <a href="/store/{{ $facility->ulid }}" class="text-xs text-green-700 hover:underline mb-2 inline-block">← Back to {{ $facility->facility_name }}</a>
-        <h1 class="text-2xl font-bold text-gray-900">Checkout</h1>
-        <p class="text-sm text-gray-500 mt-0.5">{{ $facility->facility_name }} — {{ $facility->county }}</p>
+        <a href="/store/{{ $facility->ulid }}" class="text-xs text-green-400 hover:underline mb-2 inline-block">← Back to {{ $facility->facility_name }}</a>
+        <h1 class="text-2xl font-bold text-white">Checkout</h1>
+        <p class="text-sm text-gray-400 mt-0.5">{{ $facility->facility_name }} — {{ $facility->county }}</p>
     </div>
 
     {{-- Error --}}
-    <div x-show="error" x-cloak class="bg-red-50 border border-red-200 text-red-800 text-sm px-4 py-3 rounded-lg">
+    <div x-show="error" x-cloak class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
         <span x-text="error"></span>
     </div>
 
     {{-- Order summary --}}
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-700">Order Summary</h3>
+    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-700">
+            <h3 class="text-sm font-semibold text-gray-300">Order Summary</h3>
         </div>
-        <table class="w-full text-sm">
-            <thead class="bg-gray-50 text-xs text-gray-500 uppercase tracking-wider">
+        <div class="overflow-x-auto"><table class="w-full text-sm">
+            <thead class="bg-gray-900/50 text-xs text-gray-400 uppercase tracking-wider">
                 <tr>
                     <th class="px-5 py-3 text-left">Item</th>
                     <th class="px-5 py-3 text-right">Qty</th>
@@ -72,36 +72,36 @@
                     <th class="px-5 py-3 text-right">Total</th>
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-gray-700">
                 @foreach($lines as $line)
                 <tr>
                     <td class="px-5 py-3">
-                        <p class="font-medium text-gray-800">{{ $line->generic_name }}</p>
+                        <p class="font-medium text-gray-200">{{ $line->generic_name }}</p>
                         <p class="text-xs text-gray-400">{{ $line->brand_name }} — {{ $line->unit_size }}</p>
                     </td>
-                    <td class="px-5 py-3 text-right text-gray-700">{{ $line->quantity }}</td>
-                    <td class="px-5 py-3 text-right text-gray-700">
+                    <td class="px-5 py-3 text-right text-gray-300">{{ $line->quantity }}</td>
+                    <td class="px-5 py-3 text-right text-gray-300">
                         {{ $currency['symbol'] }} {{ number_format($line->unit_price, $currency['decimal_places']) }}
                     </td>
-                    <td class="px-5 py-3 text-right font-medium text-gray-800">
+                    <td class="px-5 py-3 text-right font-medium text-gray-200">
                         {{ $currency['symbol'] }} {{ number_format($line->line_total, $currency['decimal_places']) }}
                     </td>
                 </tr>
                 @endforeach
             </tbody>
-        </table>
-        <div class="px-5 py-4 border-t border-gray-100 space-y-2">
-            <div class="flex justify-between text-sm text-gray-600">
+        </table></div>
+        <div class="px-5 py-4 border-t border-gray-700 space-y-2">
+            <div class="flex justify-between text-sm text-gray-400">
                 <span>Subtotal</span>
                 <span>{{ $currency['symbol'] }} {{ number_format($subtotal, $currency['decimal_places']) }}</span>
             </div>
             @if($platformFee > 0)
-            <div class="flex justify-between text-sm text-gray-500">
+            <div class="flex justify-between text-sm text-gray-400">
                 <span>Platform fee ({{ $platformFeePct }}%)</span>
                 <span>{{ $currency['symbol'] }} {{ number_format($platformFee, $currency['decimal_places']) }}</span>
             </div>
             @endif
-            <div class="flex justify-between text-lg font-bold text-gray-900 pt-2 border-t border-gray-100">
+            <div class="flex justify-between text-lg font-bold text-white pt-2 border-t border-gray-700">
                 <span>Total</span>
                 <span>{{ $currency['symbol'] }} {{ number_format($total, $currency['decimal_places']) }}</span>
             </div>
@@ -109,29 +109,29 @@
     </div>
 
     {{-- Promo code --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-5">
-        <label class="block text-xs font-medium text-gray-700 mb-2">Promo Code (optional)</label>
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
+        <label class="block text-xs font-medium text-gray-300 mb-2">Promo Code (optional)</label>
         <div class="flex gap-2">
             <input type="text" x-model="promoCode" placeholder="Enter code"
-                   class="flex-1 px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                   class="flex-1 px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
         </div>
         <p class="text-xs text-gray-400 mt-1">Discount will be applied when you pay</p>
     </div>
 
     {{-- Payment --}}
-    <div class="bg-white rounded-xl border border-gray-200 p-5 space-y-4">
-        <h3 class="text-sm font-semibold text-gray-700">Payment</h3>
+    <div class="bg-gray-800 rounded-xl border border-gray-700 p-5 space-y-4">
+        <h3 class="text-sm font-semibold text-gray-300">Payment</h3>
 
         <div>
-            <label class="block text-xs font-medium text-gray-700 mb-1">M-Pesa Phone Number</label>
+            <label class="block text-xs font-medium text-gray-300 mb-1">M-Pesa Phone Number</label>
             <input type="tel" x-model="phone"
                    placeholder="0712345678 or +254712345678"
-                   class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                   class="w-full px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
         </div>
 
         <button @click="pay()"
                 :disabled="paying"
-                class="w-full py-3 bg-green-600 text-white rounded-lg font-semibold text-sm hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                class="w-full py-3 bg-yellow-400 text-gray-900 rounded-lg font-semibold text-sm hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <span x-show="!paying">Pay {{ $currency['symbol'] }} {{ number_format($total, $currency['decimal_places']) }} via M-Pesa</span>
             <span x-show="paying" class="flex items-center justify-center gap-2">
                 <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -139,11 +139,11 @@
             </span>
         </button>
 
-        <p class="text-xs text-gray-500 text-center">
+        <p class="text-xs text-gray-400 text-center">
             You will receive an M-Pesa STK push on your phone. Enter your PIN to complete payment.
         </p>
 
-        <div class="bg-blue-50 border border-blue-200 text-blue-800 text-xs px-3 py-2 rounded-lg">
+        <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-xs px-3 py-2 rounded-lg">
             Your items will be held for 15 minutes after payment is initiated.
         </div>
     </div>

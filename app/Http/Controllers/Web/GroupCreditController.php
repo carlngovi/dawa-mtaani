@@ -38,14 +38,15 @@ class GroupCreditController extends Controller
             ->whereIn('ca.facility_id', $outletIds)
             ->select(['ca.account_status', 'ca.suspension_reason', 'ca.approved_at',
                       'f.facility_name', 'f.county',
-                      'ct.tranche_name', 'ct.credit_limit_kes'])
+                      'ct.name as tranche_name', 'ct.ceiling_amount as credit_limit_kes'])
             ->get();
 
         $recentEvents = DB::table('credit_events as e')
-            ->join('facilities as f', 'e.facility_id', '=', 'f.id')
-            ->whereIn('e.facility_id', $outletIds)
-            ->select(['e.event_type', 'e.amount', 'e.created_at', 'f.facility_name'])
-            ->orderBy('e.created_at', 'desc')
+            ->join('facility_credit_accounts as ca', 'e.credit_account_id', '=', 'ca.id')
+            ->join('facilities as f', 'ca.facility_id', '=', 'f.id')
+            ->whereIn('ca.facility_id', $outletIds)
+            ->select(['e.event_type', 'e.amount', 'e.occurred_at as created_at', 'f.facility_name'])
+            ->orderBy('e.occurred_at', 'desc')
             ->limit(20)
             ->get();
 

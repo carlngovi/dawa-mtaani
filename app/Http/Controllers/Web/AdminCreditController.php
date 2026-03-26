@@ -19,7 +19,7 @@ class AdminCreditController extends Controller
     public function index()
     {
         $user = Auth::user();
-        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin'])) abort(403);
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin', 'technical_admin', 'assistant_admin', 'shared_accountant'])) abort(403);
 
         $currency = CurrencyConfig::get();
         $tranches = CreditTranche::with(['activeParties', 'activeTiers'])->orderBy('id')->get();

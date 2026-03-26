@@ -31,7 +31,7 @@ class SuperRolesController extends Controller
                 $q->where('u.name',  'like', '%' . $request->search . '%')
                   ->orWhere('u.email', 'like', '%' . $request->search . '%');
             }))
-            ->select(['u.id', 'u.name', 'u.email', 'u.county', 'r.name as role_name'])
+            ->select(['u.id', 'u.name', 'u.email', 'r.name as role_name'])
             ->orderBy('r.name')
             ->orderBy('u.name')
             ->paginate(30)->withQueryString();

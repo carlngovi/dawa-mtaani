@@ -15,10 +15,7 @@ class SuperT0ApprovalsController extends Controller
 {
     public function index()
     {
-        $user = Auth::user();
-        if (! $user->hasRole('super_admin')) {
-            return redirect('/dashboard');
-        }
+        abort_unless(Auth::user()->hasAnyRole(['super_admin', 'technical_admin']), 403);
         $approvals = new \Illuminate\Pagination\LengthAwarePaginator([], 0, 20);
         if (Schema::hasTable('t0_approval_requests')) {
             $approvals = DB::table('t0_approval_requests')

@@ -17,7 +17,7 @@ class AdminPlacersController extends Controller
     public function index(Request $request)
     {
         $user = $request->user();
-        if (! $user->hasAnyRole(['admin', 'super_admin', 'technical_admin', 'assistant_admin'])) {
+        if (! $user->hasAnyRole(['network_admin', 'admin', 'super_admin', 'technical_admin', 'assistant_admin'])) {
             return redirect('/dashboard');
         }
 

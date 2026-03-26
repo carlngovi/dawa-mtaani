@@ -27,11 +27,11 @@ class RepPharmaciesController extends Controller
             ->whereNull('deleted_at')
             ->when($request->filled('search'), fn($q) => $q->where(function ($q) use ($request) {
                 $q->where('facility_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('ppb_licence',  'like', '%' . $request->search . '%');
+                  ->orWhere('ppb_licence_number',  'like', '%' . $request->search . '%');
             }))
             ->when($request->filled('status'), fn($q) => $q->where('facility_status', $request->status))
             ->select([
-                'ulid', 'facility_name', 'ppb_licence',
+                'ulid', 'facility_name', 'ppb_licence_number',
                 'ward', 'facility_status', 'network_membership', 'created_at',
                 // STRICT: no financial columns
             ])
@@ -52,7 +52,7 @@ class RepPharmaciesController extends Controller
             ->where('county', $county)
             ->whereNull('deleted_at')
             ->select([
-                'ulid', 'facility_name', 'ppb_licence', 'facility_type',
+                'ulid', 'facility_name', 'ppb_licence_number', 'facility_type',
                 'ward', 'sub_county', 'county',
                 'facility_status', 'network_membership', 'created_at',
                 // STRICT: no financial, credit, or GPS columns

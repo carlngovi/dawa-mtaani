@@ -19,15 +19,18 @@ class PatientRegistrationController extends Controller
     public function store(Request $request)
     {
         $validated = $request->validate([
-            'name'     => ['required', 'string', 'max:255'],
-            'email'    => ['required', 'email', 'unique:users,email'],
-            'password' => ['required', 'min:8', 'confirmed'],
-            'terms'    => ['accepted'],
+            'first_name' => ['required', 'string', 'max:100'],
+            'last_name'  => ['required', 'string', 'max:100'],
+            'email'      => ['required', 'email', 'unique:users,email'],
+            'password'   => ['required', 'min:8', 'confirmed'],
+            'terms'      => ['accepted'],
         ]);
 
-        $user = DB::transaction(function () use ($validated) {
+        $fullName = $validated['first_name'] . ' ' . $validated['last_name'];
+
+        $user = DB::transaction(function () use ($validated, $fullName) {
             $user = User::create([
-                'name'              => $validated['name'],
+                'name'              => $fullName,
                 'email'             => $validated['email'],
                 'password'          => Hash::make($validated['password']),
                 'email_verified_at' => now(),

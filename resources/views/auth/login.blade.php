@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full">
+<html lang="{{ str_replace('_', '-', app()->getLocale()) }}" class="h-full dark">
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -44,7 +44,7 @@
         });
     </script>
 </head>
-<body class="h-full bg-white dark:bg-gray-900">
+<body class="h-full bg-gray-900">
 
 <div class="relative flex h-screen w-full flex-col lg:flex-row">
 
@@ -54,9 +54,9 @@
         {{-- Top logo bar --}}
         <div class="flex items-center gap-2 px-5 sm:px-8 pt-6 sm:pt-8">
             <div class="h-8 w-8 rounded-lg bg-yellow-400 flex items-center justify-center">
-                <span class="text-gray-900 font-bold text-sm">DM</span>
+                <span class="text-white font-bold text-sm">DM</span>
             </div>
-            <span class="text-lg font-bold text-gray-900 dark:text-white">
+            <span class="text-lg font-bold text-white">
                 Dawa<span class="text-yellow-400">Mtaani</span>
             </span>
         </div>
@@ -65,10 +65,10 @@
         <div class="mx-auto flex w-full max-w-md flex-1 flex-col justify-center px-5 sm:px-8 py-8">
 
             <div class="mb-8">
-                <h1 class="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                <h1 class="text-2xl font-bold text-white mb-2">
                     Sign in to your account
                 </h1>
-                <p class="text-sm text-gray-500 dark:text-gray-400">
+                <p class="text-sm text-gray-400">
                     Enter your credentials to access your portal
                 </p>
             </div>
@@ -95,7 +95,7 @@
 
             {{-- Google OAuth --}}
             <a href="{{ route('auth.google') }}"
-               class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-300 bg-white px-4 py-3 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors dark:border-gray-700 dark:bg-gray-800 dark:text-gray-300 dark:hover:bg-gray-700 mb-6">
+               class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-600 bg-gray-800 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-gray-900 transition-colors mb-6">
                 <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                     <path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.38a4.6 4.6 0 01-2 3.02v2.5h3.22c1.89-1.74 2.98-4.3 2.98-7.31z" fill="#4285F4"/>
                     <path d="M10 20c2.7 0 4.96-.89 6.62-2.42l-3.22-2.5c-.9.6-2.04.96-3.4.96-2.61 0-4.82-1.76-5.61-4.13H1.07v2.58A10 10 0 0010 20z" fill="#34A853"/>
@@ -108,10 +108,10 @@
             {{-- Divider --}}
             <div class="relative mb-6">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                    <div class="w-full border-t border-gray-700"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="bg-white px-4 text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                    <span class="bg-gray-800 px-4 text-gray-400">
                         or sign in with email
                     </span>
                 </div>
@@ -128,7 +128,7 @@
                     {{-- Email --}}
                     <div>
                         <label for="email"
-                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                               class="block text-sm font-medium text-gray-300 mb-1.5">
                             Email address <span class="text-red-500">*</span>
                         </label>
                         <input type="email"
@@ -138,13 +138,13 @@
                                required
                                autocomplete="email"
                                placeholder="you@example.com"
-                               class="h-11 w-full rounded-lg border border-gray-300 bg-transparent px-4 py-2.5 text-sm text-gray-800 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-yellow-400 @error('email') border-red-400 @enderror"/>
+                               class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('email') border-red-400 @enderror"/>
                     </div>
 
                     {{-- Password with show/hide toggle --}}
                     <div>
                         <label for="password"
-                               class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1.5">
+                               class="block text-sm font-medium text-gray-300 mb-1.5">
                             Password <span class="text-red-500">*</span>
                         </label>
                         <div class="relative">
@@ -154,10 +154,10 @@
                                    required
                                    autocomplete="current-password"
                                    placeholder="Enter your password"
-                                   class="h-11 w-full rounded-lg border border-gray-300 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-800 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 dark:border-gray-700 dark:bg-gray-900 dark:text-white dark:placeholder:text-gray-500 dark:focus:border-yellow-400 @error('password') border-red-400 @enderror"/>
+                                   class="h-11 w-full rounded-lg border border-gray-600 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('password') border-red-400 @enderror"/>
                             <button type="button"
                                     @click="showPassword = !showPassword"
-                                    class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300">
+                                    class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-400">
                                 <svg x-show="!showPassword" class="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/>
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"/>
@@ -171,7 +171,7 @@
 
                     {{-- Remember me + Forgot password --}}
                     <div class="flex items-center justify-between">
-                        <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-700 select-none dark:text-gray-400">
+                        <label class="flex cursor-pointer items-center gap-2 text-sm text-gray-300 select-none">
                             <div class="relative">
                                 <input type="checkbox"
                                        name="remember"
@@ -179,7 +179,7 @@
                                        @change="remember = !remember"/>
                                 <div :class="remember
                                         ? 'border-yellow-400 bg-yellow-400'
-                                        : 'border-gray-300 bg-transparent dark:border-gray-600'"
+                                        : 'border-gray-600 bg-transparent'"
                                      class="flex h-5 w-5 items-center justify-center rounded-md border-[1.5px] transition-colors">
                                     <span :class="remember ? 'opacity-100' : 'opacity-0'" class="transition-opacity">
                                         <svg width="12" height="12" viewBox="0 0 12 12" fill="none">
@@ -191,7 +191,7 @@
                             Keep me logged in
                         </label>
                         <a href="{{ route('password.request') }}"
-                           class="text-sm text-yellow-600 hover:text-yellow-700 dark:text-yellow-400 dark:hover:text-yellow-300 font-medium">
+                           class="text-sm text-yellow-600 hover:text-yellow-700 font-medium">
                             Forgot password?
                         </a>
                     </div>
@@ -199,7 +199,7 @@
                     {{-- Submit --}}
                     <button type="submit"
                             :disabled="loading"
-                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-300 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors dark:focus:ring-offset-gray-900 disabled:opacity-70">
+                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors disabled:opacity-70">
                         <svg x-show="loading" class="animate-spin h-4 w-4 text-gray-900" fill="none" viewBox="0 0 24 24" style="display:none;">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
@@ -213,10 +213,10 @@
             {{-- Sign-up section --}}
             <div class="relative mt-8 mb-2">
                 <div class="absolute inset-0 flex items-center">
-                    <div class="w-full border-t border-gray-200 dark:border-gray-700"></div>
+                    <div class="w-full border-t border-gray-700"></div>
                 </div>
                 <div class="relative flex justify-center text-sm">
-                    <span class="bg-white px-4 text-gray-400 dark:bg-gray-900 dark:text-gray-500">
+                    <span class="bg-gray-800 px-4 text-gray-400">
                         Don't have an account?
                     </span>
                 </div>
@@ -224,32 +224,32 @@
 
             <div class="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
                 {{-- Card 1 — Register Pharmacy --}}
-                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center hover:border-yellow-400 transition-colors">
-                    <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-900/20">
-                        <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
-                        </svg>
+                <div class="flex flex-col items-center gap-3 p-5 rounded-xl bg-gray-800 border border-gray-700 text-center">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+                    </svg>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm text-white">Register your Pharmacy</p>
+                        <p class="text-xs text-gray-400 mt-0.5">For pharmacy owners &amp; operators</p>
                     </div>
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">Register your Pharmacy</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">For pharmacy owners &amp; operators</p>
                     <a href="{{ route('register.facility') }}"
-                       class="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white px-4 py-2 text-xs font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors w-full">
+                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-lg transition-colors">
                         Get Started
                     </a>
                 </div>
 
                 {{-- Card 2 — Patient --}}
-                <div class="rounded-lg border border-gray-200 dark:border-gray-700 p-4 text-center hover:border-yellow-400 transition-colors">
-                    <div class="mx-auto mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-50 dark:bg-yellow-900/20">
-                        <svg class="h-5 w-5 text-yellow-600 dark:text-yellow-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
-                        </svg>
+                <div class="flex flex-col items-center gap-3 p-5 rounded-xl bg-gray-800 border border-gray-700 text-center">
+                    <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+                    </svg>
+                    <div class="flex-1">
+                        <p class="font-bold text-sm text-white">I'm a Patient</p>
+                        <p class="text-xs text-gray-400 mt-0.5">Order medicines from nearby pharmacies</p>
                     </div>
-                    <h3 class="text-sm font-semibold text-gray-900 dark:text-white mb-1">I'm a Patient</h3>
-                    <p class="text-xs text-gray-400 dark:text-gray-500 mb-3">Order medicines from nearby pharmacies</p>
                     <a href="{{ route('register.patient') }}"
-                       class="inline-flex items-center justify-center rounded-md bg-gray-900 dark:bg-white px-4 py-2 text-xs font-medium text-white dark:text-gray-900 hover:bg-gray-700 dark:hover:bg-gray-200 transition-colors w-full">
-                        Continue with Phone
+                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-lg transition-colors">
+                        Get Started
                     </a>
                 </div>
             </div>
@@ -278,16 +278,18 @@
         {{-- Content --}}
         <div class="relative z-10 flex flex-col items-center text-center px-12 max-w-sm">
 
-            <div class="h-16 w-16 rounded-2xl bg-yellow-400 flex items-center justify-center mb-6 shadow-2xl">
-                <span class="text-gray-900 font-bold text-2xl">DM</span>
+            <div class="h-20 w-20 rounded-2xl bg-yellow-400 flex items-center justify-center mb-6 shadow-2xl">
+                <span class="text-gray-900 font-bold text-3xl tracking-tight">DM</span>
             </div>
 
-            <h2 class="text-2xl font-bold text-white mb-1">Dawa Mtaani</h2>
+            <h2 class="text-3xl font-bold mb-1">
+                <span class="text-white">Dawa</span><span class="text-yellow-400">Mtaani</span>
+            </h2>
             <p class="text-yellow-400 text-xs font-semibold tracking-widest uppercase mb-6">
                 Quality, Affordably
             </p>
 
-            <p class="text-gray-400 text-sm leading-relaxed mb-8">
+            <p class="text-gray-300 text-sm leading-relaxed mb-8">
                 Kenya's pharmacy network platform — connecting retail pharmacies,
                 hospitals, and wholesale distributors built for speed,
                 transparency, and PPB compliance.
@@ -299,26 +301,26 @@
                     'Network Orders', 'PPB Verified', 'Credit Engine',
                     'WhatsApp Ordering', 'Kenya DPA Compliant', 'M-Pesa Integrated'
                 ] as $feature)
-                <span class="inline-flex items-center rounded-full bg-white/5 px-3 py-1 text-xs font-medium text-gray-400 border border-white/10">
+                <span class="inline-flex items-center rounded-full bg-gray-800 px-3 py-1 text-xs font-medium text-gray-300 border border-gray-700">
                     {{ $feature }}
                 </span>
                 @endforeach
             </div>
 
             {{-- Stats --}}
-            <div class="grid grid-cols-3 gap-6 w-full border-t border-white/10 pt-8"
+            <div class="grid grid-cols-3 gap-6 w-full border-t border-gray-700 pt-8"
                  x-data="countUp()" x-init="start()">
                 <div class="text-center">
                     <p class="text-2xl font-bold text-yellow-400" x-text="counts[0] + '+'"></p>
-                    <p class="text-xs text-gray-500 mt-1">Pharmacies</p>
+                    <p class="text-xs text-gray-400 mt-1">Pharmacies</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-yellow-400" x-text="counts[1]"></p>
-                    <p class="text-xs text-gray-500 mt-1">SKUs</p>
+                    <p class="text-xs text-gray-400 mt-1">SKUs</p>
                 </div>
                 <div class="text-center">
                     <p class="text-2xl font-bold text-yellow-400" x-text="counts[2]"></p>
-                    <p class="text-xs text-gray-500 mt-1">Counties</p>
+                    <p class="text-xs text-gray-400 mt-1">Counties</p>
                 </div>
             </div>
         </div>
@@ -329,7 +331,7 @@
 {{-- Dark mode toggle --}}
 <div class="fixed right-6 bottom-6 z-50" x-data>
     <button @click.prevent="$store.theme.toggle()"
-            class="bg-yellow-400 hover:bg-yellow-300 inline-flex h-12 w-12 items-center justify-center rounded-full text-gray-900 shadow-lg transition-colors">
+            class="bg-yellow-400 hover:bg-yellow-500 inline-flex h-12 w-12 items-center justify-center rounded-full text-gray-900 shadow-lg transition-colors">
         <svg class="hidden dark:block w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>

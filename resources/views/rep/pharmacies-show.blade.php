@@ -6,39 +6,39 @@
     {{-- Back + header --}}
     <div>
         <a href="/rep/pharmacies"
-           class="text-xs text-green-700 hover:underline">← Back to Pharmacy List</a>
+           class="text-xs text-green-400 hover:underline">← Back to Pharmacy List</a>
         <div class="flex items-center gap-3 mt-3">
-            <h1 class="text-2xl font-bold text-gray-900">{{ $facility->facility_name }}</h1>
+            <h1 class="text-2xl font-bold text-white">{{ $facility->facility_name }}</h1>
             @php
                 $badge = match($facility->facility_status) {
-                    'ACTIVE'         => 'bg-green-100 text-green-700',
-                    'APPLIED'        => 'bg-gray-100 text-gray-600',
-                    'PPB_VERIFIED'   => 'bg-blue-100 text-blue-700',
-                    'ACCOUNT_LINKED' => 'bg-amber-100 text-amber-700',
-                    'SUSPENDED'      => 'bg-red-100 text-red-700',
-                    'PAUSED'         => 'bg-orange-100 text-orange-700',
-                    'CHURNED'        => 'bg-gray-100 text-gray-500',
-                    default          => 'bg-gray-100 text-gray-600',
+                    'ACTIVE'         => 'bg-green-900/30 text-green-400',
+                    'APPLIED'        => 'bg-gray-700 text-gray-400',
+                    'PPB_VERIFIED'   => 'bg-blue-900/30 text-blue-400',
+                    'ACCOUNT_LINKED' => 'bg-amber-900/30 text-amber-400',
+                    'SUSPENDED'      => 'bg-red-900/30 text-red-400',
+                    'PAUSED'         => 'bg-orange-900/30 text-orange-400',
+                    'CHURNED'        => 'bg-gray-700 text-gray-400',
+                    default          => 'bg-gray-700 text-gray-400',
                 };
             @endphp
             <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $badge }}">
                 {{ str_replace('_', ' ', $facility->facility_status) }}
             </span>
-            <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-100 text-gray-500">
+            <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-gray-700 text-gray-400">
                 Read Only
             </span>
         </div>
     </div>
 
     {{-- Info grid --}}
-    <div class="bg-white rounded-xl border border-gray-200 overflow-hidden">
-        <div class="px-5 py-4 border-b border-gray-100">
-            <h3 class="text-sm font-semibold text-gray-700">Facility Details</h3>
+    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-700">
+            <h3 class="text-sm font-semibold text-gray-300">Facility Details</h3>
         </div>
-        <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-100">
+        <dl class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-0 divide-y sm:divide-y-0 sm:divide-x divide-gray-700">
             @php
                 $fields = [
-                    'PPB Licence'      => $facility->ppb_licence,
+                    'PPB Licence'      => $facility->ppb_licence_number,
                     'Facility Type'    => $facility->facility_type ?? '—',
                     'County'           => $facility->county,
                     'Sub-County'       => $facility->sub_county ?? '—',
@@ -51,7 +51,7 @@
             @foreach($fields as $label => $value)
             <div class="px-5 py-4">
                 <dt class="text-xs text-gray-400 uppercase tracking-wider">{{ $label }}</dt>
-                <dd class="mt-1 text-sm font-medium text-gray-800">{{ $value }}</dd>
+                <dd class="mt-1 text-sm font-medium text-gray-200">{{ $value }}</dd>
             </div>
             @endforeach
         </dl>

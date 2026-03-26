@@ -105,10 +105,13 @@ Route::middleware(['auth', 'portal'])
     ->group(function () {
         Route::get('/dashboard', [\App\Http\Controllers\Web\RetailDashboardController::class, 'index']);
         Route::get('/catalogue', [\App\Http\Controllers\Web\RetailCatalogueController::class, 'index']);
+        Route::get('/cart', [\App\Http\Controllers\Web\RetailCatalogueController::class, 'cart']);
         Route::get('/basket', [\App\Http\Controllers\Web\RetailOrdersController::class, 'basket']);
         Route::get('/orders', [\App\Http\Controllers\Web\RetailOrdersController::class, 'index']);
         Route::post('/orders', [\App\Http\Controllers\Web\RetailOrdersController::class, 'store']);
         Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\RetailOrdersController::class, 'show']);
+        Route::get('/orders/{ulid}/payment-pending', [\App\Http\Controllers\Web\RetailOrdersController::class, 'paymentPending']);
+        Route::get('/orders/{ulid}/payment-status', [\App\Http\Controllers\Web\RetailOrdersController::class, 'paymentStatus']);
         Route::post('/orders/{ulid}/dispute', [\App\Http\Controllers\Web\RetailOrdersController::class, 'raiseDispute']);
         Route::get('/favourites', [\App\Http\Controllers\Web\RetailFavouritesController::class, 'index']);
         Route::get('/credit', [\App\Http\Controllers\Web\RetailCreditController::class, 'index'])->name('retail.credit.index');
@@ -211,6 +214,10 @@ Route::middleware(['auth', 'portal'])->prefix('store')->group(function () {
     Route::get('/orders/{ulid}', [\App\Http\Controllers\Web\StoreOrdersController::class, 'show']);
     Route::get('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'index']);
     Route::post('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'store']);
+    Route::get('/basket', [\App\Http\Controllers\Web\StoreBrowseController::class, 'basket'])->name('store.basket');
+    Route::post('/basket/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'patientCheckout'])->name('store.basket.checkout');
+    Route::get('/orders/{ulid}/pending', [\App\Http\Controllers\Web\StoreBrowseController::class, 'paymentPending'])->name('store.payment-pending');
+    Route::post('/orders/{ulid}/check-payment', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkPayment'])->name('store.check-payment');
     Route::get('/{facilityUlid}', [\App\Http\Controllers\Web\StoreBrowseController::class, 'storefront'])->name('store.storefront');
     Route::get('/{facilityUlid}/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkout'])->name('store.checkout');
 });

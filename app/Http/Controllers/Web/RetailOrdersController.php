@@ -124,14 +124,27 @@ class RetailOrdersController extends Controller
         }
 
         $request->validate([
-            'items'          => 'required|array|min:1',
+            'items'                 => 'required|array|min:1',
             'items.*.product_id'    => 'required|integer',
             'items.*.price_list_id' => 'required|integer',
             'items.*.quantity'      => 'required|integer|min:1',
             'items.*.payment_type'  => 'required|in:CREDIT,CASH,OFF_NETWORK_CASH',
-            'order_type'     => 'required|in:STANDARD,LPO',
-            'notes'          => 'nullable|string|max:1000',
+            'order_type'            => 'required|in:STANDARD,LPO',
+            'notes'                 => 'nullable|string|max:1000',
+            'mpesa_phone'           => 'nullable|string|max:20',
+            'first_name'            => 'nullable|string|max:100',
+            'last_name'             => 'nullable|string|max:100',
+            'email'                 => 'nullable|email|max:255',
+            'delivery_address'      => 'nullable|string|max:500',
+            'delivery_instructions' => 'nullable|string|max:1000',
         ]);
+
+        // Normalise M-Pesa phone to 254XXXXXXXXX
+        $mpesaPhone = $request->mpesa_phone ? preg_replace('/\s+/', '', $request->mpesa_phone) : null;
+        if ($mpesaPhone) {
+            if (str_starts_with($mpesaPhone, '+')) $mpesaPhone = substr($mpesaPhone, 1);
+            if (str_starts_with($mpesaPhone, '0')) $mpesaPhone = '254' . substr($mpesaPhone, 1);
+        }
 
         // Build lines for OrderPlacementService
         $lines = collect($request->items)->map(fn($item) => [
@@ -153,6 +166,19 @@ class RetailOrdersController extends Controller
                 sourceChannel: 'WEB',
                 notes: $request->notes,
             );
+
+            // Store delivery details on the order
+            $deliveryUpdate = array_filter([
+                'customer_first_name'   => $request->first_name,
+                'customer_last_name'    => $request->last_name,
+                'customer_email'        => $request->email,
+                'delivery_address'      => $request->delivery_address,
+                'delivery_instructions' => $request->delivery_instructions,
+                'mpesa_phone'           => $mpesaPhone,
+            ]);
+            if (! empty($deliveryUpdate)) {
+                DB::table('orders')->where('id', $result['order_id'])->update($deliveryUpdate);
+            }
 
             DB::table('audit_logs')->insert([
                 'facility_id'    => $facilityId,
@@ -176,17 +202,108 @@ class RetailOrdersController extends Controller
                 Log::warning('SMS failed after order placement', ['error' => $e->getMessage()]);
             }
 
-            return redirect("/retail/orders/{$result['ulid']}")
-                ->with('success', "Order placed successfully! Reference: " . substr($result['ulid'], -8));
+            $isJson = $request->expectsJson() || $request->isJson();
+            $redirectUrl = "/retail/orders/{$result['ulid']}";
+            $stkSent = false;
+
+            // Trigger M-Pesa STK Push if phone provided
+            if ($mpesaPhone && $result['total_amount'] > 0) {
+                try {
+                    Log::info('STK Push attempt', [
+                        'phone' => $mpesaPhone,
+                        'amount' => (int) ceil($result['total_amount']),
+                        'ref' => $result['ulid'],
+                    ]);
+
+                    $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
+                    $stkResult = $mpesa->initiateSTKPush(
+                        $mpesaPhone,
+                        (float) $result['total_amount'],
+                        $result['ulid']
+                    );
+
+                    Log::info('STK Push result', ['result' => $stkResult]);
+
+                    if (isset($stkResult['CheckoutRequestID'])) {
+                        DB::table('orders')->where('id', $result['order_id'])->update([
+                            'mpesa_checkout_request_id' => $stkResult['CheckoutRequestID'],
+                            'copay_status' => 'PENDING',
+                        ]);
+                    }
+
+                    $redirectUrl = "/retail/orders/{$result['ulid']}/payment-pending";
+                    $stkSent = true;
+
+                } catch (\Throwable $e) {
+                    Log::error('STK Push failed', ['order' => $result['ulid'], 'error' => $e->getMessage()]);
+                }
+            }
+
+            if ($isJson) {
+                return response()->json([
+                    'success' => true,
+                    'redirect' => $redirectUrl,
+                    'order_ulid' => $result['ulid'],
+                    'stk_sent' => $stkSent,
+                    'message' => $stkSent ? 'Order placed! Check your phone for M-Pesa prompt.' : 'Order placed successfully!',
+                ]);
+            }
+
+            return redirect($redirectUrl)->with('success',
+                $stkSent ? 'Order placed! Check your phone for M-Pesa prompt.' : "Order placed! Reference: " . substr($result['ulid'], -8));
 
         } catch (\Illuminate\Auth\Access\AuthorizationException $e) {
+            if ($request->expectsJson()) return response()->json(['message' => $e->getMessage()], 403);
             return back()->with('error', $e->getMessage());
         } catch (\InvalidArgumentException $e) {
+            if ($request->expectsJson()) return response()->json(['message' => $e->getMessage()], 422);
             return back()->with('error', $e->getMessage());
         } catch (\Throwable $e) {
             Log::error('Order placement failed', ['error' => $e->getMessage()]);
+            if ($request->expectsJson()) return response()->json(['message' => 'Order could not be placed. Please try again.'], 500);
             return back()->with('error', 'Order could not be placed. Please try again.');
         }
+    }
+
+    public function paymentPending(string $ulid)
+    {
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
+        $facilityId = Auth::user()->facility_id;
+
+        $order = DB::table('orders')
+            ->where('ulid', $ulid)
+            ->where('retail_facility_id', $facilityId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        abort_if(! $order, 404);
+
+        return view('retail.payment-pending', compact('order'));
+    }
+
+    public function paymentStatus(string $ulid)
+    {
+        abort_unless(Auth::user()->hasRole('retail_facility'), 403);
+        $facilityId = Auth::user()->facility_id;
+
+        $order = DB::table('orders')
+            ->where('ulid', $ulid)
+            ->where('retail_facility_id', $facilityId)
+            ->whereNull('deleted_at')
+            ->first();
+
+        abort_if(! $order, 404);
+
+        $paid = $order->mpesa_receipt_number !== null
+             || in_array($order->status, ['CONFIRMED', 'PACKED', 'DISPATCHED', 'DELIVERED']);
+
+        return response()->json([
+            'paid'         => $paid,
+            'status'       => $order->copay_status ?? $order->status,
+            'receipt'      => $order->mpesa_receipt_number,
+            'order_status' => $order->status,
+            'redirect_url' => $paid ? "/retail/orders/{$ulid}" : null,
+        ]);
     }
 
     public function raiseDispute(Request $request, string $ulid)

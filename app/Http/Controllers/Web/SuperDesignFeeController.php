@@ -20,7 +20,7 @@ class SuperDesignFeeController extends Controller
             return redirect('/dashboard');
         }
         $currency = CurrencyConfig::get();
-        $tranches = DB::table('credit_tranches')->orderBy('tranche_order')->get();
+        $tranches = DB::table('credit_tranches')->orderBy('id')->get();
         return view('super.design-fee', compact('tranches', 'currency'));
     }
 

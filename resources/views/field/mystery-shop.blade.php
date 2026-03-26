@@ -14,20 +14,20 @@
          overallColor() {
              const o = parseFloat(this.overall);
              if (isNaN(o)) return 'text-gray-400';
-             if (o >= 4)   return 'text-green-700';
-             if (o >= 3)   return 'text-amber-600';
-             return 'text-red-600';
+             if (o >= 4)   return 'text-green-400';
+             if (o >= 3)   return 'text-amber-400';
+             return 'text-red-400';
          }
      }">
 
     {{-- Header --}}
     <div>
-        <h1 class="text-2xl font-bold text-gray-900">Mystery Shopping</h1>
-        <p class="text-sm text-gray-500 mt-1">{{ $county }} County · Reports are advisory only</p>
+        <h1 class="text-2xl font-bold text-white">Mystery Shopping</h1>
+        <p class="text-sm text-gray-400 mt-1">{{ $county }} County · Reports are advisory only</p>
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-50 border border-blue-200 text-blue-800 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Visit reports are advisory. Findings are forwarded to Network Admin for review.
         They do not automatically affect facility status.
     </div>
@@ -38,10 +38,10 @@
         <div class="lg:col-span-2 space-y-4">
 
             {{-- Facility selector --}}
-            <div class="bg-white rounded-xl border border-gray-200 p-5">
-                <label class="block text-xs font-medium text-gray-700 mb-2">Select Pharmacy</label>
+            <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
+                <label class="block text-xs font-medium text-gray-300 mb-2">Select Pharmacy</label>
                 <select x-model="selectedFacility"
-                        class="w-full px-3 py-2.5 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                        class="w-full px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
                     <option value="">— choose a pharmacy —</option>
                     @foreach($facilities as $facility)
                     <option value="{{ $facility->id }}">{{ $facility->facility_name }} ({{ $facility->ward }})</option>
@@ -50,7 +50,7 @@
             </div>
 
             {{-- Scoring form --}}
-            <div x-show="selectedFacility" class="bg-white rounded-xl border border-gray-200 p-6 space-y-6">
+            <div x-show="selectedFacility" class="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-6">
                 <form method="POST" action="/api/v1/mystery-shop">
                     @csrf
                     <input type="hidden" name="facility_id" :value="selectedFacility">
@@ -67,7 +67,7 @@
 
                     @foreach($categories as $key => $label)
                     <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">{{ $label }}</label>
+                        <label class="block text-sm font-medium text-gray-300">{{ $label }}</label>
                         <input type="hidden" name="score_{{ $key }}" :value="scores.{{ $key }}">
                         <div class="flex gap-2">
                             @for($i = 1; $i <= 5; $i++)
@@ -84,29 +84,29 @@
                     @endforeach
 
                     {{-- Overall --}}
-                    <div class="pt-2 border-t border-gray-100 flex items-center gap-4">
-                        <span class="text-sm text-gray-500">Overall Score:</span>
+                    <div class="pt-2 border-t border-gray-700 flex items-center gap-4">
+                        <span class="text-sm text-gray-400">Overall Score:</span>
                         <span class="text-3xl font-bold" :class="overallColor()" x-text="overall"></span>
                     </div>
 
                     <div class="grid grid-cols-2 gap-3 pt-2">
                         <div>
-                            <label class="block text-xs font-medium text-gray-700 mb-1">Date of Visit</label>
+                            <label class="block text-xs font-medium text-gray-300 mb-1">Date of Visit</label>
                             <input type="date" name="visited_at"
                                    value="{{ now()->format('Y-m-d') }}"
-                                   class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500">
+                                   class="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
                         </div>
                     </div>
 
                     <div>
-                        <label class="block text-xs font-medium text-gray-700 mb-1">Notes (optional)</label>
+                        <label class="block text-xs font-medium text-gray-300 mb-1">Notes (optional)</label>
                         <textarea name="notes" rows="3"
                                   placeholder="Additional observations..."
-                                  class="w-full px-3 py-2 border border-gray-300 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-green-500"></textarea>
+                                  class="w-full px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400"></textarea>
                     </div>
 
                     <button type="submit"
-                            class="w-full px-4 py-2.5 bg-green-700 text-white rounded-lg text-sm hover:bg-green-800 transition-colors">
+                            class="w-full px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Submit Report
                     </button>
                 </form>
@@ -114,9 +114,9 @@
         </div>
 
         {{-- Recent visits --}}
-        <div class="bg-white rounded-xl border border-gray-200 overflow-hidden h-fit">
-            <div class="px-5 py-4 border-b border-gray-100">
-                <h3 class="text-sm font-semibold text-gray-700">Recent Visits</h3>
+        <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden h-fit">
+            <div class="px-5 py-4 border-b border-gray-700">
+                <h3 class="text-sm font-semibold text-gray-300">Recent Visits</h3>
             </div>
             @if($recentVisits->isEmpty())
             <p class="px-5 py-6 text-center text-gray-400 text-sm">
@@ -127,21 +127,21 @@
                 @endif
             </p>
             @else
-            <ul class="divide-y divide-gray-100">
+            <ul class="divide-y divide-gray-700">
                 @foreach($recentVisits as $visit)
                 <li class="px-5 py-3">
                     <div class="flex items-center justify-between">
                         <div>
-                            <p class="text-sm font-medium text-gray-800">{{ $visit->facility_name }}</p>
+                            <p class="text-sm font-medium text-gray-200">{{ $visit->facility_name }}</p>
                             <p class="text-xs text-gray-400">
                                 {{ \Carbon\Carbon::parse($visit->visited_at)->timezone('Africa/Nairobi')->format('d M Y') }}
                             </p>
                         </div>
                         @if($visit->overall_score)
                         @php
-                            $sc = $visit->overall_score >= 4 ? 'bg-green-100 text-green-700'
-                                : ($visit->overall_score >= 3 ? 'bg-amber-100 text-amber-700'
-                                : 'bg-red-100 text-red-700');
+                            $sc = $visit->overall_score >= 4 ? 'bg-green-900/30 text-green-400'
+                                : ($visit->overall_score >= 3 ? 'bg-amber-900/30 text-amber-400'
+                                : 'bg-red-900/30 text-red-400');
                         @endphp
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $sc }}">
                             {{ number_format($visit->overall_score, 1) }}

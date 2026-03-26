@@ -15,14 +15,24 @@ class StoreBrowseController extends Controller
         $user     = Auth::user();
         $currency = CurrencyConfig::get();
 
-        $query = DB::table('products')
-            ->where('is_active', true)
+        $query = DB::table('products as p')
+            ->leftJoin('wholesale_price_lists as wpl', function ($join) {
+                $join->on('wpl.product_id', '=', 'p.id')
+                     ->where('wpl.is_active', true);
+            })
+            ->where('p.is_active', true)
             ->when($request->filled('search'), fn($q) => $q->where(function ($q) use ($request) {
-                $q->where('generic_name', 'like', '%' . $request->search . '%')
-                  ->orWhere('brand_name', 'like', '%' . $request->search . '%');
+                $q->where('p.generic_name', 'like', '%' . $request->search . '%')
+                  ->orWhere('p.brand_name', 'like', '%' . $request->search . '%');
             }))
-            ->when($request->filled('category'), fn($q) => $q->where('therapeutic_category', $request->category))
-            ->orderBy('generic_name');
+            ->when($request->filled('category'), fn($q) => $q->where('p.therapeutic_category', $request->category))
+            ->select([
+                'p.id', 'p.generic_name', 'p.brand_name', 'p.unit_size',
+                'p.therapeutic_category',
+                DB::raw('COALESCE(wpl.unit_price, 0) as unit_price'),
+                DB::raw("COALESCE(wpl.stock_status, 'IN_STOCK') as stock_status"),
+            ])
+            ->orderBy('p.generic_name');
 
         $products = $query->paginate(24)->withQueryString();
 
@@ -50,6 +60,172 @@ class StoreBrowseController extends Controller
             ->get();
 
         return view('store.browse', compact('products', 'categories', 'currency', 'basketCount', 'eligibleFacilities'));
+    }
+
+    public function basket()
+    {
+        $currency = CurrencyConfig::get();
+        return view('store.basket', compact('currency'));
+    }
+
+    public function patientCheckout(Request $request)
+    {
+        $request->validate([
+            'phone'                 => 'required|string|max:20',
+            'items'                 => 'required|array|min:1',
+            'items.*.product_id'    => 'required|integer',
+            'items.*.name'          => 'required|string',
+            'items.*.qty'           => 'required|integer|min:1',
+            'items.*.price'         => 'required|numeric|min:0',
+            'total'                 => 'required|numeric|min:0',
+            'first_name'            => 'required|string|max:100',
+            'last_name'             => 'required|string|max:100',
+            'email'                 => 'required|email|max:255',
+            'delivery_address'      => 'required|string|max:500',
+            'delivery_instructions' => 'nullable|string|max:1000',
+        ]);
+
+        $user  = Auth::user();
+        $phone = preg_replace('/\D/', '', $request->phone);
+        if (str_starts_with($phone, '0')) $phone = '254' . substr($phone, 1);
+        $total = (float) $request->total;
+        $ulid  = strtolower((string) \Illuminate\Support\Str::ulid());
+
+        // Get a facility — use wholesale facility linked to the first product's price list
+        $firstProductId = $request->items[0]['product_id'] ?? null;
+        $facilityId = DB::table('wholesale_price_lists')
+            ->where('product_id', $firstProductId)
+            ->where('is_active', true)
+            ->value('wholesale_facility_id')
+            ?? DB::table('facilities')->where('facility_status', 'ACTIVE')->value('id')
+            ?? 1;
+
+        DB::beginTransaction();
+        try {
+            $orderId = DB::table('patient_orders')->insertGetId([
+                'ulid'                  => $ulid,
+                'patient_phone'         => $phone,
+                'patient_name'          => $request->first_name . ' ' . $request->last_name,
+                'facility_id'           => $facilityId,
+                'status'                => 'PAYMENT_PENDING',
+                'subtotal_amount'       => $total,
+                'discount_amount'       => 0,
+                'total_amount'          => $total,
+                'platform_fee_pct'      => 0,
+                'platform_fee_amount'   => 0,
+                'facility_net_amount'   => $total,
+                'customer_first_name'   => $request->first_name,
+                'customer_last_name'    => $request->last_name,
+                'customer_email'        => $request->email,
+                'delivery_address'      => $request->delivery_address,
+                'delivery_instructions' => $request->delivery_instructions,
+                'created_at'            => now(),
+                'updated_at'            => now(),
+            ]);
+
+            foreach ($request->items as $item) {
+                DB::table('patient_order_lines')->insert([
+                    'patient_order_id' => $orderId,
+                    'product_id'       => $item['product_id'],
+                    'quantity'         => $item['qty'],
+                    'unit_price'       => $item['price'],
+                    'line_discount'    => 0,
+                    'line_total'       => $item['qty'] * $item['price'],
+                    'created_at'       => now(),
+                    'updated_at'       => now(),
+                ]);
+            }
+
+            DB::commit();
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            \Illuminate\Support\Facades\Log::error('Patient order failed', ['error' => $e->getMessage()]);
+            return response()->json(['success' => false, 'message' => 'Order creation failed.'], 500);
+        }
+
+        // Trigger M-Pesa STK Push
+        try {
+            $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
+            $stkResult = $mpesa->initiateSTKPush($phone, $total, $ulid);
+
+            \Illuminate\Support\Facades\Log::info('Patient STK Push', ['ulid' => $ulid, 'result' => $stkResult]);
+
+            if (isset($stkResult['CheckoutRequestID'])) {
+                DB::table('patient_orders')->where('ulid', $ulid)->update([
+                    'mpesa_checkout_request_id' => $stkResult['CheckoutRequestID'],
+                    'updated_at' => now(),
+                ]);
+            }
+
+            return response()->json([
+                'success'      => true,
+                'redirect_url' => "/store/orders/{$ulid}/pending",
+                'message'      => 'M-Pesa prompt sent!',
+            ]);
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::error('Patient STK failed', ['ulid' => $ulid, 'error' => $e->getMessage()]);
+            return response()->json([
+                'success'      => true,
+                'redirect_url' => "/store/orders/{$ulid}?pending=true",
+                'message'      => 'Order placed but M-Pesa prompt failed: ' . $e->getMessage(),
+            ]);
+        }
+    }
+
+    public function paymentPending(string $ulid)
+    {
+        $user = Auth::user();
+        $order = DB::table('patient_orders')
+            ->where('ulid', $ulid)
+            ->where('patient_phone', 'like', '%' . substr($user->phone ?? '', -9))
+            ->first();
+
+        if (! $order) $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        abort_if(! $order, 404);
+
+        $currency = CurrencyConfig::get();
+        return view('store.payment-pending', compact('order', 'currency'));
+    }
+
+    public function checkPayment(Request $request, string $ulid)
+    {
+        $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        abort_if(! $order, 404);
+
+        // If already confirmed, return immediately
+        if (in_array($order->status, ['CONFIRMED', 'READY', 'COLLECTED'])) {
+            return response()->json(['paid' => true, 'status' => $order->status, 'receipt' => $order->mpesa_receipt_number]);
+        }
+
+        // Query Safaricom for the STK push result
+        if (! $order->mpesa_checkout_request_id) {
+            return response()->json(['paid' => false, 'status' => $order->status, 'message' => 'No checkout request ID found.']);
+        }
+
+        try {
+            $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
+            $result = $mpesa->queryTransactionStatus($order->mpesa_checkout_request_id);
+
+            \Illuminate\Support\Facades\Log::info('STK Query result', ['ulid' => $ulid, 'result' => $result]);
+
+            $resultCode = $result['ResultCode'] ?? -1;
+
+            if ((int) $resultCode === 0) {
+                // Payment successful — update order
+                DB::table('patient_orders')->where('ulid', $ulid)->update([
+                    'status' => 'CONFIRMED',
+                    'mpesa_receipt_number' => 'STK_QUERY_CONFIRMED',
+                    'paid_at' => now(),
+                    'updated_at' => now(),
+                ]);
+                return response()->json(['paid' => true, 'status' => 'CONFIRMED', 'receipt' => 'STK_QUERY_CONFIRMED']);
+            } else {
+                return response()->json(['paid' => false, 'status' => $order->status, 'message' => $result['ResultDesc'] ?? 'Payment not yet confirmed.']);
+            }
+        } catch (\Throwable $e) {
+            \Illuminate\Support\Facades\Log::warning('STK Query failed', ['ulid' => $ulid, 'error' => $e->getMessage()]);
+            return response()->json(['paid' => false, 'status' => $order->status, 'message' => 'Unable to check status. Try again.']);
+        }
     }
 
     public function storefront(string $facilityUlid)
