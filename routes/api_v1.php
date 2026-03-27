@@ -304,3 +304,28 @@ Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
     Route::get('/admin/security/summary', [\App\Http\Controllers\Api\V1\SecurityEventController::class, 'summary']);
     Route::post('/admin/users/{id}/mfa/disable', [\App\Http\Controllers\Api\V1\AdminMfaController::class, 'disable']);
 });
+
+// -------------------------------------------------------
+// Spotter Field Agent Module
+// -------------------------------------------------------
+
+// Public — no auth
+Route::post('spotter/activate', [\App\Http\Controllers\Api\V1\Spotter\ActivationController::class, 'activate']);
+Route::post('auth/refresh', [\App\Http\Controllers\Api\V1\Spotter\AuthController::class, 'refresh']);
+
+// Authenticated spotter routes
+Route::middleware('auth.spotter')->prefix('spotter')->group(function () {
+    Route::post('clock/in', [\App\Http\Controllers\Api\V1\Spotter\ClockController::class, 'clockIn']);
+    Route::post('clock/out', [\App\Http\Controllers\Api\V1\Spotter\ClockController::class, 'clockOut']);
+    Route::post('submissions', [\App\Http\Controllers\Api\V1\Spotter\SubmissionController::class, 'store']);
+    Route::get('submissions', [\App\Http\Controllers\Api\V1\Spotter\SubmissionController::class, 'index']);
+    Route::post('sync', [\App\Http\Controllers\Api\V1\Spotter\SyncController::class, 'sync']);
+    Route::get('leaderboard', [\App\Http\Controllers\Api\V1\Spotter\LeaderboardController::class, 'index']);
+});
+
+// Admin spotter management — sanctum auth + admin role
+Route::middleware(['auth:sanctum', 'role:admin|super_admin'])->prefix('spotter/admin')->group(function () {
+    Route::get('tokens', [\App\Http\Controllers\Api\V1\Spotter\AdminTokenController::class, 'index']);
+    Route::post('activation-codes', [\App\Http\Controllers\Api\V1\Spotter\AdminTokenController::class, 'generateCode']);
+    Route::delete('tokens/{token}/revoke', [\App\Http\Controllers\Api\V1\Spotter\AdminTokenController::class, 'revoke']);
+});

@@ -89,8 +89,7 @@
 
                 <div>
                     <label class="block text-xs text-gray-400 mb-1.5">Delivery Address *</label>
-                    <textarea x-model="deliveryAddress" rows="2" placeholder="House/Apartment No, Street, Area, Town"
-                              class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2.5 text-sm placeholder-gray-500 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 outline-none resize-none"></textarea>
+                    <x-address-picker placeholder="Search for your delivery location..." />
                 </div>
 
                 <div>

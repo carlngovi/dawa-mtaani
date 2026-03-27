@@ -90,8 +90,7 @@
                 </div>
                 <div>
                     <label class="block text-xs text-gray-400 mb-1.5">Delivery Address *</label>
-                    <textarea x-model="deliveryAddress" rows="2" placeholder="Pharmacy address for delivery"
-                              class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2.5 text-sm placeholder-gray-500 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 outline-none resize-none"></textarea>
+                    <x-address-picker placeholder="Search for your pharmacy delivery location..." />
                 </div>
                 <div>
                     <label class="block text-xs text-gray-400 mb-1.5">Delivery Instructions <span class="text-gray-500">(optional)</span></label>
@@ -158,6 +157,7 @@ function retailBasketPage() {
         count: 0, total: 0,
         firstName: '', lastName: '', email: '',
         deliveryAddress: '', deliveryInstructions: '',
+        deliveryLat: '', deliveryLng: '', deliveryPlaceId: '',
         paymentType: '{{ $isNetworkMember && $creditAvailable > 0 ? 'CREDIT' : 'CASH' }}',
         mpesaPhone: '{{ auth()->user()->phone ?? '' }}',
         notes: '',
@@ -168,6 +168,15 @@ function retailBasketPage() {
             window.addEventListener('cart-updated', () => {
                 this.items = JSON.parse(localStorage.getItem('dm_cart') || '[]');
                 this.recalc();
+            });
+            window.addEventListener('address-selected', (e) => {
+                this.deliveryAddress = e.detail.address;
+                this.deliveryLat = e.detail.lat;
+                this.deliveryLng = e.detail.lng;
+                this.deliveryPlaceId = e.detail.place_id;
+            });
+            window.addEventListener('address-typed', (e) => {
+                if (!this.deliveryLat) this.deliveryAddress = e.detail.address;
             });
         },
 
@@ -234,6 +243,9 @@ function retailBasketPage() {
                         email: this.email,
                         delivery_address: this.deliveryAddress,
                         delivery_instructions: this.deliveryInstructions || null,
+                        delivery_lat: this.deliveryLat || null,
+                        delivery_lng: this.deliveryLng || null,
+                        delivery_place_id: this.deliveryPlaceId || null,
                     })
                 });
 

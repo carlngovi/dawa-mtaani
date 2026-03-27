@@ -12,6 +12,8 @@ use App\Jobs\BasketAbandonmentJob;
 use App\Jobs\CopayEscalationJob;
 use App\Jobs\FacilitySettlementJob;
 use App\Jobs\OnlineStoreEligibilityJob;
+use App\Jobs\SpotterFollowUpOverdueJob;
+use App\Jobs\SpotterAttendanceAutoCloseJob;
 use App\Jobs\SloComplianceJob;
 use Illuminate\Foundation\Inspiring;
 use Illuminate\Support\Facades\Artisan;
@@ -34,3 +36,7 @@ Schedule::job(new OnlineStoreEligibilityJob)->dailyAt('02:00')->timezone('Africa
 Schedule::job(new BasketAbandonmentJob)->hourly()->onOneServer();
 Schedule::job(new FacilitySettlementJob)->dailyAt('01:00')->onOneServer();
 Schedule::job(new CopayEscalationJob)->hourly()->onOneServer();
+
+// Spotter module
+Schedule::job(new SpotterFollowUpOverdueJob)->dailyAt('06:00')->timezone('Africa/Nairobi');
+Schedule::job(new SpotterAttendanceAutoCloseJob)->dailyAt('23:55')->timezone('Africa/Nairobi');

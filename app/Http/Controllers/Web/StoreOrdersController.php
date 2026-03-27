@@ -45,7 +45,7 @@ class StoreOrdersController extends Controller
 
         $stats = [
             'total'     => DB::table('patient_orders')->whereIn('patient_phone', $phones)->count(),
-            'pending'   => DB::table('patient_orders')->whereIn('patient_phone', $phones)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED'])->count(),
+            'pending'   => DB::table('patient_orders')->whereIn('patient_phone', $phones)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED', 'READY'])->count(),
             'collected' => DB::table('patient_orders')->whereIn('patient_phone', $phones)->where('status', 'COLLECTED')->count(),
         ];
 

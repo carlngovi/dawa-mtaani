@@ -32,7 +32,7 @@
         <select name="status"
                 class="px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
             <option value="">All statuses</option>
-            @foreach(['PENDING','CONFIRMED','READY','COLLECTED','CANCELLED','REJECTED'] as $s)
+            @foreach(['PAYMENT_PENDING','CONFIRMED','READY','COLLECTED','PAYMENT_FAILED','CANCELLED','REJECTED'] as $s)
                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ $s }}</option>
             @endforeach
         </select>
@@ -60,13 +60,15 @@
                 </div>
                 @php
                     $badge = match($order->status) {
-                        'COLLECTED'  => 'bg-green-900/30 text-green-400',
-                        'READY'      => 'bg-blue-900/30 text-blue-400',
-                        'CONFIRMED'  => 'bg-blue-900/30 text-blue-400',
-                        'CANCELLED'  => 'bg-red-900/30 text-red-400',
-                        'REJECTED'   => 'bg-red-900/30 text-red-400',
-                        'PENDING'    => 'bg-amber-900/30 text-amber-400',
-                        default      => 'bg-gray-100 text-gray-400',
+                        'COLLECTED'       => 'bg-green-900/30 text-green-400',
+                        'READY'           => 'bg-blue-900/30 text-blue-400',
+                        'CONFIRMED'       => 'bg-blue-900/30 text-blue-400',
+                        'CANCELLED'       => 'bg-red-900/30 text-red-400',
+                        'REJECTED'        => 'bg-red-900/30 text-red-400',
+                        'PAYMENT_FAILED'  => 'bg-red-900/30 text-red-400',
+                        'PAYMENT_PENDING' => 'bg-amber-900/30 text-amber-400',
+                        'PENDING'         => 'bg-amber-900/30 text-amber-400',
+                        default           => 'bg-gray-100 text-gray-400',
                     };
                 @endphp
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $badge }}">

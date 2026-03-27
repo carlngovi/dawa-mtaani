@@ -68,7 +68,11 @@
             </button>
             <a x-show="paid" x-cloak :href="redirectUrl || '/retail/orders'" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl text-center transition-colors">View Order →</a>
             <a x-show="failed" x-cloak href="/retail/basket" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl text-center transition-colors">Try Again →</a>
-            <a x-show="!paid" href="/retail/orders" class="block text-xs text-gray-600 hover:text-gray-400 text-center transition-colors">View orders without waiting</a>
+            <button x-show="failed" x-cloak @click="pollCount = 0; timedOut = false; failed = false; failureReason = null; check()"
+                    class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors">
+                Re-check Payment Status
+            </button>
+            <a href="/retail/orders" class="block text-xs text-gray-600 hover:text-gray-400 text-center transition-colors">View My Orders</a>
         </div>
     </div>
 
@@ -87,16 +91,18 @@
 <script>
 function paymentPoller(orderUlid, statusUrl) {
     return {
-        paid: false, failed: false, checking: false,
+        paid: false, failed: false, checking: false, timedOut: false,
         receipt: null, failureReason: null, redirectUrl: null,
         countdown: 5, pollTimer: null, countTimer: null,
-        errorMsg: null, pollCount: 0, maxPolls: 24,
+        errorMsg: null, pollCount: 0, maxPolls: 36,
 
         init() { this.schedule(); },
 
         schedule() {
             if (this.pollCount >= this.maxPolls) {
-                this.errorMsg = 'Check timed out. Please check your M-Pesa messages or refresh.';
+                this.timedOut = true;
+                this.failed = true;
+                this.failureReason = 'Payment verification timed out. If you completed the payment, your order will be confirmed shortly. Check My Orders.';
                 return;
             }
             this.countdown = 5;
@@ -107,9 +113,12 @@ function paymentPoller(orderUlid, statusUrl) {
         },
 
         async check() {
-            if (this.checking || this.paid || this.failed) return;
+            if (this.checking || this.paid) return;
+            if (this.failed && !this.timedOut) return;
             this.checking = true;
             this.errorMsg = null;
+            this.timedOut = false;
+            this.failed = false;
             this.pollCount++;
             try {
                 const res = await fetch(statusUrl, {
@@ -125,7 +134,7 @@ function paymentPoller(orderUlid, statusUrl) {
                 this.failureReason = data.failure_reason || null;
                 this.redirectUrl = data.redirect_url || null;
                 if (this.paid) {
-                    setTimeout(() => { window.location.href = this.redirectUrl || '/retail/orders'; }, 2000);
+                    setTimeout(() => { window.location.href = this.redirectUrl || '/retail/orders'; }, 2500);
                 } else if (!this.failed) {
                     this.schedule();
                 }

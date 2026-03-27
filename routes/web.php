@@ -98,6 +98,20 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
         Route::get('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'index']);
         Route::post('/invitations', [\App\Http\Controllers\Web\AdminInvitationController::class, 'store']);
         Route::delete('/invitations/{id}', [\App\Http\Controllers\Web\AdminInvitationController::class, 'destroy']);
+
+        // Spotter Field Agent
+        Route::prefix('spotter')->name('admin.spotter.')->group(function () {
+            Route::get('/', [\App\Http\Controllers\Web\SpotterController::class, 'index'])->name('index');
+            Route::get('activations', [\App\Http\Controllers\Web\SpotterActivationController::class, 'index'])->name('activations.index');
+            Route::get('activations/create', [\App\Http\Controllers\Web\SpotterActivationController::class, 'create'])->name('activations.create');
+            Route::post('activations', [\App\Http\Controllers\Web\SpotterActivationController::class, 'store'])->name('activations.store');
+            Route::get('submissions', [\App\Http\Controllers\Web\SpotterSubmissionController::class, 'index'])->name('submissions.index');
+            Route::get('submissions/{submission}', [\App\Http\Controllers\Web\SpotterSubmissionController::class, 'show'])->name('submissions.show');
+            Route::get('duplicates', [\App\Http\Controllers\Web\SpotterDuplicateController::class, 'index'])->name('duplicates.index');
+            Route::post('duplicates/{review}/decide', [\App\Http\Controllers\Web\SpotterDuplicateController::class, 'decide'])->name('duplicates.decide');
+            Route::get('attendance', [\App\Http\Controllers\Web\SpotterAttendanceController::class, 'index'])->name('attendance.index');
+            Route::get('followups', [\App\Http\Controllers\Web\SpotterFollowUpController::class, 'index'])->name('followups.index');
+        });
     });
 
 // -------------------------------------------------------
@@ -234,5 +248,9 @@ Route::middleware(['auth', 'portal'])->prefix('tech')->group(function () {
     Route::get('/write', [\App\Http\Controllers\Web\TechWriteController::class, 'index']);
     Route::get('/incidents', [\App\Http\Controllers\Web\TechIncidentsController::class, 'index']);
 });
+
+// ── Spotter Field App (PWA — no auth middleware, uses own token auth) ────
+Route::get('/spotter', [\App\Http\Controllers\SpotterAppController::class, 'index'])->name('spotter.app');
+Route::get('/spotter/{any}', [\App\Http\Controllers\SpotterAppController::class, 'index'])->where('any', '.*')->name('spotter.fallback');
 
 require __DIR__.'/auth.php';
