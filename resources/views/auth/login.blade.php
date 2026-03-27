@@ -4,7 +4,9 @@
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
-    <title>Sign In — Dawa Mtaani</title>
+    <title>DawaMtaani</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg"><link rel="shortcut icon" href="/favicon.svg">
+
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     <script>
         (function() {
@@ -290,40 +292,6 @@
                 Quality, Affordably
             </p>
 
-            <p class="text-sm leading-relaxed mb-8" style="color: #d1d5db !important;">
-                Kenya's pharmacy network platform — connecting retail pharmacies,
-                hospitals, and wholesale distributors built for speed,
-                transparency, and PPB compliance.
-            </p>
-
-            {{-- Feature pills --}}
-            <div class="flex flex-wrap justify-center gap-2 mb-10">
-                @foreach([
-                    'Network Orders', 'PPB Verified', 'Credit Engine',
-                    'WhatsApp Ordering', 'Kenya DPA Compliant', 'M-Pesa Integrated'
-                ] as $feature)
-                <span class="inline-flex items-center rounded-full px-3 py-1 text-xs font-medium" style="background:#1f2937 !important; color:#d1d5db !important; border:1px solid #374151 !important;">
-                    {{ $feature }}
-                </span>
-                @endforeach
-            </div>
-
-            {{-- Stats --}}
-            <div class="grid grid-cols-3 gap-6 w-full pt-8" style="border-top: 1px solid #374151 !important;"
-                 x-data="countUp()" x-init="start()">
-                <div class="text-center">
-                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[0] + '+'"></p>
-                    <p class="text-xs mt-1" style="color: #9ca3af !important;">Pharmacies</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[1]"></p>
-                    <p class="text-xs mt-1" style="color: #9ca3af !important;">SKUs</p>
-                </div>
-                <div class="text-center">
-                    <p class="text-2xl font-bold" style="color: #facc15 !important;" x-text="counts[2]"></p>
-                    <p class="text-xs mt-1" style="color: #9ca3af !important;">Counties</p>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -342,33 +310,6 @@
     </button>
 </div>
 
-<script>
-function countUp() {
-    return {
-        targets: [210, 49, 3],
-        counts:  [0,   0,  0],
-        start() {
-            setTimeout(() => {
-                this.targets.forEach((target, i) => {
-                    const steps    = 60;
-                    const stepTime = 1800 / steps;
-                    let current    = 0;
-                    const inc      = target / steps;
-                    const timer    = setInterval(() => {
-                        current += inc;
-                        if (current >= target) {
-                            this.counts[i] = target;
-                            clearInterval(timer);
-                        } else {
-                            this.counts[i] = Math.floor(current);
-                        }
-                    }, stepTime);
-                });
-            }, 400);
-        }
-    };
-}
-</script>
 
 </body>
 </html>

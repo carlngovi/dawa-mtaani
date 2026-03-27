@@ -90,6 +90,50 @@ class StoreSearchController extends Controller
             })->all();
         });
 
+        // Fallback: if no stock-linked results, search products catalogue directly
+        if (empty($results)) {
+            $fallback = DB::table('products as p')
+                ->where('p.is_active', true)
+                ->where(function ($where) use ($q) {
+                    $where->where('p.generic_name', 'LIKE', "%{$q}%")
+                          ->orWhere('p.brand_name', 'LIKE', "%{$q}%")
+                          ->orWhere('p.sku_code', 'LIKE', "%{$q}%");
+                })
+                ->select([
+                    'p.id as product_id',
+                    'p.ulid as product_ulid',
+                    'p.generic_name',
+                    'p.brand_name',
+                    'p.unit_size',
+                    'p.therapeutic_category',
+                ])
+                ->limit(20)
+                ->get()
+                ->map(function ($row) {
+                    return [
+                        'product_id'             => $row->product_id,
+                        'product_ulid'           => $row->product_ulid,
+                        'generic_name'           => $row->generic_name,
+                        'brand_name'             => $row->brand_name ?? '',
+                        'unit_size'              => $row->unit_size,
+                        'therapeutic_category'   => $row->therapeutic_category,
+                        'unit_price'             => 'Price on request',
+                        'facility_ulid'          => null,
+                        'display_name'           => 'Catalogue',
+                        'branding_mode'          => null,
+                        'verified_badge_eligible' => false,
+                        'stock_confirmed_at'     => null,
+                        'distance_km'            => null,
+                    ];
+                })->all();
+
+            return response()->json([
+                'status'  => 'success',
+                'data'    => $fallback,
+                'message' => 'Showing catalogue results — no live stock data available.',
+            ]);
+        }
+
         return response()->json([
             'status'  => 'success',
             'data'    => $results,

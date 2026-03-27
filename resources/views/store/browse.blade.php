@@ -3,23 +3,7 @@
 @section('content')
 <div class="space-y-6"
      x-init="$store.patientCart.load()"
-     x-data="{
-         searchQuery: '',
-         searching: false,
-         results: [],
-         async liveSearch() {
-             if (this.searchQuery.length < 2) { this.results = []; return; }
-             this.searching = true;
-             try {
-                 const res = await fetch('/api/store/search?q=' + encodeURIComponent(this.searchQuery));
-                 const json = await res.json();
-                 this.results = json.data || [];
-             } catch (e) {
-                 this.results = [];
-             }
-             this.searching = false;
-         }
-     }">
+     x-data>
 
     {{-- Header --}}
     <div class="flex items-center justify-between">
@@ -30,31 +14,90 @@
     </div>
 
     {{-- Live search --}}
-    <div class="relative">
-        <input type="text" x-model="searchQuery"
-               @input.debounce.300ms="liveSearch()"
-               placeholder="Search for a medicine (e.g. Paracetamol, Amoxicillin)..."
-               class="w-full px-5 py-4 bg-gray-800 border border-gray-600 text-white rounded-xl text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-colors">
+    <div class="relative"
+         x-data="{
+             searchQuery: '',
+             searching: false,
+             results: [],
+             async liveSearch() {
+                 if (this.searchQuery.length < 2) { this.results = []; return; }
+                 this.searching = true;
+                 try {
+                     const res = await fetch('/api/store/search?q=' + encodeURIComponent(this.searchQuery));
+                     const json = await res.json();
+                     this.results = json.data || [];
+                 } catch (e) { this.results = []; }
+                 this.searching = false;
+             }
+         }">
+        <div class="relative">
+            <input type="text"
+                   x-model="searchQuery"
+                   @input.debounce.300ms="liveSearch()"
+                   placeholder="Search for a medicine (e.g. Paracetamol, Amoxicillin)..."
+                   class="w-full px-5 py-4 bg-gray-800 border border-gray-600 text-white rounded-xl text-base placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:border-yellow-400 transition-colors">
+            <div x-show="searching" class="absolute right-4 top-4">
+                <svg class="h-5 w-5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+                </svg>
+            </div>
+        </div>
 
-        <div x-show="results.length > 0" x-cloak @click.outside="results = []"
-             class="absolute z-30 mt-1 w-full bg-gray-800 rounded-xl border border-gray-700 shadow-lg max-h-96 overflow-y-auto">
-            <template x-for="item in results" :key="item.product_ulid + item.facility_ulid">
-                <a :href="'/store/' + item.facility_ulid"
-                   class="flex items-center justify-between px-4 py-3 hover:bg-gray-900 border-b border-gray-700 last:border-0">
-                    <div class="flex-1 min-w-0">
-                        <p class="text-sm font-medium text-gray-200" x-text="item.generic_name"></p>
-                        <p class="text-xs text-gray-400" x-text="item.brand_name + ' — ' + item.unit_size"></p>
-                        <p class="text-xs text-gray-400 mt-0.5" x-text="item.display_name + (item.distance_km ? ' · ' + item.distance_km + ' km' : '')"></p>
+        {{-- Search results as product cards --}}
+        <div x-show="results.length > 0" x-cloak @click.outside="results = []; searchQuery = ''"
+             class="mt-4 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            <template x-for="item in results" :key="item.product_ulid + '-' + item.facility_ulid">
+                <div class="bg-gray-800 rounded-xl border border-yellow-600 p-4 flex flex-col gap-3"
+                     x-data="{ added: false, qty: 1 }">
+                    <div class="flex-1">
+                        <h3 class="text-white font-medium text-sm leading-tight" x-text="item.generic_name"></h3>
+                        <p class="text-gray-400 text-xs mt-0.5" x-text="item.brand_name"></p>
+                        <p class="text-gray-500 text-xs mt-1" x-text="item.unit_size"></p>
+                        <div class="mt-2">
+                            <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium bg-yellow-900/30 text-yellow-400 border border-yellow-800"
+                                  x-text="item.therapeutic_category"></span>
+                        </div>
+                        <p class="text-xs text-gray-400 mt-2" x-text="item.display_name"></p>
                     </div>
-                    <div class="text-right flex-shrink-0 ml-3">
-                        <p class="text-sm font-semibold text-yellow-400" x-text="item.unit_price"></p>
+                    <div class="border-t border-gray-700 pt-3 space-y-2">
+                        <div class="flex items-center justify-between">
+                            <span class="text-white font-mono text-sm font-semibold" x-text="item.unit_price"></span>
+                            <span class="text-xs text-green-400">IN STOCK</span>
+                        </div>
+                        <div class="flex items-center gap-2">
+                            <div class="flex items-center rounded-lg overflow-hidden border border-gray-600">
+                                <button type="button" @click="qty = Math.max(1, qty - 1)"
+                                        class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">−</button>
+                                <span class="w-8 text-center text-white text-sm font-semibold" x-text="qty"></span>
+                                <button type="button" @click="qty = Math.min(999, qty + 1)"
+                                        class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">+</button>
+                            </div>
+                            <button @click="
+                                        $store.patientCart.add(
+                                            item.product_id,
+                                            item.generic_name,
+                                            parseFloat(item.unit_price),
+                                            item.unit_size,
+                                            qty
+                                        );
+                                        added = true;
+                                        qty = 1;
+                                        setTimeout(() => added = false, 1500)"
+                                    class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+                                <span x-show="!added">+ Add to Cart</span>
+                                <span x-show="added" x-cloak>Added ✓</span>
+                            </button>
+                        </div>
                     </div>
-                </a>
+                </div>
             </template>
         </div>
 
-        <div x-show="searching" class="absolute right-4 top-4">
-            <svg class="h-5 w-5 animate-spin text-gray-400" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
+        {{-- No results --}}
+        <div x-show="!searching && searchQuery.length >= 2 && results.length === 0" x-cloak
+             class="mt-4 text-center py-8 text-gray-500 text-sm">
+            No medicines found for "<span x-text="searchQuery" class="text-gray-300"></span>"
         </div>
     </div>
 
@@ -110,7 +153,7 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             @foreach($products as $product)
             <div class="bg-gray-800 rounded-xl border border-gray-700 p-4 flex flex-col gap-3 hover:border-gray-600 transition-colors"
-                 x-data="{ added: false }">
+                 x-data="{ added: false, qty: 1 }">
                 <div class="flex-1">
                     <h3 class="text-white font-medium text-sm leading-tight">{{ $product->generic_name }}</h3>
                     @if($product->brand_name)
@@ -137,19 +180,30 @@
                         @endif
                     </div>
                     @if($product->stock_status !== 'OUT_OF_STOCK')
-                    <button @click="
-                                $store.patientCart.add(
-                                    {{ $product->id }},
-                                    '{{ addslashes($product->generic_name) }}',
-                                    {{ $product->unit_price }},
-                                    '{{ $product->unit_size }}'
-                                );
-                                added = true;
-                                setTimeout(() => added = false, 1500)"
-                            class="w-full py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
-                        <span x-show="!added">+ Add to Cart</span>
-                        <span x-show="added">Added ✓</span>
-                    </button>
+                    <div class="flex items-center gap-2">
+                        <div class="flex items-center rounded-lg overflow-hidden border border-gray-600">
+                            <button type="button" @click="qty = Math.max(1, qty - 1)"
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">−</button>
+                            <span class="w-8 text-center text-white text-sm font-semibold" x-text="qty"></span>
+                            <button type="button" @click="qty = Math.min(999, qty + 1)"
+                                    class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">+</button>
+                        </div>
+                        <button @click="
+                                    $store.patientCart.add(
+                                        {{ $product->id }},
+                                        '{{ addslashes($product->generic_name) }}',
+                                        {{ $product->unit_price }},
+                                        '{{ $product->unit_size }}',
+                                        qty
+                                    );
+                                    added = true;
+                                    qty = 1;
+                                    setTimeout(() => added = false, 1500)"
+                                class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+                            <span x-show="!added">+ Add to Cart</span>
+                            <span x-show="added" x-cloak>Added ✓</span>
+                        </button>
+                    </div>
                     @else
                     <button disabled class="w-full py-2 bg-gray-700 text-gray-500 text-sm rounded-lg cursor-not-allowed">Out of Stock</button>
                     @endif

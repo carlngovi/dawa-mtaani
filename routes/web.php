@@ -54,6 +54,7 @@ Route::get('/dashboard', function () {
 Route::middleware(['auth', 'portal', 'financial.timeout'])
     ->prefix('admin')
     ->group(function () {
+        Route::get('/search', [\App\Http\Controllers\Web\GlobalSearchController::class, 'search']);
         Route::get('/dashboard', [\App\Http\Controllers\Web\AdminDashboardController::class, 'index']);
         Route::get('/facilities', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'index']);
         Route::get('/facilities/retail', [\App\Http\Controllers\Web\AdminFacilitiesController::class, 'retail']);
