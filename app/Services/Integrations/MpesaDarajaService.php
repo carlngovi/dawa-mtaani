@@ -111,41 +111,68 @@ class MpesaDarajaService extends IntegrationService
     // TRANSACTION STATUS QUERY
     // -------------------------------------------------------------------------
 
+    /**
+     * Query STK push status with retry (for background jobs / callbacks).
+     */
     public function queryTransactionStatus(string $checkoutRequestId): array
     {
         return $this->callWithRetry(function () use ($checkoutRequestId) {
-            $token     = $this->getAccessToken();
-            $timestamp = now()->format('YmdHis');
-            $password  = base64_encode($this->shortcode . $this->passkey . $timestamp);
-            $endpoint  = $this->baseUrl . '/mpesa/stkpushquery/v1/query';
-
-            $payload = [
-                'BusinessShortCode' => $this->shortcode,
-                'Password'          => $password,
-                'Timestamp'         => $timestamp,
-                'CheckoutRequestID' => $checkoutRequestId,
-            ];
-
-            $start    = microtime(true);
-            $response = Http::withToken($token)->post($endpoint, $payload);
-            $duration = (int) ((microtime(true) - $start) * 1000);
-
-            $this->log(
-                direction: 'OUTBOUND',
-                status: $response->successful() ? 'success' : 'failed',
-                error: $response->successful() ? null : $response->body(),
-                durationMs: $duration,
-                endpoint: $endpoint,
-                request: $payload,
-                response: $response->json(),
-            );
-
-            if (! $response->successful()) {
-                throw new \RuntimeException('STK status query failed: ' . $response->body());
-            }
-
-            return $response->json();
+            return $this->stkQuery($checkoutRequestId);
         });
+    }
+
+    /**
+     * Single-attempt STK query with short timeout — safe for polling endpoints.
+     * Returns the JSON response or null if Safaricom hasn't finished processing.
+     */
+    public function queryTransactionStatusOnce(string $checkoutRequestId): ?array
+    {
+        try {
+            return $this->stkQuery($checkoutRequestId);
+        } catch (\Throwable $e) {
+            // HTTP 500 = "still processing", network error, etc.
+            // Return null so the polling endpoint can just re-poll later.
+            Log::info('STK query pending/unavailable', [
+                'checkout_id' => $checkoutRequestId,
+                'error'       => $e->getMessage(),
+            ]);
+            return null;
+        }
+    }
+
+    private function stkQuery(string $checkoutRequestId): array
+    {
+        $token     = $this->getAccessToken();
+        $timestamp = now()->format('YmdHis');
+        $password  = base64_encode($this->shortcode . $this->passkey . $timestamp);
+        $endpoint  = $this->baseUrl . '/mpesa/stkpushquery/v1/query';
+
+        $payload = [
+            'BusinessShortCode' => $this->shortcode,
+            'Password'          => $password,
+            'Timestamp'         => $timestamp,
+            'CheckoutRequestID' => $checkoutRequestId,
+        ];
+
+        $start    = microtime(true);
+        $response = Http::timeout(10)->withToken($token)->post($endpoint, $payload);
+        $duration = (int) ((microtime(true) - $start) * 1000);
+
+        $this->log(
+            direction: 'OUTBOUND',
+            status: $response->successful() ? 'success' : 'failed',
+            error: $response->successful() ? null : $response->body(),
+            durationMs: $duration,
+            endpoint: $endpoint,
+            request: $payload,
+            response: $response->json(),
+        );
+
+        if (! $response->successful()) {
+            throw new \RuntimeException('STK status query failed: ' . $response->body());
+        }
+
+        return $response->json();
     }
 
     // -------------------------------------------------------------------------

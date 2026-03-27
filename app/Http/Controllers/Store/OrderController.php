@@ -14,6 +14,7 @@ use App\Services\Integrations\MpesaDarajaService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
 
 class OrderController extends Controller
@@ -146,6 +147,7 @@ class OrderController extends Controller
 
             $order->update([
                 'mpesa_checkout_request_id' => $stkResponse['CheckoutRequestID'] ?? null,
+                'mpesa_merchant_request_id' => $stkResponse['MerchantRequestID'] ?? null,
             ]);
 
             $basket->lines()->delete();
@@ -160,6 +162,7 @@ class OrderController extends Controller
                 'order_ulid'  => $order->ulid,
                 'total'       => CurrencyConfig::format((float) $order->total_amount),
                 'mpesa_prompt' => "STK push sent to {$validated['patient_phone']}",
+                'checkout_request_id' => $order->mpesa_checkout_request_id,
             ],
             'message' => '',
         ]);
@@ -167,43 +170,90 @@ class OrderController extends Controller
 
     public function mpesaCallback(Request $request): JsonResponse
     {
+        Log::info('M-Pesa Patient Callback Received', [
+            'payload' => $request->all(),
+            'ip' => $request->ip(),
+            'headers' => $request->headers->all()
+        ]);
+
         $callback = $request->input('Body.stkCallback');
+        
+        if (!$callback) {
+            Log::error('Invalid M-Pesa callback structure - missing stkCallback');
+            return response()->json(['ResultCode' => 1, 'ResultDesc' => 'Invalid callback structure'], 400);
+        }
 
         $checkoutRequestId = $callback['CheckoutRequestID'] ?? null;
-        $resultCode = $callback['ResultCode'] ?? -1;
+        $merchantRequestId = $callback['MerchantRequestID'] ?? null;
+        $resultCode = (int) ($callback['ResultCode'] ?? 1);
+        $resultDesc = $callback['ResultDesc'] ?? 'Unknown error';
 
-        $order = PatientOrder::where('mpesa_checkout_request_id', $checkoutRequestId)->first();
+        Log::info('Processing M-Pesa callback', [
+            'checkout_request_id' => $checkoutRequestId,
+            'merchant_request_id' => $merchantRequestId,
+            'result_code' => $resultCode,
+            'result_desc' => $resultDesc
+        ]);
+
+        // Find order by either checkout request ID or merchant request ID
+        $order = PatientOrder::where('mpesa_checkout_request_id', $checkoutRequestId)
+            ->orWhere('mpesa_merchant_request_id', $merchantRequestId)
+            ->first();
 
         if (! $order) {
-            return response()->json(['status' => 'ignored']);
+            Log::warning('Order not found for callback', [
+                'checkout_request_id' => $checkoutRequestId,
+                'merchant_request_id' => $merchantRequestId
+            ]);
+            return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Order not found, but accepted'], 200);
         }
 
+        // Prevent double processing
         if ($order->status !== 'PAYMENT_PENDING') {
-            return response()->json(['status' => 'already_processed']);
+            Log::info('Order already processed', [
+                'order_ulid' => $order->ulid,
+                'current_status' => $order->status
+            ]);
+            return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Already processed'], 200);
         }
 
-        if ((int) $resultCode === 0) {
+        // Handle successful payment (ResultCode 0)
+        if ($resultCode === 0) {
             $receiptNumber = null;
+            $amount = null;
+            $phone = null;
+            
             $items = $callback['CallbackMetadata']['Item'] ?? [];
             foreach ($items as $item) {
                 if ($item['Name'] === 'MpesaReceiptNumber') {
                     $receiptNumber = $item['Value'];
-                    break;
+                }
+                if ($item['Name'] === 'Amount') {
+                    $amount = $item['Value'];
+                }
+                if ($item['Name'] === 'PhoneNumber') {
+                    $phone = $item['Value'];
                 }
             }
 
-            // Idempotency: check duplicate receipt
+            // Check for duplicate receipt
             if ($receiptNumber && PatientOrder::where('mpesa_receipt_number', $receiptNumber)->exists()) {
-                return response()->json(['status' => 'duplicate_receipt']);
+                Log::warning('Duplicate receipt number detected', ['receipt' => $receiptNumber]);
+                return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Duplicate receipt'], 200);
             }
 
-            DB::transaction(function () use ($order, $receiptNumber) {
+            DB::transaction(function () use ($order, $receiptNumber, $amount, $phone, $resultDesc) {
                 $order->update([
-                    'status'               => 'CONFIRMED',
+                    'status'                => 'CONFIRMED',
                     'mpesa_receipt_number'  => $receiptNumber,
-                    'paid_at'              => now(),
+                    'mpesa_paid_at'         => now(),
+                    'paid_at'               => now(),
+                    'mpesa_amount'          => $amount,
+                    'mpesa_phone'           => $phone,
+                    'mpesa_result_desc'     => $resultDesc,
                 ]);
 
+                // Update stock
                 foreach ($order->lines as $line) {
                     DB::table('facility_stock_status')
                         ->where('wholesale_facility_id', $order->facility_id)
@@ -212,12 +262,45 @@ class OrderController extends Controller
                 }
 
                 event(new OrderConfirmed($order));
+                
+                Log::info('Order confirmed successfully', [
+                    'order_ulid' => $order->ulid,
+                    'receipt' => $receiptNumber,
+                    'amount' => $amount
+                ]);
             });
-        } else {
-            $order->update(['status' => 'CANCELLED']);
+        } 
+        // Handle failed payment
+        else {
+            // Map M-Pesa error codes to user-friendly messages
+            $failureReason = match ($resultCode) {
+                1 => 'Insufficient M-Pesa balance. Please top up and try again.',
+                17 => 'M-Pesa transaction limit exceeded. Please use another payment method.',
+                1032 => 'Payment was cancelled by the user.',
+                1037 => 'M-Pesa prompt timed out. Please try again.',
+                2001 => 'Incorrect M-Pesa PIN entered. Please try again.',
+                2002 => 'M-Pesa service is temporarily unavailable. Please try again later.',
+                2003 => 'Transaction declined by the bank. Please contact your bank.',
+                400 => 'Invalid transaction. Please try again.',
+                default => "Payment failed: {$resultDesc}",
+            };
+
+            $order->update([
+                'status'                 => 'PAYMENT_FAILED',
+                'payment_failure_reason' => $failureReason,
+                'mpesa_result_code'      => $resultCode,
+                'mpesa_result_desc'      => $resultDesc,
+                'failed_at'              => now(),
+            ]);
+
+            Log::warning('Order payment failed', [
+                'order_ulid' => $order->ulid,
+                'result_code' => $resultCode,
+                'reason' => $failureReason
+            ]);
         }
 
-        return response()->json(['status' => 'ok']);
+        return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Accepted'], 200);
     }
 
     public function getOrderStatus(string $ulid): JsonResponse
@@ -248,6 +331,8 @@ class OrderController extends Controller
                 'status'       => $order->status,
                 'paid_at'      => $order->paid_at,
                 'collected_at' => $order->collected_at,
+                'total_amount' => CurrencyConfig::format((float) $order->total_amount),
+                'failure_reason' => $order->payment_failure_reason,
                 'lines'        => $lines,
             ],
             'message' => '',
@@ -281,12 +366,10 @@ class OrderController extends Controller
             'collected_at' => now(),
         ]);
 
-        // TODO: Dispatch SMS receipt notification
-
         return response()->json([
             'status'  => 'success',
             'data'    => [],
-            'message' => '',
+            'message' => 'Order marked as collected',
         ]);
     }
 
@@ -347,7 +430,7 @@ class OrderController extends Controller
         return match ($promo->discount_type) {
             'PERCENTAGE_OFF'  => round($subtotal * ((float) $promo->discount_value / 100), 2),
             'FIXED_AMOUNT_OFF' => min((float) $promo->discount_value, $subtotal),
-            'BUY_X_GET_Y'     => 0, // Deferred to Phase 4
+            'BUY_X_GET_Y'     => 0,
         };
     }
 }

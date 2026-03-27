@@ -174,6 +174,9 @@ class RetailOrdersController extends Controller
                 'customer_email'        => $request->email,
                 'delivery_address'      => $request->delivery_address,
                 'delivery_instructions' => $request->delivery_instructions,
+                'delivery_lat'          => $request->delivery_lat,
+                'delivery_lng'          => $request->delivery_lng,
+                'delivery_place_id'     => $request->delivery_place_id,
                 'mpesa_phone'           => $mpesaPhone,
             ]);
             if (! empty($deliveryUpdate)) {
@@ -224,12 +227,11 @@ class RetailOrdersController extends Controller
 
                     Log::info('STK Push result', ['result' => $stkResult]);
 
-                    if (isset($stkResult['CheckoutRequestID'])) {
-                        DB::table('orders')->where('id', $result['order_id'])->update([
-                            'mpesa_checkout_request_id' => $stkResult['CheckoutRequestID'],
-                            'copay_status' => 'PENDING',
-                        ]);
-                    }
+                    DB::table('orders')->where('id', $result['order_id'])->update(array_filter([
+                        'mpesa_checkout_request_id'  => $stkResult['CheckoutRequestID'] ?? null,
+                        'mpesa_merchant_request_id'  => $stkResult['MerchantRequestID'] ?? null,
+                        'copay_status'               => 'PENDING',
+                    ]));
 
                     $redirectUrl = "/retail/orders/{$result['ulid']}/payment-pending";
                     $stkSent = true;
@@ -294,17 +296,78 @@ class RetailOrdersController extends Controller
 
         abort_if(! $order, 404);
 
+        if ($order->status === 'PAYMENT_PENDING') {
+            $updated = false;
+
+            // 1) Try Safaricom STK Query (single attempt, 10s timeout, no retry)
+            if ($order->mpesa_checkout_request_id) {
+                $mpesa  = app(\App\Services\Integrations\MpesaDarajaService::class);
+                $result = $mpesa->queryTransactionStatusOnce($order->mpesa_checkout_request_id);
+
+                if ($result !== null) {
+                    $resultCode = (int) ($result['ResultCode'] ?? -1);
+
+                    if ($resultCode === 0) {
+                        DB::table('orders')->where('ulid', $ulid)->update([
+                            'status'        => 'CONFIRMED',
+                            'copay_status'  => 'PAID',
+                            'mpesa_paid_at' => now(),
+                            'paid_at'       => now(),
+                            'updated_at'    => now(),
+                        ]);
+                        $updated = true;
+                    } elseif ($resultCode !== -1) {
+                        $reason = match ($resultCode) {
+                            1    => 'Insufficient M-Pesa balance.',
+                            17   => 'Transaction limit exceeded.',
+                            1032 => 'Payment was cancelled by user.',
+                            1037 => 'M-Pesa prompt timed out. Please try again.',
+                            2001 => 'Incorrect M-Pesa PIN entered.',
+                            default => $result['ResultDesc'] ?? 'Payment failed.',
+                        };
+                        DB::table('orders')->where('ulid', $ulid)->update([
+                            'status'                 => 'PAYMENT_FAILED',
+                            'copay_status'           => 'FAILED',
+                            'payment_failure_reason'  => $reason,
+                            'failed_at'              => now(),
+                            'updated_at'             => now(),
+                        ]);
+                        $updated = true;
+                    }
+                }
+            }
+
+            // 2) Timeout fallback: M-Pesa STK prompt expires after ~60s.
+            if (! $updated) {
+                $age = \Carbon\Carbon::parse($order->created_at)->diffInSeconds(now());
+                if ($age > 120) {
+                    DB::table('orders')->where('ulid', $ulid)->update([
+                        'status'                 => 'PAYMENT_FAILED',
+                        'copay_status'           => 'FAILED',
+                        'payment_failure_reason'  => 'M-Pesa prompt timed out. Please try again.',
+                        'failed_at'              => now(),
+                        'updated_at'             => now(),
+                    ]);
+                    $updated = true;
+                }
+            }
+
+            if ($updated) {
+                $order = DB::table('orders')->where('ulid', $ulid)->first();
+            }
+        }
+
         $paid   = $order->mpesa_receipt_number !== null
                 || in_array($order->status, ['CONFIRMED', 'PACKED', 'DISPATCHED', 'DELIVERED']);
         $failed = $order->copay_status === 'FAILED' || $order->status === 'PAYMENT_FAILED';
 
         return response()->json([
-            'paid'         => $paid,
-            'failed'       => $failed,
-            'status'       => $order->status,
-            'receipt'      => $order->mpesa_receipt_number,
-            'message'      => $order->payment_failure_reason,
-            'redirect_url' => $paid ? "/retail/orders/{$ulid}" : null,
+            'paid'           => $paid,
+            'failed'         => $failed,
+            'status'         => $order->status,
+            'receipt'        => $order->mpesa_receipt_number,
+            'failure_reason' => $order->payment_failure_reason,
+            'redirect_url'   => $paid ? "/retail/orders/{$ulid}" : null,
         ]);
     }
 

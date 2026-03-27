@@ -26,6 +26,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
+            'auth.spotter' => \App\Http\Middleware\AuthenticateSpotter::class,
             'facility.scope' => \App\Http\Middleware\EnsureFacilityScope::class,
             'anonymise.flag' => \App\Http\Middleware\AnonymiseQualityFlagResponse::class,
             'financial.timeout' => \App\Http\Middleware\FinancialSessionTimeout::class,

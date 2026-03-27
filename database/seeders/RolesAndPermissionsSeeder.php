@@ -106,5 +106,12 @@ class RolesAndPermissionsSeeder extends Seeder
 
         Role::firstOrCreate(['name' => 'system', 'guard_name' => 'web'])
             ->syncPermissions($permissions);
+
+        // Spotter module — county coordinator supervises field agents in a county
+        Role::firstOrCreate(['name' => 'county_coordinator', 'guard_name' => 'web'])
+            ->syncPermissions([
+                'view-all-facilities', 'update-facility-status',
+                'resolve-disputes', 'view-flags', 'view-quality-flags',
+            ]);
     }
 }
