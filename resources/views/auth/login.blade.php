@@ -240,13 +240,13 @@
                     </a>
                 </div>
 
-                {{-- Card 2 — Patient --}}
+                {{-- Card 2 — Customer --}}
                 <div class="flex flex-col items-center gap-3 p-5 rounded-xl bg-gray-800 border border-gray-700 text-center">
                     <svg class="w-8 h-8 text-yellow-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
                     </svg>
                     <div class="flex-1">
-                        <p class="font-bold text-sm text-white">I'm a Patient</p>
+                        <p class="font-bold text-sm text-white">I'm a Customer</p>
                         <p class="text-xs text-gray-400 mt-0.5">Order medicines from nearby pharmacies</p>
                     </div>
                     <a href="{{ route('register.patient') }}"

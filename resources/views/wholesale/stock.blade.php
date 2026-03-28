@@ -5,6 +5,14 @@
 
     <h1 class="text-2xl font-bold text-white">Stock Management</h1>
 
+    <form method="GET" action="/wholesale/stock">
+        <input type="text"
+               name="search"
+               value="{{ request('search') }}"
+               placeholder="Search by name or SKU..."
+               class="w-full sm:w-80 bg-gray-800 border border-gray-700 text-white rounded-lg px-4 py-2 text-sm placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"/>
+    </form>
+
     <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
         <div class="bg-gray-800 rounded-xl border border-gray-700 p-4">
             <p class="text-xs text-gray-400">In Stock</p>
