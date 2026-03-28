@@ -16,7 +16,7 @@ class FacilityRegistrationController extends Controller
 {
     public function create()
     {
-        $counties = DB::table('kenya_counties')->orderBy('name')->get();
+        $counties = DB::table('kenya_counties')->orderBy('county_name')->get();
 
         $prefill = session('google_prefill');
 
@@ -30,12 +30,15 @@ class FacilityRegistrationController extends Controller
 
         $rules = [
             'name'                => ['required', 'string', 'max:255'],
-            'ppb_licence_number'  => ['required', 'string', 'unique:facilities,ppb_licence_number'],
-            'facility_name'      => ['required', 'string', 'max:255'],
-            'phone'              => ['required', 'string', 'regex:/^\+254[17]\d{8}$/', 'unique:facilities,phone'],
-            'email'              => ['required', 'email', 'unique:users,email'],
-            'county'             => ['required', 'exists:kenya_counties,code'],
-            'terms'              => ['accepted'],
+            'ppb_licence_number'    => ['nullable', 'string', 'max:50'],
+            'facility_name'        => ['required', 'string', 'max:255'],
+            'phone'                => ['required', 'string', 'regex:/^\+254[17]\d{8}$/', 'unique:facilities,phone'],
+            'email'                => ['required', 'email', 'unique:users,email'],
+            'kenya_county_id'      => ['required', 'exists:kenya_counties,id'],
+            'kenya_constituency_id'=> ['required', 'exists:kenya_constituencies,id'],
+            'kenya_ward_id'        => ['required', 'exists:kenya_wards,id'],
+            'village_town'         => ['nullable', 'string', 'max:150'],
+            'terms'                => ['accepted'],
         ];
 
         if (! $isGoogle) {
@@ -45,8 +48,8 @@ class FacilityRegistrationController extends Controller
         $validated = $request->validate($rules);
 
         $countyName = DB::table('kenya_counties')
-            ->where('code', $validated['county'])
-            ->value('name');
+            ->where('id', $validated['kenya_county_id'])
+            ->value('county_name');
 
         try {
             $result = DB::transaction(function () use ($validated, $isGoogle, $googlePrefill, $countyName, $request) {
@@ -67,18 +70,35 @@ class FacilityRegistrationController extends Controller
                 $user = User::create($userData);
                 $user->assignRole('retail_facility');
 
+                // Resolve constituency + ward names for the legacy text columns
+                $constituencyName = DB::table('kenya_constituencies')
+                    ->where('id', $validated['kenya_constituency_id'])
+                    ->value('constituency_name') ?? '';
+                $wardName = DB::table('kenya_wards')
+                    ->where('id', $validated['kenya_ward_id'])
+                    ->value('ward_name') ?? '';
+
                 $facility = Facility::create([
-                    'ulid'               => Str::ulid(),
-                    'owner_name'         => $validated['name'],
-                    'ppb_licence_number' => $validated['ppb_licence_number'],
-                    'facility_name'      => $validated['facility_name'],
-                    'phone'              => $validated['phone'],
-                    'email'              => $validated['email'],
-                    'county'             => $countyName,
-                    'network_membership' => 'NETWORK',
-                    'onboarding_status'  => 'APPLIED',
-                    'facility_status'    => 'APPLIED',
-                    'created_by'         => $user->id,
+                    'ulid'                  => Str::ulid(),
+                    'owner_name'            => $validated['name'],
+                    'ppb_licence_number'    => $request->ppb_licence_number,
+                    'ppb_facility_type'     => 'RETAIL',
+                    'ppb_licence_status'    => 'VALID',
+                    'facility_name'         => $validated['facility_name'],
+                    'phone'                 => $validated['phone'],
+                    'email'                 => $validated['email'],
+                    'county'                => $countyName,
+                    'sub_county'            => $constituencyName,
+                    'ward'                  => $wardName,
+                    'physical_address'      => trim(($request->village_town ? $request->village_town . ', ' : '') . $wardName . ', ' . $countyName),
+                    'kenya_county_id'       => $request->kenya_county_id,
+                    'kenya_constituency_id' => $request->kenya_constituency_id,
+                    'kenya_ward_id'         => $request->kenya_ward_id,
+                    'village_town'          => $request->village_town,
+                    'network_membership'    => 'NETWORK',
+                    'onboarding_status'     => 'APPLIED',
+                    'facility_status'       => 'SUSPENDED',
+                    'created_by'            => $user->id,
                 ]);
 
                 $user->facility_id = $facility->id;
@@ -103,8 +123,13 @@ class FacilityRegistrationController extends Controller
                 ->with('pending_facility_name', $result->facility_name);
 
         } catch (\Exception $e) {
+            \Illuminate\Support\Facades\Log::error('Facility registration failed', [
+                'error' => $e->getMessage(),
+                'file'  => $e->getFile() . ':' . $e->getLine(),
+                'trace' => $e->getTraceAsString(),
+            ]);
             return back()->withInput()->withErrors([
-                'general' => 'Registration failed. Please try again.',
+                'general' => 'Registration failed: ' . $e->getMessage(),
             ]);
         }
     }

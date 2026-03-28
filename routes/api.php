@@ -78,3 +78,10 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::delete('/v1/auth/token', [\App\Http\Controllers\Api\V1\AuthTokenController::class, 'revoke']);
     Route::get('/v1/auth/me', [\App\Http\Controllers\Api\V1\AuthTokenController::class, 'me']);
 });
+
+// Kenya administrative location lookup (public — used by registration forms)
+Route::prefix('kenya')->name('api.kenya.')->group(function () {
+    Route::get('/counties', [\App\Http\Controllers\KenyaLocationController::class, 'counties'])->name('counties');
+    Route::get('/constituencies/{county}', [\App\Http\Controllers\KenyaLocationController::class, 'constituencies'])->name('constituencies');
+    Route::get('/wards/{constituency}', [\App\Http\Controllers\KenyaLocationController::class, 'wards'])->name('wards');
+});

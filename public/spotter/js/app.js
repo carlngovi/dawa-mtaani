@@ -2,6 +2,7 @@ function spotterApp() {
   return {
     // ── State ──────────────────────────────────────
     activated: false,
+    sidebarOpen: false,
     currentView: 'home',
     viewHistory: [],
     profile: { id: '', name: '', county: '', ward: '', salesRep: '', role: '' },

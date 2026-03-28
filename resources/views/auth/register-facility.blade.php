@@ -97,17 +97,16 @@
                        class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"/>
             </div>
 
-            {{-- PPB Licence Number --}}
+            {{-- PPB Licence Number (optional) --}}
             <div>
                 <label for="ppb_licence_number" class="block text-sm font-medium text-gray-300 mb-1.5">
-                    PPB Licence Number <span class="text-red-500">*</span>
+                    PPB Licence Number <span class="text-gray-500 text-xs">(Optional)</span>
                 </label>
                 <input type="text" id="ppb_licence_number" name="ppb_licence_number"
                        value="{{ old('ppb_licence_number') }}"
-                       required
                        placeholder="PPB/PH/XXXX/XXXX"
                        class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"/>
-                <p class="mt-1 text-xs text-gray-400">Your PPB registration number e.g. PPB/PH/XXXX/XXXX</p>
+                <p class="mt-1 text-xs text-gray-400">Can be added later after approval</p>
             </div>
 
             {{-- Facility name --}}
@@ -145,20 +144,107 @@
                        class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 {{ $prefill ? 'bg-gray-800' : '' }}"/>
             </div>
 
-            {{-- County --}}
-            <div>
-                <label for="county" class="block text-sm font-medium text-gray-300 mb-1.5">
-                    County <span class="text-red-500">*</span>
-                </label>
-                <select id="county" name="county" required
-                        class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20">
-                    <option value="">Select county...</option>
-                    @foreach ($counties as $county)
-                        <option value="{{ $county->code }}" {{ old('county') == $county->code ? 'selected' : '' }}>
-                            {{ $county->name }}
-                        </option>
-                    @endforeach
-                </select>
+            {{-- Location (cascading county → constituency → ward) --}}
+            <div x-data="locationPicker({
+                initCounty: {{ json_encode(old('kenya_county_id')) }},
+                initConstituency: {{ json_encode(old('kenya_constituency_id')) }},
+                initWard: {{ json_encode(old('kenya_ward_id')) }}
+            })" x-init="init()" class="space-y-5">
+
+                {{-- County --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">
+                        County <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <input type="hidden" name="kenya_county_id" :value="selectedCountyId">
+                        <button type="button" @click="open = !open"
+                            class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 flex items-center justify-between text-left"
+                            :class="!selectedCountyId ? 'text-gray-400' : 'text-gray-200'">
+                            <span x-text="selectedCountyId ? counties.find(c => c.id == selectedCountyId)?.name : 'Select county...'"></span>
+                            <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                            <div class="sticky top-0 bg-gray-800 px-3 py-2 border-b border-gray-700">
+                                <input type="text" x-model="countySearch" placeholder="Search county..."
+                                    class="w-full bg-gray-700 border border-gray-600 rounded text-white text-sm px-3 py-1.5 focus:outline-none focus:border-yellow-400" @click.stop>
+                            </div>
+                            <div x-show="loadingCounties" class="px-4 py-3 text-sm text-yellow-400">Loading...</div>
+                            <template x-for="county in counties" :key="county.id">
+                                <div x-show="!countySearch || county.name.toLowerCase().includes(countySearch.toLowerCase())"
+                                    @click="selectedCountyId = county.id; open = false; countySearch = ''; onCountyChange()"
+                                    class="px-4 py-2.5 text-sm cursor-pointer hover:bg-gray-700 hover:text-yellow-400"
+                                    :class="county.id == selectedCountyId ? 'bg-gray-700 text-yellow-400' : 'text-white'">
+                                    <span x-text="county.name"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Constituency --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">
+                        Constituency <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <input type="hidden" name="kenya_constituency_id" :value="selectedConstituencyId">
+                        <button type="button" @click="if (selectedCountyId && !loadingCons) open = !open"
+                            class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 flex items-center justify-between text-left"
+                            :class="[!selectedCountyId || loadingCons ? 'opacity-50 cursor-not-allowed' : '', !selectedConstituencyId ? 'text-gray-400' : 'text-gray-200']">
+                            <span x-text="selectedConstituencyId ? constituencies.find(c => c.id == selectedConstituencyId)?.name : (selectedCountyId ? 'Select constituency...' : 'Select county first')"></span>
+                            <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                            <div x-show="loadingCons" class="px-4 py-3 text-sm text-yellow-400">Loading...</div>
+                            <template x-for="con in constituencies" :key="con.id">
+                                <div @click="selectedConstituencyId = con.id; open = false; onConstituencyChange()"
+                                    class="px-4 py-2.5 text-sm cursor-pointer hover:bg-gray-700 hover:text-yellow-400"
+                                    :class="con.id == selectedConstituencyId ? 'bg-gray-700 text-yellow-400' : 'text-white'">
+                                    <span x-text="con.name"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Ward --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">
+                        Ward <span class="text-red-500">*</span>
+                    </label>
+                    <div class="relative" x-data="{ open: false }" @click.outside="open = false">
+                        <input type="hidden" name="kenya_ward_id" :value="selectedWardId">
+                        <button type="button" @click="if (selectedConstituencyId && !loadingWards) open = !open"
+                            class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 flex items-center justify-between text-left"
+                            :class="[!selectedConstituencyId || loadingWards ? 'opacity-50 cursor-not-allowed' : '', !selectedWardId ? 'text-gray-400' : 'text-gray-200']">
+                            <span x-text="selectedWardId ? wards.find(w => w.id == selectedWardId)?.name : (selectedConstituencyId ? 'Select ward...' : 'Select constituency first')"></span>
+                            <svg class="w-4 h-4 text-gray-400 shrink-0 transition-transform" :class="{ 'rotate-180': open }" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>
+                        </button>
+                        <div x-show="open" x-transition class="absolute z-50 w-full mt-1 bg-gray-800 border border-gray-600 rounded-lg shadow-xl max-h-60 overflow-y-auto">
+                            <div x-show="loadingWards" class="px-4 py-3 text-sm text-yellow-400">Loading...</div>
+                            <template x-for="ward in wards" :key="ward.id">
+                                <div @click="selectedWardId = ward.id; open = false"
+                                    class="px-4 py-2.5 text-sm cursor-pointer hover:bg-gray-700 hover:text-yellow-400"
+                                    :class="ward.id == selectedWardId ? 'bg-gray-700 text-yellow-400' : 'text-white'">
+                                    <span x-text="ward.name"></span>
+                                </div>
+                            </template>
+                        </div>
+                    </div>
+                </div>
+
+                {{-- Village / Town Centre --}}
+                <div>
+                    <label class="block text-sm font-medium text-gray-300 mb-1.5">
+                        Village / Town Centre
+                    </label>
+                    <input type="text" name="village_town"
+                           value="{{ old('village_town') }}"
+                           placeholder="e.g. Kawangware, Tom Mboya St"
+                           class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20"/>
+                </div>
+
             </div>
 
             {{-- Password fields (hidden if Google prefill) --}}
@@ -232,5 +318,49 @@
     </div>
 </div>
 
+<script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+<script>
+function locationPicker({ initCounty, initConstituency, initWard }) {
+    return {
+        counties: [], constituencies: [], wards: [],
+        countySearch: '',
+        selectedCountyId: initCounty ?? '',
+        selectedConstituencyId: initConstituency ?? '',
+        selectedWardId: initWard ?? '',
+        loadingCounties: false, loadingCons: false, loadingWards: false,
+        async init() {
+            this.loadingCounties = true;
+            const r = await fetch('/api/kenya/counties');
+            this.counties = await r.json();
+            this.loadingCounties = false;
+            if (this.selectedCountyId) {
+                await this.fetchConstituencies();
+                if (this.selectedConstituencyId) await this.fetchWards();
+            }
+        },
+        async fetchConstituencies() {
+            this.loadingCons = true;
+            const r = await fetch('/api/kenya/constituencies/' + this.selectedCountyId);
+            this.constituencies = await r.json();
+            this.loadingCons = false;
+        },
+        async fetchWards() {
+            this.loadingWards = true;
+            const r = await fetch('/api/kenya/wards/' + this.selectedConstituencyId);
+            this.wards = await r.json();
+            this.loadingWards = false;
+        },
+        async onCountyChange() {
+            this.constituencies = []; this.wards = [];
+            this.selectedConstituencyId = ''; this.selectedWardId = '';
+            if (this.selectedCountyId) await this.fetchConstituencies();
+        },
+        async onConstituencyChange() {
+            this.wards = []; this.selectedWardId = '';
+            if (this.selectedConstituencyId) await this.fetchWards();
+        }
+    };
+}
+</script>
 </body>
 </html>

@@ -20,6 +20,7 @@ class Facility extends Model
         'latitude', 'longitude', 'gps_accuracy_meters', 'gps_captured_at',
         'gps_captured_by', 'gps_capture_method',
         'phone_uniqueness_override', 'phone_override_reason', 'phone_override_by',
+        'village_town', 'kenya_ward_id', 'kenya_constituency_id', 'kenya_county_id',
         'is_anonymised', 'anonymised_at', 'created_by', 'updated_by',
     ];
 

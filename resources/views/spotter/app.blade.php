@@ -92,23 +92,133 @@
   {{-- ═══════════════════════════════════════════════════════ --}}
   {{-- MAIN APP (post-activation)                              --}}
   {{-- ═══════════════════════════════════════════════════════ --}}
-  <div x-show="activated" class="flex flex-col min-h-screen min-h-dvh">
+  <div x-show="activated" class="flex min-h-screen min-h-dvh">
+
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    {{-- SIDEBAR                                                 --}}
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    <aside
+      class="fixed inset-y-0 left-0 z-50 w-64 bg-gray-800 border-r border-gray-700 flex flex-col transform transition-transform duration-200 ease-in-out lg:translate-x-0 lg:static lg:inset-auto"
+      :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'"
+    >
+      {{-- Logo + user info --}}
+      <div class="px-4 py-5 border-b border-gray-700 flex-shrink-0">
+        <div class="text-yellow-400 font-bold text-sm tracking-widest">DAWA MTAANI</div>
+        <div class="text-gray-500 text-xs mt-0.5" x-text="isSupervisor() ? (profile.role || 'Supervisor').replace(/_/g,' ') : 'Field Agent'"></div>
+        <div class="text-gray-300 text-sm mt-2 font-medium" x-text="profile.name || 'Activating...'"></div>
+      </div>
+
+      {{-- Nav items --}}
+      <nav class="flex-1 overflow-y-auto py-3 space-y-0.5 px-2">
+
+        {{-- SPOTTER NAV --}}
+        <template x-if="!isSupervisor()">
+          <div class="space-y-0.5">
+            <button @click="navigate('home'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'home' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
+              <span>Home</span>
+            </button>
+            <button @click="clockedIn ? (navigate('submit'), sidebarOpen = false) : showClockInPrompt = true" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'submit' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : clockedIn ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' : 'text-gray-600 cursor-not-allowed'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+              <span>New Visit</span>
+              <svg x-show="!clockedIn" class="w-3 h-3 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+            </button>
+            <button @click="navigate('submissions'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'submissions' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <span>My Visits</span>
+            </button>
+            <button @click="navigate('tasks'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'tasks' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4"/></svg>
+              <span>Follow-ups</span>
+              <span x-show="overdueCount() > 0" class="ml-auto bg-red-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="overdueCount()"></span>
+            </button>
+            <button @click="navigate('ward'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'ward' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Co-Ward</span>
+            </button>
+            <button @click="navigate('settings'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'settings' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
+              <span>Settings</span>
+            </button>
+          </div>
+        </template>
+
+        {{-- SUPERVISOR NAV --}}
+        <template x-if="isSupervisor()">
+          <div class="space-y-0.5">
+            <button @click="navigate('supervisor_dashboard'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_dashboard' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+              <span>Dashboard</span>
+            </button>
+            <button @click="navigate('supervisor_submissions'); loadSupervisorSubmissions(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_submissions' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+              <span>Submissions</span>
+            </button>
+            <button @click="navigate('supervisor_duplicates'); loadSupervisorDuplicates(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_duplicates' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <span>Reviews</span>
+              <span x-show="(supervisorStats.pendingDuplicates ?? 0) > 0" class="ml-auto bg-orange-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.pendingDuplicates"></span>
+            </button>
+            <button @click="navigate('supervisor_followups'); loadSupervisorFollowUps(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_followups' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4"/></svg>
+              <span>Follow-ups</span>
+              <span x-show="(supervisorStats.overdueFollowUps ?? 0) > 0" class="ml-auto bg-red-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.overdueFollowUps"></span>
+            </button>
+            <button @click="navigate('supervisor_attendance'); loadSupervisorAttendance(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_attendance' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <span>Attendance</span>
+            </button>
+            <button @click="navigate('supervisor_leaderboard'); loadLeaderboard(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_leaderboard' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+              <span>Leaderboard</span>
+            </button>
+            <button @click="navigate('settings'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'settings' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
+              <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+              <span>Account</span>
+            </button>
+          </div>
+        </template>
+
+      </nav>
+
+      {{-- Sidebar bottom: Sign Out only --}}
+      <div class="px-3 py-4 border-t border-gray-700 flex-shrink-0">
+        <button @click="confirmClearData = true"
+          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all">
+          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+          <span x-text="isSupervisor() ? 'Sign Out' : 'Log Out'"></span>
+        </button>
+      </div>
+    </aside>
+
+    {{-- MOBILE OVERLAY --}}
+    <div
+      x-show="sidebarOpen"
+      x-transition:enter="transition ease-out duration-200" x-transition:enter-start="opacity-0" x-transition:enter-end="opacity-100"
+      x-transition:leave="transition ease-in duration-150" x-transition:leave-start="opacity-100" x-transition:leave-end="opacity-0"
+      @click="sidebarOpen = false"
+      class="fixed inset-0 z-40 bg-black/60 lg:hidden"
+      style="display:none"
+    ></div>
+
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    {{-- MAIN CONTENT                                            --}}
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    <div class="flex-1 flex flex-col min-w-0 min-h-screen min-h-dvh">
 
     {{-- TOP BAR --}}
     <div class="bg-gray-800 border-b border-gray-700 px-4 py-3 flex items-center justify-between flex-shrink-0 pt-safe">
-      <div class="flex items-center gap-3">
-        <button x-show="currentView !== 'home'" @click="goBack" class="text-gray-400 hover:text-white mr-1">
+      <div class="flex items-center gap-2">
+        <button @click="sidebarOpen = !sidebarOpen" class="lg:hidden p-1 text-gray-400 hover:text-white">
+          <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"/></svg>
+        </button>
+        <button x-show="currentView !== 'home'" @click="goBack" class="text-gray-400 hover:text-white">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/></svg>
         </button>
         <span class="text-yellow-400 font-bold text-sm tracking-widest" x-text="viewTitle()"></span>
       </div>
       <div class="flex items-center gap-2">
-        <button x-show="pendingCount > 0 && online && !syncing" @click="handleSync" class="text-xs text-yellow-400 border border-yellow-400/30 rounded-full px-2 py-0.5" x-text="`${pendingCount} pending`"></button>
         <span x-show="syncing" class="w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
-        <div class="flex items-center gap-1">
-          <div class="w-2 h-2 rounded-full" :class="online ? 'bg-green-400' : 'bg-gray-600'"></div>
-          <span class="text-xs text-gray-400" x-text="online ? 'Online' : 'Offline'"></span>
-        </div>
       </div>
     </div>
 
@@ -121,11 +231,38 @@
       {{-- ─── HOME SCREEN ─── --}}
       <div x-show="currentView === 'home'" class="px-4 py-6 space-y-4">
 
-        {{-- Profile card --}}
+        {{-- User status card --}}
         <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4">
-          <div class="text-white text-lg font-medium" x-text="greeting()"></div>
-          <div class="text-gray-400 text-sm mt-0.5" x-text="`${profile.county} County · ${profile.ward}`"></div>
-          <div x-show="profile.salesRep" class="text-gray-500 text-xs mt-1" x-text="`Sales Rep: ${profile.salesRep}`"></div>
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0">
+                <span class="text-yellow-400 font-bold text-sm" x-text="profile.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'SP'"></span>
+              </div>
+              <div>
+                <div class="text-white font-semibold text-base" x-text="profile.name || 'Spotter'"></div>
+                <div class="text-gray-400 text-xs" x-text="profile.id ? 'ID: ' + profile.id : ''"></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-green-400/30' : 'bg-gray-700 border-gray-600'">
+              <div class="w-2 h-2 rounded-full" :class="online ? 'bg-green-400' : 'bg-gray-500'"></div>
+              <span class="text-xs font-medium" :class="online ? 'text-green-400' : 'text-gray-400'" x-text="online ? 'Online' : 'Offline'"></span>
+            </div>
+          </div>
+          <div class="border-t border-gray-700 mb-3"></div>
+          <div class="grid grid-cols-2 gap-3">
+            <div><div class="text-gray-500 text-xs mb-0.5">County</div><div class="text-white text-sm font-medium" x-text="profile.county || '—'"></div></div>
+            <div><div class="text-gray-500 text-xs mb-0.5">Ward</div><div class="text-white text-sm font-medium" x-text="profile.ward || '—'"></div></div>
+            <div x-show="profile.salesRep"><div class="text-gray-500 text-xs mb-0.5">Sales Rep</div><div class="text-white text-sm font-medium" x-text="profile.salesRep"></div></div>
+            <div x-show="profile.role && profile.role !== 'spotter'"><div class="text-gray-500 text-xs mb-0.5">Role</div><div class="text-yellow-400 text-sm font-medium capitalize" x-text="profile.role?.replace(/_/g,' ')"></div></div>
+          </div>
+          <div class="mt-3 pt-3 border-t border-gray-700 flex items-center justify-between">
+            <div class="flex items-center gap-2">
+              <span x-show="syncing" class="w-3 h-3 border-2 border-yellow-400 border-t-transparent rounded-full animate-spin"></span>
+              <span class="text-xs text-gray-500" x-text="syncing ? 'Syncing...' : (pendingCount > 0 ? pendingCount + ' records pending' : 'All synced')"></span>
+            </div>
+            <button x-show="pendingCount > 0 && online && !syncing" @click="handleSync" class="text-xs text-yellow-400 border border-yellow-400/30 rounded-lg px-2.5 py-1 hover:bg-yellow-400/10 transition-all">Sync now</button>
+            <span x-show="!syncing && pendingCount === 0" class="text-xs text-green-400">&#10003; Up to date</span>
+          </div>
         </div>
 
         {{-- Clock status card --}}
@@ -589,12 +726,26 @@
 
       {{-- ─── SUPERVISOR DASHBOARD ─── --}}
       <div x-show="currentView === 'supervisor_dashboard'" class="px-4 py-6 space-y-4">
-        <div class="flex items-center justify-between">
-          <div>
-            <h1 class="text-white text-xl font-bold" x-text="supervisorRoleLabel()"></h1>
-            <p class="text-gray-400 text-sm" x-text="supervisorScopeLabel()"></p>
+        {{-- Supervisor user status card --}}
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4">
+          <div class="flex items-center justify-between mb-3">
+            <div class="flex items-center gap-3">
+              <div class="w-10 h-10 rounded-full bg-yellow-400/20 border border-yellow-400/30 flex items-center justify-center flex-shrink-0">
+                <span class="text-yellow-400 font-bold text-sm" x-text="profile.name ? profile.name.split(' ').map(n => n[0]).join('').slice(0,2).toUpperCase() : 'SV'"></span>
+              </div>
+              <div>
+                <div class="text-white font-semibold text-base" x-text="profile.name || 'Supervisor'"></div>
+                <div class="text-yellow-400 text-xs capitalize" x-text="profile.role?.replace(/_/g,' ')"></div>
+              </div>
+            </div>
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-green-400/30' : 'bg-gray-700 border-gray-600'">
+              <div class="w-2 h-2 rounded-full" :class="online ? 'bg-green-400' : 'bg-gray-500'"></div>
+              <span class="text-xs font-medium" :class="online ? 'text-green-400' : 'text-gray-400'" x-text="online ? 'Online' : 'Offline'"></span>
+            </div>
           </div>
-          <span class="bg-yellow-400/10 text-yellow-400 text-xs px-3 py-1 rounded-full capitalize" x-text="profile.role?.replace(/_/g,' ')"></span>
+          <div class="border-t border-gray-700 pt-3">
+            <div class="text-gray-400 text-sm" x-text="supervisorScopeLabel()"></div>
+          </div>
         </div>
         <div class="grid grid-cols-2 gap-3">
           <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4"><div class="text-yellow-400 font-bold text-2xl" x-text="supervisorStats.submissionsToday ?? '—'"></div><div class="text-gray-400 text-xs mt-1">Submissions Today</div></div>
@@ -758,43 +909,7 @@
 
     </div>
 
-    {{-- SPOTTER BOTTOM NAV --}}
-    <div x-show="!isSupervisor() && currentView !== 'submit'" class="bg-gray-800 border-t border-gray-700 flex-shrink-0 pb-safe">
-      <div class="flex">
-        <template x-for="item in [{view:'home',label:'Home',icon:'home'},{view:'submit',label:'Submit',icon:'plus'},{view:'ward',label:'Ward',icon:'ward'},{view:'tasks',label:'Tasks',icon:'check'},{view:'settings',label:'Settings',icon:'gear'}]" :key="item.view">
-          <button @click="navigate(item.view)" class="flex-1 flex flex-col items-center py-3 gap-1 transition-colors" :class="currentView === item.view ? 'text-yellow-400' : 'text-gray-600'">
-            <svg x-show="item.icon === 'home'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
-            <svg x-show="item.icon === 'plus'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
-            <svg x-show="item.icon === 'ward'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <div x-show="item.icon === 'check'" class="relative">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
-              <div x-show="overdueCount() > 0" class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></div>
-            </div>
-            <svg x-show="item.icon === 'gear'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
-            <span class="text-xs" x-text="item.label"></span>
-          </button>
-        </template>
-      </div>
-    </div>
-
-    {{-- SUPERVISOR BOTTOM NAV --}}
-    <div x-show="isSupervisor()" class="bg-gray-800 border-t border-gray-700 flex-shrink-0 pb-safe">
-      <div class="flex">
-        <template x-for="item in supervisorNavItems()" :key="item.view">
-          <button @click="navigate(item.view)" class="flex-1 flex flex-col items-center py-3 gap-1 transition-colors" :class="currentView === item.view ? 'text-yellow-400' : 'text-gray-600'">
-            <svg x-show="item.icon === 'dashboard'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
-            <svg x-show="item.icon === 'list'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
-            <div x-show="item.icon === 'alert'" class="relative">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
-              <div x-show="(supervisorStats.pendingDuplicates ?? 0) > 0" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full"></div>
-            </div>
-            <svg x-show="item.icon === 'trophy'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
-            <svg x-show="item.icon === 'user'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
-            <span class="text-xs" x-text="item.label"></span>
-          </button>
-        </template>
-      </div>
-    </div>
+    </div>{{-- /main content --}}
 
   </div>
 
