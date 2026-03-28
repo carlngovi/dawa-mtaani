@@ -11,7 +11,7 @@ class WardAdjacency extends Model
 
     protected $table = 'ward_adjacencies';
 
-    protected $fillable = ['ward_id', 'adjacent_ward_id'];
+    protected $fillable = ['ward_id', 'adjacent_ward_id', 'county'];
 
     public static function getAdjacentWards(string $wardId): array
     {
@@ -22,11 +22,15 @@ class WardAdjacency extends Model
         return array_values(array_unique(array_merge([$wardId], $adjacent)));
     }
 
-    // TODO: Filter by county once county column is added to ward_adjacencies
-    public static function getAdjacentWardMap(string $county): array
+    public static function getAdjacentWardMap(string $county = ''): array
     {
-        return DB::table('ward_adjacencies')
-            ->get()
+        $query = DB::table('ward_adjacencies');
+
+        if ($county) {
+            $query->where('county', $county);
+        }
+
+        return $query->get()
             ->groupBy('ward_id')
             ->map(fn ($rows) => $rows->pluck('adjacent_ward_id')->toArray())
             ->toArray();

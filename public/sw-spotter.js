@@ -1,71 +1,39 @@
-var CACHE = 'spotter-v1';
-var SHELL = [
-  '/spotter',
-  '/spotter-assets/js/db.js',
-  '/spotter-assets/js/duplicate.js',
-  '/spotter-assets/js/camera.js',
-  '/spotter-assets/js/gps.js',
-  '/spotter-assets/js/sync.js',
-  '/spotter-assets/js/app.js',
-  '/spotter-assets/manifest.json',
-  '/spotter-assets/icon-192.png'
-];
+const CACHE = 'spotter-v1';
+const SHELL = ['/spotter', '/spotter/js/db.js', '/spotter/js/duplicate.js', '/spotter/js/camera.js', '/spotter/js/gps.js', '/spotter/js/sync.js', '/spotter/js/app.js', '/spotter/manifest.json', '/spotter/icon-192.png'];
 
-self.addEventListener('install', function(e) {
-  e.waitUntil(
-    caches.open(CACHE)
-      .then(function(c) { return c.addAll(SHELL); })
-      .then(function() { return self.skipWaiting(); })
-  );
+self.addEventListener('install', e => {
+  e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting()));
 });
 
-self.addEventListener('activate', function(e) {
-  e.waitUntil(
-    caches.keys().then(function(keys) {
-      return Promise.all(
-        keys.filter(function(k) { return k !== CACHE; })
-            .map(function(k) { return caches.delete(k); })
-      );
-    }).then(function() { return self.clients.claim(); })
-  );
+self.addEventListener('activate', e => {
+  e.waitUntil(caches.keys().then(keys =>
+    Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+  ).then(() => self.clients.claim()));
 });
 
-self.addEventListener('fetch', function(e) {
-  var url = new URL(e.request.url);
+self.addEventListener('fetch', e => {
+  const url = new URL(e.request.url);
 
-  // API calls — network only, offline fallback
   if (url.pathname.startsWith('/api/')) {
-    e.respondWith(
-      fetch(e.request).catch(function() {
-        return new Response(JSON.stringify({ error: 'Offline' }), {
-          status: 503,
-          headers: { 'Content-Type': 'application/json' }
-        });
+    e.respondWith(fetch(e.request).catch(() =>
+      new Response(JSON.stringify({ error: 'Offline' }), {
+        status: 503,
+        headers: { 'Content-Type': 'application/json' }
       })
-    );
+    ));
     return;
   }
 
-  // App shell — stale-while-revalidate
   if (url.pathname.startsWith('/spotter')) {
-    e.respondWith(
-      caches.match(e.request).then(function(cached) {
-        var network = fetch(e.request).then(function(res) {
-          if (res.ok) {
-            caches.open(CACHE).then(function(c) { c.put(e.request, res.clone()); });
-          }
-          return res;
-        }).catch(function() { return cached; });
-        return cached || network;
-      })
-    );
+    e.respondWith(caches.match(e.request).then(cached => {
+      const network = fetch(e.request).then(res => {
+        if (res.ok) caches.open(CACHE).then(c => c.put(e.request, res.clone()));
+        return res;
+      }).catch(() => cached);
+      return cached || network;
+    }));
     return;
   }
 
-  // Everything else — cache first
-  e.respondWith(
-    caches.match(e.request).then(function(cached) {
-      return cached || fetch(e.request);
-    })
-  );
+  e.respondWith(caches.match(e.request).then(cached => cached || fetch(e.request)));
 });

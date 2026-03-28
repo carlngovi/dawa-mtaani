@@ -10,29 +10,14 @@ use Illuminate\Support\Facades\DB;
 
 class StoreOrdersController extends Controller
 {
-    private function phoneVariants(?string $phone): array
-    {
-        if (! $phone) return [''];
-        $digits = preg_replace('/\D/', '', $phone);
-        if (str_starts_with($digits, '254')) {
-            return [$digits, '0' . substr($digits, 3), '+' . $digits];
-        }
-        if (str_starts_with($digits, '0')) {
-            $intl = '254' . substr($digits, 1);
-            return [$digits, $intl, '+' . $intl];
-        }
-        return [$digits];
-    }
-
     public function index(Request $request)
     {
         $user     = Auth::user();
         $currency = CurrencyConfig::get();
-        $phones   = $this->phoneVariants($user->phone);
 
         $orders = DB::table('patient_orders as po')
             ->leftJoin('facilities as f', 'po.facility_id', '=', 'f.id')
-            ->whereIn('po.patient_phone', $phones)
+            ->where('po.user_id', $user->id)
             ->when($request->filled('status'), fn($q) => $q->where('po.status', $request->status))
             ->select([
                 'po.id', 'po.ulid', 'po.status', 'po.total_amount',
@@ -44,9 +29,9 @@ class StoreOrdersController extends Controller
             ->paginate(15)->withQueryString();
 
         $stats = [
-            'total'     => DB::table('patient_orders')->whereIn('patient_phone', $phones)->count(),
-            'pending'   => DB::table('patient_orders')->whereIn('patient_phone', $phones)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED', 'READY'])->count(),
-            'collected' => DB::table('patient_orders')->whereIn('patient_phone', $phones)->where('status', 'COLLECTED')->count(),
+            'total'     => DB::table('patient_orders')->where('user_id', $user->id)->count(),
+            'pending'   => DB::table('patient_orders')->where('user_id', $user->id)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED', 'READY'])->count(),
+            'collected' => DB::table('patient_orders')->where('user_id', $user->id)->where('status', 'COLLECTED')->count(),
         ];
 
         return view('store.orders', compact('orders', 'stats', 'currency'));
@@ -57,12 +42,10 @@ class StoreOrdersController extends Controller
         $user     = Auth::user();
         $currency = CurrencyConfig::get();
 
-        $phones = $this->phoneVariants($user->phone);
-
         $order = DB::table('patient_orders as po')
             ->leftJoin('facilities as f', 'po.facility_id', '=', 'f.id')
             ->where('po.ulid', $ulid)
-            ->whereIn('po.patient_phone', $phones)
+            ->where('po.user_id', $user->id)
             ->select([
                 'po.*',
                 'f.facility_name', 'f.county', 'f.physical_address', 'f.ulid as facility_ulid',

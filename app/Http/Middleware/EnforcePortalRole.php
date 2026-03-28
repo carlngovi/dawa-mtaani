@@ -36,6 +36,8 @@ class EnforcePortalRole
         'group'     => ['group_owner'],
         'field'     => ['network_field_agent'],
         'rep'       => ['sales_rep'],
+        'sales'     => ['sales_rep'],
+        'county'    => ['county_coordinator'],
         'store'     => ['patient', 'retail_facility', 'group_owner'],
     ];
 

@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'Dawa Mtaani')</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="shortcut icon" href="/favicon.svg">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
     {{-- Apply theme before paint to prevent flash --}}
     <script>
@@ -61,7 +63,7 @@
                 load() { try { this.items = JSON.parse(localStorage.getItem(this.KEY) || '[]'); } catch(e) { this.items = []; } this.recalc(); },
                 recalc() { this.count = this.items.reduce((s,i) => s + (i.qty||1), 0); this.total = this.items.reduce((s,i) => s + ((i.price||0)*(i.qty||1)), 0); },
                 save() { localStorage.setItem(this.KEY, JSON.stringify(this.items)); this.recalc(); },
-                add(id, name, price, unit) { const f = this.items.find(i => i.product_id === id); if (f) { f.qty++; } else { this.items.push({ product_id: id, name, price, unit, qty: 1 }); } this.save(); window.dispatchEvent(new CustomEvent('toast', { detail: { message: name + ' added to cart', type: 'success' } })); },
+                add(id, name, price, unit, qty = 1) { qty = Math.max(1, parseInt(qty) || 1); const f = this.items.find(i => i.product_id === id); if (f) { f.qty += qty; } else { this.items.push({ product_id: id, name, price, unit, qty }); } this.save(); window.dispatchEvent(new CustomEvent('toast', { detail: { message: name + ' added to cart', type: 'success' } })); },
                 increase(id) { const i = this.items.find(x => x.product_id === id); if (i) { i.qty++; this.save(); } },
                 decrease(id) { const idx = this.items.findIndex(x => x.product_id === id); if (idx === -1) return; if (this.items[idx].qty <= 1) this.items.splice(idx, 1); else this.items[idx].qty--; this.save(); },
                 remove(id) { this.items = this.items.filter(x => x.product_id !== id); this.save(); },

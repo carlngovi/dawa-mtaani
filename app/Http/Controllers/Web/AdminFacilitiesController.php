@@ -45,6 +45,59 @@ class AdminFacilitiesController extends Controller
         return view('admin.facilities', compact('facilities', 'counties', 'stats'));
     }
 
+    public function retail(Request $request)
+    {
+        return $this->indexByType($request, ['RETAIL'], 'Retail Facilities');
+    }
+
+    public function wholesale(Request $request)
+    {
+        return $this->indexByType($request, ['WHOLESALE', 'MANUFACTURER'], 'Wholesale & Manufacturers');
+    }
+
+    public function hospitals(Request $request)
+    {
+        return $this->indexByType($request, ['HOSPITAL'], 'Hospital Pharmacies');
+    }
+
+    private function indexByType(Request $request, array $types, string $pageTitle)
+    {
+        $query = DB::table('facilities')
+            ->whereNull('deleted_at')
+            ->whereIn('ppb_facility_type', $types)
+            ->orderBy('facility_name');
+
+        if ($request->filled('search')) {
+            $search = '%' . $request->search . '%';
+            $query->where(function ($q) use ($search) {
+                $q->where('facility_name', 'like', $search)
+                  ->orWhere('ppb_licence_number', 'like', $search)
+                  ->orWhere('phone', 'like', $search);
+            });
+        }
+
+        if ($request->filled('status'))     $query->where('facility_status', $request->status);
+        if ($request->filled('county'))     $query->where('county', $request->county);
+        if ($request->filled('membership')) $query->where('network_membership', $request->membership);
+        if ($request->filled('gps_pending')) $query->whereNull('latitude');
+
+        $facilities = $query->paginate(30)->withQueryString();
+
+        $counties = DB::table('facilities')
+            ->whereNull('deleted_at')
+            ->whereIn('ppb_facility_type', $types)
+            ->distinct()->orderBy('county')->pluck('county');
+
+        $stats = [
+            'total'       => DB::table('facilities')->whereNull('deleted_at')->whereIn('ppb_facility_type', $types)->count(),
+            'active'      => DB::table('facilities')->whereIn('ppb_facility_type', $types)->where('facility_status', 'ACTIVE')->count(),
+            'network'     => DB::table('facilities')->whereIn('ppb_facility_type', $types)->where('network_membership', 'NETWORK')->count(),
+            'gps_pending' => DB::table('facilities')->whereNull('latitude')->whereIn('ppb_facility_type', $types)->where('facility_status', 'ACTIVE')->count(),
+        ];
+
+        return view('admin.facilities', compact('facilities', 'counties', 'stats', 'pageTitle'));
+    }
+
     public function show(Request $request, string $ulid)
     {
         $facility = DB::table('facilities')->where('ulid', $ulid)->first();

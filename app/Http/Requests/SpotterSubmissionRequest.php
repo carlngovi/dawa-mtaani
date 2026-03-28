@@ -40,7 +40,7 @@ class SpotterSubmissionRequest extends FormRequest
             'potential' => 'required|in:high,medium,low',
             'notes' => 'nullable|string',
             'nextStep' => 'required|in:sales_rep,spotter_followup,owner_absent,no_action',
-            'followUpDate' => 'required_unless:nextStep,no_action|nullable|date',
+            'followUpDate' => 'required_unless:nextStep,no_action|date',
             'repNotes' => 'nullable|string',
             'brochure' => 'required|in:Yes,No',
             'status' => 'nullable|in:submitted,held,draft',

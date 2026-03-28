@@ -6,7 +6,7 @@
 <div class="space-y-6">
 
     <div class="flex items-center justify-between">
-        <h1 class="text-2xl font-bold text-white">Facilities</h1>
+        <h1 class="text-2xl font-bold text-white">{{ $pageTitle ?? 'All Facilities' }}</h1>
         <a href="/admin/facilities?gps_pending=1" class="text-sm text-yellow-500 hover:underline">
             {{ $stats['gps_pending'] }} GPS pending
         </a>

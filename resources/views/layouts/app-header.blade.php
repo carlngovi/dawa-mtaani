@@ -22,13 +22,89 @@
                 </button>
             </form>
 
-            <div class="hidden xl:block flex-1 max-w-md">
+            <div class="{{ request()->is('store*') ? 'hidden' : 'hidden xl:block' }} flex-1 max-w-md"
+                 x-data="{
+                     query: '',
+                     results: [],
+                     open: false,
+                     loading: false,
+                     debounceTimer: null,
+                     search() {
+                         clearTimeout(this.debounceTimer);
+                         if (this.query.length < 2) {
+                             this.results = [];
+                             this.open = false;
+                             return;
+                         }
+                         this.debounceTimer = setTimeout(() => {
+                             this.loading = true;
+                             fetch('/admin/search?q=' + encodeURIComponent(this.query), {
+                                 credentials: 'same-origin',
+                                 headers: {
+                                     'X-Requested-With': 'XMLHttpRequest',
+                                     'Accept': 'application/json'
+                                 }
+                             })
+                             .then(r => r.json())
+                             .then(data => {
+                                 this.results = data.results;
+                                 this.open = this.results.length > 0;
+                                 this.loading = false;
+                             })
+                             .catch(() => { this.loading = false; });
+                         }, 300);
+                     },
+                     go(url) {
+                         this.open = false;
+                         this.query = '';
+                         window.location.href = url;
+                     }
+                 }"
+                 @click.away="open = false"
+                 @keydown.escape="open = false">
                 <div class="relative">
                     <span class="absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none">
-                        <svg class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"/></svg>
+                        <svg x-show="!loading" class="w-4 h-4 text-gray-500" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" clip-rule="evenodd" d="M3.04175 9.37363C3.04175 5.87693 5.87711 3.04199 9.37508 3.04199C12.8731 3.04199 15.7084 5.87693 15.7084 9.37363C15.7084 12.8703 12.8731 15.7053 9.37508 15.7053C5.87711 15.7053 3.04175 12.8703 3.04175 9.37363ZM9.37508 1.54199C5.04902 1.54199 1.54175 5.04817 1.54175 9.37363C1.54175 13.6991 5.04902 17.2053 9.37508 17.2053C11.2674 17.2053 13.003 16.5344 14.357 15.4176L17.177 18.238C17.4699 18.5309 17.9448 18.5309 18.2377 18.238C18.5306 17.9451 18.5306 17.4703 18.2377 17.1774L15.418 14.3573C16.5365 13.0033 17.2084 11.2669 17.2084 9.37363C17.2084 5.04817 13.7011 1.54199 9.37508 1.54199Z"/></svg>
+                        <svg x-show="loading" class="w-4 h-4 text-yellow-400 animate-spin" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
+                        </svg>
                     </span>
-                    <input type="text" placeholder="Search..."
+                    <input type="text"
+                           placeholder="Search facilities, orders, products..."
+                           x-model="query"
+                           @input="search()"
+                           @keydown.enter.prevent="results.length && go(results[0].url)"
                            class="w-full bg-gray-800 border border-gray-700 rounded-lg pl-9 pr-4 py-2.5 text-sm text-white placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 transition-colors"/>
+
+                    {{-- Results dropdown --}}
+                    <div x-show="open"
+                         x-transition:enter="transition ease-out duration-100"
+                         x-transition:enter-start="opacity-0 -translate-y-1"
+                         x-transition:enter-end="opacity-100 translate-y-0"
+                         class="absolute top-full left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-xl shadow-xl z-50 overflow-hidden"
+                         style="display:none;">
+                        <template x-for="(result, index) in results" :key="index">
+                            <button @click="go(result.url)"
+                                    class="w-full flex items-start gap-3 px-4 py-3 hover:bg-gray-700 transition-colors text-left border-b border-gray-700/50 last:border-0">
+                                <div class="flex-1 min-w-0">
+                                    <div class="flex items-center gap-2">
+                                        <span class="text-xs font-medium text-yellow-400 uppercase tracking-wide" x-text="result.type"></span>
+                                        <span x-show="result.status"
+                                              class="text-xs px-1.5 py-0.5 rounded bg-gray-700 text-gray-300"
+                                              x-text="result.status"></span>
+                                    </div>
+                                    <p class="text-sm text-white font-medium truncate mt-0.5" x-text="result.label"></p>
+                                    <p class="text-xs text-gray-400 truncate" x-text="result.sublabel"></p>
+                                </div>
+                                <svg class="w-4 h-4 text-gray-500 flex-shrink-0 mt-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"/></svg>
+                            </button>
+                        </template>
+                        <div x-show="results.length === 0 && query.length >= 2 && !loading"
+                             class="px-4 py-6 text-center text-sm text-gray-500">
+                            No results for "<span x-text="query"></span>"
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
