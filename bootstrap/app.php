@@ -41,6 +41,8 @@ return Application::configure(basePath: dirname(__DIR__))
             'permission' => \Spatie\Permission\Middleware\PermissionMiddleware::class,
             'role_or_permission' => \Spatie\Permission\Middleware\RoleOrPermissionMiddleware::class,
             'portal' => \App\Http\Middleware\EnforcePortalRole::class,
+            'auth.sales_rep' => \App\Http\Middleware\EnsureSalesRep::class,
+            'auth.county' => \App\Http\Middleware\EnsureCountyCoordinator::class,
         ]);
 
         // Unauthenticated web requests → /login; API requests → 401 JSON

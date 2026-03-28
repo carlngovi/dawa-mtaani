@@ -7,10 +7,10 @@
   <meta name="apple-mobile-web-app-capable" content="yes">
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Spotter">
-  <meta name="api-base" content="{{ rtrim(config('app.url'), '/') }}/api/v1">
+  <meta name="api-base" content="{{ rtrim(request()->getSchemeAndHttpHost(), '/') }}/api/v1">
   <meta name="csrf-token" content="{{ csrf_token() }}">
-  <link rel="manifest" href="/spotter-assets/manifest.json">
-  <link rel="apple-touch-icon" href="/spotter-assets/icon-192.png">
+  <link rel="manifest" href="/spotter/manifest.json">
+  <link rel="apple-touch-icon" href="/spotter/icon-192.png">
   <title>Dawa Mtaani — Spotter</title>
 
   @vite(['resources/css/app.css'])
@@ -48,31 +48,42 @@
         <div class="text-gray-400 text-sm mt-1">Spotter Field App</div>
       </div>
 
-      <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6">
+      {{-- Tab switcher --}}
+      <div class="flex bg-gray-800 border border-gray-700 rounded-xl p-1 mb-6">
+        <button @click="loginTab = 'spotter'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'spotter' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'">Field Agent</button>
+        <button @click="loginTab = 'supervisor'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'supervisor' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'">Supervisor</button>
+      </div>
+
+      {{-- SPOTTER TAB --}}
+      <div x-show="loginTab === 'spotter'" class="bg-gray-800 border border-gray-700 rounded-2xl p-6">
         <h2 class="text-white text-lg font-medium mb-1">Enter Activation Code</h2>
         <p class="text-gray-400 text-sm mb-6">Provided by your Sales Rep or Admin</p>
-
-        <input
-          type="text"
-          x-model="activationCode"
-          @input="formatActivationCode"
-          @keydown.enter="handleActivate"
-          placeholder="XXXX-XXXX-XXXX"
-          maxlength="14"
-          class="w-full bg-gray-900 border border-gray-700 text-white text-center text-xl tracking-widest rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none uppercase"
-          :class="activationError ? 'border-red-400' : ''"
-          autocomplete="off" autocorrect="off" spellcheck="false"
-        >
-
+        <input type="text" x-model="activationCode" @input="formatActivationCode" @keydown.enter="handleActivate" placeholder="XXXX-XXXX-XXXX" maxlength="14" class="w-full bg-gray-900 border border-gray-700 text-white text-center text-xl tracking-widest rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none uppercase" :class="activationError ? 'border-red-400' : ''" autocomplete="off" spellcheck="false">
         <p x-show="activationError" x-text="activationError" class="text-red-400 text-sm mt-2 text-center"></p>
-
-        <button
-          @click="handleActivate"
-          :disabled="activationCode.replace(/-/g,'').length < 12 || activating"
-          class="w-full mt-4 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-        >
+        <button @click="handleActivate" :disabled="activationCode.replace(/-/g,'').length < 12 || activating" class="w-full mt-4 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
           <span x-show="activating" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
           <span x-text="activating ? 'Activating...' : 'Activate Device'"></span>
+        </button>
+      </div>
+
+      {{-- SUPERVISOR TAB --}}
+      <div x-show="loginTab === 'supervisor'" class="bg-gray-800 border border-gray-700 rounded-2xl p-6">
+        <h2 class="text-white text-lg font-medium mb-1">Supervisor Login</h2>
+        <p class="text-gray-400 text-sm mb-6">Sales Rep · County Coordinator · Admin</p>
+        <div class="space-y-4">
+          <div>
+            <label class="text-gray-400 text-xs mb-1 block">Email</label>
+            <input type="email" x-model="supervisorEmail" @keydown.enter="handleSupervisorLogin" placeholder="you@example.com" autocomplete="email" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-red-400' : ''">
+          </div>
+          <div>
+            <label class="text-gray-400 text-xs mb-1 block">Password</label>
+            <input type="password" x-model="supervisorPassword" @keydown.enter="handleSupervisorLogin" placeholder="••••••••" autocomplete="current-password" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-red-400' : ''">
+          </div>
+        </div>
+        <p x-show="supervisorError" x-text="supervisorError" class="text-red-400 text-sm mt-3 text-center"></p>
+        <button @click="handleSupervisorLogin" :disabled="!supervisorEmail || !supervisorPassword || supervisorLoggingIn" class="w-full mt-4 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
+          <span x-show="supervisorLoggingIn" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
+          <span x-text="supervisorLoggingIn ? 'Signing in...' : 'Sign In'"></span>
         </button>
       </div>
     </div>
@@ -163,7 +174,12 @@
         <div>
           <div class="text-gray-400 text-xs uppercase tracking-widest mb-3">Quick Actions</div>
           <div class="space-y-3">
-            <button @click="clockedIn ? navigate('submit') : null" class="w-full py-4 rounded-2xl font-bold text-center transition-all" :class="clockedIn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed opacity-50'">+ New Submission</button>
+            <button @click="clockedIn ? navigate('submit') : showClockInPrompt = true" class="w-full py-4 rounded-2xl font-bold text-center transition-all" :class="clockedIn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed opacity-50'">+ New Submission</button>
+            <div x-show="showClockInPrompt" x-transition class="mt-2 bg-yellow-400/10 border border-yellow-400/30 rounded-xl px-4 py-3">
+              <p class="text-yellow-400 text-sm font-medium">You must clock in before submitting a visit.</p>
+              <button @click="navigate('clock'); showClockInPrompt = false" class="text-yellow-400 text-xs underline mt-1">Clock in now →</button>
+              <button @click="showClockInPrompt = false" class="text-gray-500 text-xs ml-3">Dismiss</button>
+            </div>
             <button @click="navigate('submissions')" class="w-full py-4 rounded-2xl font-bold text-center bg-gray-800 border border-gray-700 text-white">My Submissions</button>
           </div>
         </div>
@@ -250,11 +266,19 @@
             <p x-show="formErrors.town" class="text-red-400 text-xs mt-1" x-text="formErrors.town"></p>
           </div>
           <div>
+            <label class="text-gray-400 text-xs mb-1 block">Nearest Landmark</label>
+            <input type="text" x-model="form.landmark" class="field-input">
+          </div>
+          <div>
+            <label class="text-gray-400 text-xs mb-1 block">Date of Visit</label>
+            <input type="text" :value="today()" readonly class="field-input cursor-not-allowed" style="color:#6b7280">
+          </div>
+          <div>
             <label class="text-gray-400 text-xs mb-1 block">Pharmacy Name <span class="text-red-400">*</span></label>
             <input type="text" x-model="form.pharmacy" @blur="checkDuplicate" class="field-input" :style="formErrors.pharmacy ? 'border-color:#f87171' : ''">
             <p x-show="formErrors.pharmacy" class="text-red-400 text-xs mt-1" x-text="formErrors.pharmacy"></p>
-            <div x-show="duplicateWarning" class="mt-2 bg-yellow-400/10 border border-yellow-400/30 rounded-lg px-3 py-2">
-              <p class="text-yellow-400 text-xs" x-text="`Similar pharmacy found: ${duplicateWarning}. Verify before continuing.`"></p>
+            <div x-show="duplicateWarning" class="mt-2 border rounded-lg px-3 py-2" :class="duplicateBlock ? 'bg-red-400/10 border-red-400/30' : 'bg-yellow-400/10 border-yellow-400/30'">
+              <p class="text-sm" :class="duplicateBlock ? 'text-red-400' : 'text-yellow-400'" x-text="duplicateWarning"></p>
             </div>
           </div>
           <div>
@@ -309,6 +333,7 @@
                 <img :src="photoPreview" class="w-full h-full object-cover">
               </div>
             </div>
+            <p x-show="form.photoData" class="text-gray-500 text-xs mt-1" x-text="photoSizeKB() + 'KB'"></p>
             <p x-show="formErrors.photo" class="text-red-400 text-xs mt-1">Photo is required</p>
           </div>
         </div>
@@ -321,11 +346,11 @@
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Owner Phone <span class="text-red-400">*</span></label>
-            <input type="tel" x-model="form.ownerPhone" class="field-input">
+            <input type="tel" x-model="form.ownerPhone" class="field-input" placeholder="07XXXXXXXX" pattern="^(\+?254|0)[17]\d{8}$" inputmode="tel">
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Pharmacy Phone</label>
-            <input type="tel" x-model="form.pharmacyPhone" class="field-input">
+            <input type="tel" x-model="form.pharmacyPhone" class="field-input" placeholder="07XXXXXXXX" pattern="^(\+?254|0)[17]\d{8}$" inputmode="tel">
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Owner Email</label>
@@ -402,6 +427,7 @@
           <div x-show="form.nextStep && form.nextStep !== 'no_action'">
             <label class="text-gray-400 text-xs mb-1 block">Follow-up Date <span class="text-red-400">*</span></label>
             <input type="date" x-model="form.followUpDate" :min="today()" class="field-input">
+            <p class="text-gray-500 text-xs mt-1">Sales Rep is alerted if no update within 48 hours of this date.</p>
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Notes for Sales Rep</label>
@@ -465,7 +491,7 @@
       {{-- ─── SUBMISSIONS LIST ─── --}}
       <div x-show="currentView === 'submissions'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
-          <template x-for="tab in ['all','submitted','held','accepted','draft']" :key="tab">
+          <template x-for="tab in ['all','submitted','held','sr_reviewed','cc_verified','accepted','rejected','draft']" :key="tab">
             <button @click="submissionFilter = tab" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="submissionFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
           </template>
         </div>
@@ -482,10 +508,19 @@
                 <div class="text-gray-500 text-xs mt-1" x-text="sub.date"></div>
               </div>
               <div class="flex flex-col items-end gap-1">
-                <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="{'bg-yellow-400/10 text-yellow-400': sub.status === 'submitted', 'bg-orange-400/10 text-orange-400': sub.status === 'held', 'bg-green-400/10 text-green-400': sub.status === 'accepted', 'bg-red-400/10 text-red-400': sub.status === 'rejected', 'bg-gray-700 text-gray-400': sub.status === 'draft'}" x-text="sub.status === 'held' ? 'Held for Review' : sub.status"></span>
+                <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="{
+                  'bg-yellow-400/10 text-yellow-400': sub.status === 'submitted',
+                  'bg-orange-400/10 text-orange-400': sub.status === 'held',
+                  'bg-blue-400/10 text-blue-400': sub.status === 'sr_reviewed',
+                  'bg-purple-400/10 text-purple-400': sub.status === 'cc_verified',
+                  'bg-green-400/10 text-green-400': sub.status === 'accepted',
+                  'bg-red-400/10 text-red-400': sub.status === 'rejected',
+                  'bg-gray-700 text-gray-400': sub.status === 'draft',
+                }" x-text="sub.status === 'held' ? 'Held for Review' : sub.status === 'sr_reviewed' ? 'SR Reviewed' : sub.status === 'cc_verified' ? 'CC Verified' : sub.status"></span>
                 <div class="w-2 h-2 rounded-full" :class="{'bg-green-400': sub.syncStatus === 'synced', 'bg-yellow-400': sub.syncStatus === 'pending', 'bg-red-400': sub.syncStatus === 'failed'}"></div>
               </div>
             </div>
+            <p x-show="heldStatusLabel(sub.status)" class="text-xs text-gray-500 mt-1" x-text="heldStatusLabel(sub.status)"></p>
           </div>
         </template>
       </div>
@@ -528,11 +563,164 @@
         </template>
       </div>
 
+      {{-- ─── WARD SUBMISSIONS ─── --}}
+      <div x-show="currentView === 'ward'" class="px-4 py-6">
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl p-6">
+          <div class="text-gray-400 text-xs uppercase tracking-widest mb-4">Co-Ward Submissions</div>
+          <div x-show="!online" class="text-gray-500 text-sm text-center py-8">Available when online</div>
+          <div x-show="online && wardSubmissions.length === 0" class="text-gray-500 text-sm text-center py-8">No co-ward submissions yet</div>
+          <template x-for="sub in wardSubmissions" :key="sub.id">
+            <div class="bg-gray-900 border border-gray-700 rounded-xl p-3 mb-2">
+              <div class="text-white font-medium" x-text="sub.pharmacy"></div>
+              <div class="text-gray-400 text-sm" x-text="sub.town"></div>
+              <div class="text-gray-500 text-xs mt-1" x-text="sub.address"></div>
+              <div class="flex items-center justify-between mt-2">
+                <span class="text-xs" :class="{
+                  'text-green-400': sub.potential === 'high',
+                  'text-yellow-400': sub.potential === 'medium',
+                  'text-red-400': sub.potential === 'low'
+                }" x-text="(sub.potential || '') + ' potential'"></span>
+                <span class="text-gray-500 text-xs" x-text="sub.next_step ? sub.next_step.replace(/_/g,' ') : ''"></span>
+              </div>
+            </div>
+          </template>
+        </div>
+      </div>
+
+      {{-- ─── SUPERVISOR DASHBOARD ─── --}}
+      <div x-show="currentView === 'supervisor_dashboard'" class="px-4 py-6 space-y-4">
+        <div class="flex items-center justify-between">
+          <div>
+            <h1 class="text-white text-xl font-bold" x-text="supervisorRoleLabel()"></h1>
+            <p class="text-gray-400 text-sm" x-text="supervisorScopeLabel()"></p>
+          </div>
+          <span class="bg-yellow-400/10 text-yellow-400 text-xs px-3 py-1 rounded-full capitalize" x-text="profile.role?.replace(/_/g,' ')"></span>
+        </div>
+        <div class="grid grid-cols-2 gap-3">
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4"><div class="text-yellow-400 font-bold text-2xl" x-text="supervisorStats.submissionsToday ?? '—'"></div><div class="text-gray-400 text-xs mt-1">Submissions Today</div></div>
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4"><div class="text-white font-bold text-2xl" x-text="supervisorStats.totalSubmissions ?? '—'"></div><div class="text-gray-400 text-xs mt-1">Total Submitted</div></div>
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4"><div class="font-bold text-2xl" :class="(supervisorStats.pendingDuplicates ?? 0) > 0 ? 'text-orange-400' : 'text-white'" x-text="supervisorStats.pendingDuplicates ?? '—'"></div><div class="text-gray-400 text-xs mt-1">Pending Reviews</div></div>
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4"><div class="font-bold text-2xl" :class="(supervisorStats.overdueFollowUps ?? 0) > 0 ? 'text-red-400' : 'text-white'" x-text="supervisorStats.overdueFollowUps ?? '—'"></div><div class="text-gray-400 text-xs mt-1">Overdue Follow-ups</div></div>
+        </div>
+        <div x-show="(supervisorStats.pendingDuplicates ?? 0) > 0 || (supervisorStats.overdueFollowUps ?? 0) > 0" class="bg-gray-800 border border-yellow-400/30 rounded-2xl p-4">
+          <div class="text-yellow-400 text-xs uppercase tracking-widest mb-3">Pending Actions</div>
+          <button x-show="supervisorStats.pendingDuplicates > 0" @click="navigate('supervisor_duplicates')" class="w-full flex items-center justify-between py-2 border-b border-gray-700"><span class="text-white text-sm">Duplicate Reviews</span><span class="bg-orange-400/10 text-orange-400 text-xs px-2 py-0.5 rounded-full" x-text="supervisorStats.pendingDuplicates"></span></button>
+          <button x-show="supervisorStats.overdueFollowUps > 0" @click="navigate('supervisor_followups')" class="w-full flex items-center justify-between py-2"><span class="text-white text-sm">Overdue Follow-ups</span><span class="bg-red-400/10 text-red-400 text-xs px-2 py-0.5 rounded-full" x-text="supervisorStats.overdueFollowUps"></span></button>
+        </div>
+        <div x-show="profile.role === 'sales_rep' && supervisorSpotters.length > 0">
+          <div class="text-gray-400 text-xs uppercase tracking-widest mb-3">My Spotters</div>
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
+            <template x-for="spotter in supervisorSpotters" :key="spotter.id">
+              <div class="flex items-center justify-between px-4 py-3 border-b border-gray-700 last:border-0">
+                <div><div class="text-white text-sm font-medium" x-text="spotter.name"></div><div class="text-gray-500 text-xs" x-text="`${spotter.today_submissions} today · ${spotter.total_submissions} total`"></div></div>
+                <div class="flex items-center gap-2"><div class="w-2 h-2 rounded-full" :class="spotter.clocked_in ? 'bg-green-400' : 'bg-gray-600'"></div><span class="text-xs text-gray-500" x-text="spotter.clocked_in ? 'Active' : 'Offline'"></span></div>
+              </div>
+            </template>
+          </div>
+        </div>
+      </div>
+
+      {{-- ─── SUPERVISOR SUBMISSIONS ─── --}}
+      <div x-show="currentView === 'supervisor_submissions'" class="px-4 py-4">
+        <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+          <template x-for="tab in ['all','submitted','held','accepted','rejected']" :key="tab">
+            <button @click="supervisorSubmissionFilter = tab; loadSupervisorSubmissions()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="supervisorSubmissionFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+          </template>
+        </div>
+        <div x-show="supervisorSubmissions.length === 0" class="text-center py-16"><p class="text-gray-500">No submissions found</p></div>
+        <template x-for="sub in supervisorSubmissions" :key="sub.id">
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4 mb-3">
+            <div class="flex items-start justify-between">
+              <div class="flex-1"><div class="text-white font-medium" x-text="sub.pharmacy"></div><div class="text-gray-400 text-sm" x-text="`${sub.town || ''} · ${sub.ward || ''}`"></div><div class="text-gray-500 text-xs mt-1" x-text="sub.spotter?.name ?? ''"></div></div>
+              <span class="text-xs px-2 py-0.5 rounded-full font-medium" :class="{'bg-yellow-400/10 text-yellow-400': sub.status === 'submitted', 'bg-orange-400/10 text-orange-400': sub.status === 'held', 'bg-blue-400/10 text-blue-400': sub.status === 'sr_reviewed', 'bg-purple-400/10 text-purple-400': sub.status === 'cc_verified', 'bg-green-400/10 text-green-400': sub.status === 'accepted', 'bg-red-400/10 text-red-400': sub.status === 'rejected', 'bg-gray-700 text-gray-400': sub.status === 'draft'}" x-text="sub.status"></span>
+            </div>
+          </div>
+        </template>
+      </div>
+
+      {{-- ─── SUPERVISOR DUPLICATES ─── --}}
+      <div x-show="currentView === 'supervisor_duplicates'" class="px-4 py-4">
+        <div x-show="supervisorDuplicates.length === 0" class="text-center py-16"><div class="text-gray-500 text-sm">No pending duplicate reviews</div><div class="text-green-400 text-xs mt-2">All clear</div></div>
+        <template x-for="review in supervisorDuplicates" :key="review.id">
+          <div class="bg-gray-800 border border-orange-400/30 rounded-2xl p-4 mb-4">
+            <div class="text-orange-400 text-xs uppercase tracking-widest mb-3">Duplicate Review</div>
+            <div class="grid grid-cols-2 gap-3 mb-4">
+              <div class="bg-gray-900 rounded-xl p-3"><div class="text-gray-400 text-xs mb-1">Submitted</div><div class="text-white text-sm font-medium" x-text="review.submission?.pharmacy"></div><div class="text-gray-500 text-xs" x-text="review.submission?.ward"></div></div>
+              <div class="bg-gray-900 rounded-xl p-3"><div class="text-gray-400 text-xs mb-1">Matched With</div><div class="text-white text-sm font-medium" x-text="review.matched_submission?.pharmacy ?? review.match_name"></div><div class="text-gray-500 text-xs" x-text="review.matched_submission?.ward"></div></div>
+            </div>
+            <div class="flex gap-3 mb-4">
+              <div x-show="review.gps_distance_metres !== null" class="text-xs px-3 py-1 rounded-full" :class="review.gps_distance_metres <= 50 ? 'bg-red-400/10 text-red-400' : 'bg-green-400/10 text-green-400'" x-text="`GPS: ${review.gps_distance_metres}m`"></div>
+              <div x-show="review.name_edit_distance !== null" class="bg-gray-700 text-gray-300 text-xs px-3 py-1 rounded-full" x-text="`Name dist: ${review.name_edit_distance}`"></div>
+            </div>
+            <div x-show="!review._decided">
+              <div x-show="!review._confirming" class="flex gap-3">
+                <button @click="review._confirming = 'duplicate'" class="flex-1 bg-red-500/20 border border-red-500/30 text-red-400 font-medium py-2.5 rounded-xl text-sm">Confirm Duplicate</button>
+                <button @click="decideDuplicate(review, 'not_duplicate')" class="flex-1 bg-green-400/20 border border-green-400/30 text-green-400 font-medium py-2.5 rounded-xl text-sm" x-text="profile.role === 'sales_rep' ? 'Not Dup → CC' : profile.role === 'county_coordinator' ? 'Verify → Admin' : 'Accept'"></button>
+              </div>
+              <div x-show="review._confirming === 'duplicate'" class="space-y-2">
+                <textarea x-model="review._notes" rows="2" placeholder="Reason (optional)..." class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm resize-none focus:border-yellow-400 outline-none"></textarea>
+                <div class="flex gap-2"><button @click="review._confirming = null" class="flex-1 border border-gray-600 text-gray-400 py-2 rounded-xl text-sm">Cancel</button><button @click="decideDuplicate(review, 'confirmed_duplicate')" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-xl text-sm">Confirm</button></div>
+              </div>
+            </div>
+            <div x-show="review._decided" class="text-center text-green-400 text-sm py-2">Decision recorded</div>
+          </div>
+        </template>
+      </div>
+
+      {{-- ─── SUPERVISOR LEADERBOARD ─── --}}
+      <div x-show="currentView === 'supervisor_leaderboard'" class="px-4 py-4">
+        <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+          <template x-for="p in [{v:'programme',l:'All Time'},{v:'month',l:'This Month'},{v:'week',l:'This Week'}]" :key="p.v">
+            <button @click="leaderboardPeriod = p.v; loadLeaderboard()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="leaderboardPeriod === p.v ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="p.l"></button>
+          </template>
+        </div>
+        <div class="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
+          <div class="grid grid-cols-4 gap-2 px-4 py-3 bg-gray-700 text-gray-400 text-xs uppercase tracking-widest"><span>Rank</span><span class="col-span-2">Spotter</span><span class="text-right">Activations</span></div>
+          <template x-for="(entry, i) in leaderboardData" :key="i">
+            <div class="grid grid-cols-4 gap-2 px-4 py-3 border-t border-gray-700 items-center">
+              <span class="font-bold text-sm" :class="{'text-yellow-400': entry.rank === 1, 'text-gray-300': entry.rank === 2, 'text-orange-400': entry.rank === 3, 'text-gray-500': entry.rank > 3}" x-text="entry.rank"></span>
+              <span class="col-span-2 text-white text-sm" x-text="entry.name"></span>
+              <span class="text-right text-green-400 font-bold" x-text="entry.activations"></span>
+            </div>
+          </template>
+          <div x-show="leaderboardData.length === 0" class="text-center py-8 text-gray-500 text-sm">No data for this period</div>
+        </div>
+      </div>
+
+      {{-- ─── SUPERVISOR FOLLOW-UPS ─── --}}
+      <div x-show="currentView === 'supervisor_followups'" class="px-4 py-4">
+        <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
+          <template x-for="tab in ['overdue','open','completed']" :key="tab">
+            <button @click="supervisorFollowUpFilter = tab; loadSupervisorFollowUps()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="supervisorFollowUpFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+          </template>
+        </div>
+        <template x-for="task in supervisorFollowUps" :key="task.id">
+          <div class="bg-gray-800 border rounded-2xl p-4 mb-3" :class="task.status === 'overdue' ? 'border-red-400/50' : 'border-gray-700'">
+            <div class="text-white font-medium" x-text="task.submission?.pharmacy ?? 'Unknown'"></div>
+            <div class="text-gray-400 text-sm" x-text="nextStepLabel(task.next_step)"></div>
+            <div class="text-sm mt-1" :class="task.status === 'overdue' ? 'text-red-400' : 'text-gray-500'" x-text="`Due: ${task.follow_up_date}${task.status === 'overdue' ? ' · ' + daysOverdue(task.follow_up_date) + ' days overdue' : ''}`"></div>
+          </div>
+        </template>
+        <div x-show="supervisorFollowUps.length === 0" class="text-center py-16 text-gray-500">No follow-ups</div>
+      </div>
+
+      {{-- ─── SUPERVISOR ATTENDANCE ─── --}}
+      <div x-show="currentView === 'supervisor_attendance'" class="px-4 py-4">
+        <template x-for="record in supervisorAttendance" :key="record.id">
+          <div class="bg-gray-800 border border-gray-700 rounded-2xl p-4 mb-3">
+            <div class="flex items-center justify-between mb-2"><span class="text-white font-medium" x-text="record.spotter?.name ?? 'Unknown'"></span></div>
+            <div class="text-gray-400 text-sm" x-text="record.date"></div>
+            <div class="flex gap-4 mt-2 text-xs text-gray-500"><span x-text="`In: ${formatTime(record.clock_in_at)}`"></span><span x-text="record.clock_out_at ? `Out: ${formatTime(record.clock_out_at)}` : 'Not clocked out'"></span></div>
+          </div>
+        </template>
+        <div x-show="supervisorAttendance.length === 0" class="text-center py-16 text-gray-500">No attendance records</div>
+      </div>
+
       {{-- ─── SETTINGS SCREEN ─── --}}
       <div x-show="currentView === 'settings'" class="px-4 py-6 space-y-4">
         <div class="bg-gray-800 border border-gray-700 rounded-2xl divide-y divide-gray-700">
           <div class="px-4 py-3"><div class="text-gray-400 text-xs uppercase tracking-widest">Profile</div></div>
-          <template x-for="row in [{label:'Name',value:profile.name},{label:'ID',value:profile.id},{label:'County',value:profile.county},{label:'Ward',value:profile.ward},{label:'Sales Rep',value:profile.salesRep||'—'}]" :key="row.label">
+          <template x-for="row in [{label:'Name',value:profile.name},{label:'Role',value:profile.role ? profile.role.replace(/_/g,' ') : 'Spotter'},{label:'County',value:profile.county},{label:'Ward',value:profile.ward},{label:'Sales Rep',value:profile.salesRep||'—'}]" :key="row.label">
             <div class="flex justify-between items-center px-4 py-3"><span class="text-gray-400 text-sm" x-text="row.label"></span><span class="text-white text-sm" x-text="row.value"></span></div>
           </template>
         </div>
@@ -554,13 +742,13 @@
           <div class="px-4 py-3"><div class="text-gray-400 text-xs uppercase tracking-widest">App</div></div>
           <div class="flex justify-between items-center px-4 py-3"><span class="text-gray-400 text-sm">Version</span><span class="text-white text-sm">1.0.0</span></div>
           <div class="px-4 py-3">
-            <template x-if="!confirmClearData"><button @click="confirmClearData = true" class="text-red-400 text-sm">Clear Local Data</button></template>
+            <template x-if="!confirmClearData"><button @click="confirmClearData = true" class="text-red-400 text-sm">Log Out</button></template>
             <template x-if="confirmClearData">
               <div class="space-y-2">
-                <p class="text-gray-300 text-sm">This will remove all local data and deactivate this device.</p>
+                <p class="text-gray-300 text-sm" x-text="isSupervisor() ? 'Sign out of your supervisor session?' : 'This will log you out, clear all local data, and deactivate this device. You will need a new activation code to sign back in.'"></p>
                 <div class="flex gap-3">
                   <button @click="confirmClearData = false" class="flex-1 border border-gray-600 text-gray-400 py-2 rounded-lg text-sm">Cancel</button>
-                  <button @click="clearAllData" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg text-sm">Clear Everything</button>
+                  <button @click="clearAllData" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg text-sm">Log Out</button>
                 </div>
               </div>
             </template>
@@ -570,13 +758,14 @@
 
     </div>
 
-    {{-- BOTTOM NAV --}}
-    <div x-show="currentView !== 'submit'" class="bg-gray-800 border-t border-gray-700 flex-shrink-0 pb-safe">
+    {{-- SPOTTER BOTTOM NAV --}}
+    <div x-show="!isSupervisor() && currentView !== 'submit'" class="bg-gray-800 border-t border-gray-700 flex-shrink-0 pb-safe">
       <div class="flex">
-        <template x-for="item in [{view:'home',label:'Home',icon:'home'},{view:'submit',label:'Submit',icon:'plus'},{view:'tasks',label:'Tasks',icon:'check'},{view:'settings',label:'Settings',icon:'gear'}]" :key="item.view">
+        <template x-for="item in [{view:'home',label:'Home',icon:'home'},{view:'submit',label:'Submit',icon:'plus'},{view:'ward',label:'Ward',icon:'ward'},{view:'tasks',label:'Tasks',icon:'check'},{view:'settings',label:'Settings',icon:'gear'}]" :key="item.view">
           <button @click="navigate(item.view)" class="flex-1 flex flex-col items-center py-3 gap-1 transition-colors" :class="currentView === item.view ? 'text-yellow-400' : 'text-gray-600'">
             <svg x-show="item.icon === 'home'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
             <svg x-show="item.icon === 'plus'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
+            <svg x-show="item.icon === 'ward'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
             <div x-show="item.icon === 'check'" class="relative">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/></svg>
               <div x-show="overdueCount() > 0" class="absolute -top-1 -right-1 w-2 h-2 bg-red-400 rounded-full"></div>
@@ -588,14 +777,33 @@
       </div>
     </div>
 
+    {{-- SUPERVISOR BOTTOM NAV --}}
+    <div x-show="isSupervisor()" class="bg-gray-800 border-t border-gray-700 flex-shrink-0 pb-safe">
+      <div class="flex">
+        <template x-for="item in supervisorNavItems()" :key="item.view">
+          <button @click="navigate(item.view)" class="flex-1 flex flex-col items-center py-3 gap-1 transition-colors" :class="currentView === item.view ? 'text-yellow-400' : 'text-gray-600'">
+            <svg x-show="item.icon === 'dashboard'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"/></svg>
+            <svg x-show="item.icon === 'list'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
+            <div x-show="item.icon === 'alert'" class="relative">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+              <div x-show="(supervisorStats.pendingDuplicates ?? 0) > 0" class="absolute -top-1 -right-1 w-2 h-2 bg-orange-400 rounded-full"></div>
+            </div>
+            <svg x-show="item.icon === 'trophy'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"/></svg>
+            <svg x-show="item.icon === 'user'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>
+            <span class="text-xs" x-text="item.label"></span>
+          </button>
+        </template>
+      </div>
+    </div>
+
   </div>
 
-  <script src="/spotter-assets/js/db.js"></script>
-  <script src="/spotter-assets/js/duplicate.js"></script>
-  <script src="/spotter-assets/js/camera.js"></script>
-  <script src="/spotter-assets/js/gps.js"></script>
-  <script src="/spotter-assets/js/sync.js"></script>
-  <script src="/spotter-assets/js/app.js"></script>
+  <script src="/spotter/js/db.js"></script>
+  <script src="/spotter/js/duplicate.js"></script>
+  <script src="/spotter/js/camera.js"></script>
+  <script src="/spotter/js/gps.js"></script>
+  <script src="/spotter/js/sync.js"></script>
+  <script src="/spotter/js/app.js"></script>
 
   <script>
     if ('serviceWorker' in navigator) {

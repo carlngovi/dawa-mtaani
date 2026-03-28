@@ -43,7 +43,7 @@ class StoreCounterfeitController extends Controller
             'product_id'   => $request->product_id,
             'patient_phone' => $user->phone ?? '',
             'report_notes' => $request->report_notes,
-            'status'       => 'SUBMITTED',
+            'status'       => 'OPEN',
             'created_at'   => now(),
             'updated_at'   => now(),
         ]);

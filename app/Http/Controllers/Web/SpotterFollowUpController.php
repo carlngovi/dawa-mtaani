@@ -3,15 +3,26 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\Concerns\HasSpotterScope;
 use App\Models\SpotterFollowUp;
 use App\Models\User;
 use Illuminate\Http\Request;
 
 class SpotterFollowUpController extends Controller
 {
+    use HasSpotterScope;
+
     public function index(Request $request)
     {
-        $query = SpotterFollowUp::with(['submission:id,pharmacy,ward', 'spotter:id,name']);
+        $scope = $this->spotterScope();
+
+        $query = SpotterFollowUp::with(['submission:id,pharmacy,ward,county', 'spotter:id,name']);
+
+        if ($scope['isSalesRep']) {
+            $query->whereIn('spotter_user_id', $scope['spotterIds']);
+        } elseif ($scope['isCC']) {
+            $query->whereHas('submission', fn ($q) => $q->where('county', $scope['county']));
+        }
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -21,7 +32,12 @@ class SpotterFollowUpController extends Controller
         }
 
         $followUps = $query->orderByDesc('follow_up_date')->paginate(25)->withQueryString();
-        $spotters = User::role('network_field_agent')->get(['id', 'name']);
+
+        if ($scope['isSalesRep']) {
+            $spotters = User::whereIn('id', $scope['spotterIds'])->get(['id', 'name']);
+        } else {
+            $spotters = User::role('network_field_agent')->get(['id', 'name']);
+        }
 
         return view('admin.spotter.followups.index', compact('followUps', 'spotters'));
     }

@@ -21,3 +21,7 @@ yarn-error.log
 /.nova
 /.vscode
 /.zed
+dawa_mtaani.sql
+*.sql
+*.save
+cloudflared

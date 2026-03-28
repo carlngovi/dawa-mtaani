@@ -8,6 +8,7 @@ use App\Http\Requests\SpotterSubmissionRequest;
 use App\Services\SpotterDuplicateDetector;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
 
 class SyncController extends Controller
@@ -68,6 +69,11 @@ class SyncController extends Controller
 
                 $submission->status === SpotterSubmissionStatus::Held ? $conflicts++ : $synced++;
             } catch (\Exception $e) {
+                Log::error('Spotter sync item failed', [
+                    'local_id' => $item['id'] ?? 'unknown',
+                    'error' => $e->getMessage(),
+                    'trace' => $e->getTraceAsString(),
+                ]);
                 $results[] = [
                     'local_id' => $item['id'] ?? 'unknown',
                     'status' => 'error',

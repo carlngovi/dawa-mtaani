@@ -1,9 +1,16 @@
 <?php
 
+/**
+ * @deprecated-spotter
+ * This file has been migrated to dawa-spotter/.
+ * It remains here temporarily to preserve existing admin panel routes.
+ * Remove after dawa-spotter is confirmed live.
+ */
+
 namespace App\Services;
 
-use App\Models\Facility;
 use App\Models\SpotterActivationCode;
+use App\Models\SpotterProfile;
 use App\Models\User;
 use App\Models\WardAdjacency;
 use Illuminate\Validation\ValidationException;
@@ -50,20 +57,27 @@ class SpotterActivationService
 
         $activation->update(['consumed_at' => now()]);
 
-        // Derive county/ward from the spotter's linked facility
-        $county = '';
-        $ward = '';
-        if ($spotter->facility_id) {
-            $facility = Facility::find($spotter->facility_id);
-            if ($facility) {
-                $county = $facility->county ?? '';
-                $ward = $facility->ward ?? '';
+        // Load county/ward/salesRep from SpotterProfile
+        $profile = SpotterProfile::where('user_id', $spotter->id)->first();
+
+        if ($profile) {
+            $county = $profile->county;
+            $ward = $profile->ward;
+            $salesRepName = $profile->getSalesRepName();
+        } else {
+            // Fallback: try the spotter's linked facility
+            $county = '';
+            $ward = '';
+            $salesRepName = null;
+
+            if ($spotter->facility_id) {
+                $facility = \App\Models\Facility::find($spotter->facility_id);
+                if ($facility) {
+                    $county = $facility->county ?? '';
+                    $ward = $facility->ward ?? '';
+                }
             }
         }
-        // TODO: If spotter has no facility, county/ward should come from a spotter profile table
-
-        // TODO: Look up sales rep name once a spotter↔sales_rep relationship exists
-        $salesRepName = null;
 
         $tokens = $this->tokenService->issue(
             $spotter,
@@ -79,7 +93,7 @@ class SpotterActivationService
             'token' => $tokens['token'],
             'refresh_token' => $tokens['refresh_token'],
             'profile' => $this->tokenService->buildProfile($spotter, $token),
-            'ward_adjacency' => WardAdjacency::getAdjacentWardMap(''),
+            'ward_adjacency' => WardAdjacency::getAdjacentWardMap($county),
         ];
     }
 }

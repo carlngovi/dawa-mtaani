@@ -27,6 +27,7 @@ class User extends Authenticatable
         'google_id',
         'google_avatar',
         'google_linked_at',
+        'email_verified_at',
     ];
 
     /**
@@ -50,5 +51,10 @@ class User extends Authenticatable
             'email_verified_at' => 'datetime',
             'password' => 'hashed',
         ];
+    }
+
+    public function spotterProfile(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(SpotterProfile::class, 'user_id');
     }
 }

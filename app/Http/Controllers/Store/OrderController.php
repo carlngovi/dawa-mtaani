@@ -110,6 +110,7 @@ class OrderController extends Controller
 
             $order = PatientOrder::create([
                 'ulid'                => strtolower(Str::ulid()),
+                'user_id'             => auth()->id(),
                 'patient_phone'       => $validated['patient_phone'],
                 'patient_name'        => $validated['patient_name'] ?? null,
                 'facility_id'         => $basket->facility_id,

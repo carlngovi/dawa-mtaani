@@ -23,6 +23,8 @@ export default {
         'border-yellow-400', 'border-green-400', 'border-red-400', 'border-gray-600', 'border-gray-700',
         'bg-yellow-400/10', 'bg-green-400/10', 'bg-red-400/10', 'bg-orange-400/10', 'bg-gray-700/50',
         'border-yellow-400/30', 'border-green-400/30', 'border-red-400/30', 'border-red-400/50', 'border-green-400/50',
+        'bg-blue-400/10', 'text-blue-400', 'border-blue-400',
+        'bg-purple-400/10', 'text-purple-400', 'border-purple-400',
     ],
 
     theme: {

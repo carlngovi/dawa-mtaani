@@ -306,34 +306,47 @@ class RetailOrdersController extends Controller
 
                 if ($result !== null) {
                     $resultCode = (int) ($result['ResultCode'] ?? -1);
+                    $resultDesc = $result['ResultDesc'] ?? '';
+
+                    // Safaricom STK Query returns 1032 for BOTH "cancelled"
+                    // and "still processing". Only treat it as failed when
+                    // the description explicitly says cancelled.
+                    $stillProcessing = $resultCode === -1
+                        || ($resultCode === 1032 && stripos($resultDesc, 'processing') !== false);
 
                     if ($resultCode === 0) {
                         DB::table('orders')->where('ulid', $ulid)->update([
-                            'status'        => 'CONFIRMED',
-                            'copay_status'  => 'PAID',
-                            'mpesa_paid_at' => now(),
-                            'paid_at'       => now(),
-                            'updated_at'    => now(),
+                            'status'             => 'CONFIRMED',
+                            'copay_status'       => 'PAID',
+                            'mpesa_result_code'  => $resultCode,
+                            'mpesa_result_desc'  => $resultDesc,
+                            'mpesa_paid_at'      => now(),
+                            'paid_at'            => now(),
+                            'updated_at'         => now(),
                         ]);
                         $updated = true;
-                    } elseif ($resultCode !== -1) {
+                    } elseif (! $stillProcessing) {
+                        // Definite failure — user cancelled, wrong PIN, etc.
                         $reason = match ($resultCode) {
                             1    => 'Insufficient M-Pesa balance.',
                             17   => 'Transaction limit exceeded.',
                             1032 => 'Payment was cancelled by user.',
                             1037 => 'M-Pesa prompt timed out. Please try again.',
                             2001 => 'Incorrect M-Pesa PIN entered.',
-                            default => $result['ResultDesc'] ?? 'Payment failed.',
+                            default => $resultDesc ?: 'Payment failed.',
                         };
                         DB::table('orders')->where('ulid', $ulid)->update([
                             'status'                 => 'PAYMENT_FAILED',
                             'copay_status'           => 'FAILED',
+                            'mpesa_result_code'      => $resultCode,
+                            'mpesa_result_desc'      => $resultDesc,
                             'payment_failure_reason'  => $reason,
                             'failed_at'              => now(),
                             'updated_at'             => now(),
                         ]);
                         $updated = true;
                     }
+                    // else: still processing — leave as PAYMENT_PENDING, let next poll retry
                 }
             }
 

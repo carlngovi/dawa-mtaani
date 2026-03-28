@@ -312,6 +312,7 @@ Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
 // Public — no auth
 Route::post('spotter/activate', [\App\Http\Controllers\Api\V1\Spotter\ActivationController::class, 'activate']);
 Route::post('auth/refresh', [\App\Http\Controllers\Api\V1\Spotter\AuthController::class, 'refresh']);
+Route::post('spotter/supervisor/login', [\App\Http\Controllers\Api\V1\Spotter\SupervisorAuthController::class, 'login']);
 
 // Authenticated spotter routes
 Route::middleware('auth.spotter')->prefix('spotter')->group(function () {
@@ -319,8 +320,21 @@ Route::middleware('auth.spotter')->prefix('spotter')->group(function () {
     Route::post('clock/out', [\App\Http\Controllers\Api\V1\Spotter\ClockController::class, 'clockOut']);
     Route::post('submissions', [\App\Http\Controllers\Api\V1\Spotter\SubmissionController::class, 'store']);
     Route::get('submissions', [\App\Http\Controllers\Api\V1\Spotter\SubmissionController::class, 'index']);
+    Route::get('ward-submissions', [\App\Http\Controllers\Api\V1\Spotter\SubmissionController::class, 'wardSubmissions']);
     Route::post('sync', [\App\Http\Controllers\Api\V1\Spotter\SyncController::class, 'sync']);
     Route::get('leaderboard', [\App\Http\Controllers\Api\V1\Spotter\LeaderboardController::class, 'index']);
+
+    // Supervisor endpoints
+    Route::post('supervisor/logout', [\App\Http\Controllers\Api\V1\Spotter\SupervisorAuthController::class, 'logout']);
+    Route::get('supervisor/stats', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'stats']);
+    Route::get('supervisor/submissions', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'submissions']);
+    Route::get('supervisor/duplicates', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'duplicates']);
+    Route::post('supervisor/duplicates/{review}/decide', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'decide']);
+    Route::get('supervisor/followups', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'followups']);
+    Route::get('supervisor/attendance', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'attendance']);
+    Route::get('supervisor/leaderboard', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'leaderboard']);
+    Route::get('supervisor/map', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'map']);
+    Route::get('supervisor/spotters', [\App\Http\Controllers\Api\V1\Spotter\SupervisorController::class, 'spotters']);
 });
 
 // Admin spotter management — sanctum auth + admin role

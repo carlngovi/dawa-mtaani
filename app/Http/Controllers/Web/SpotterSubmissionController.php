@@ -3,13 +3,18 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\Concerns\HasSpotterScope;
 use App\Models\SpotterSubmission;
 use Illuminate\Http\Request;
 
 class SpotterSubmissionController extends Controller
 {
+    use HasSpotterScope;
+
     public function index(Request $request)
     {
+        $scope = $this->spotterScope();
+
         $query = SpotterSubmission::with('spotter:id,name')
             ->select(array_merge(
                 ['id'],
@@ -18,6 +23,8 @@ class SpotterSubmissionController extends Controller
                     SpotterSubmission::CONFIDENTIAL,
                 ),
             ));
+
+        $this->applySubmissionScope($query, $scope);
 
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -39,6 +46,15 @@ class SpotterSubmissionController extends Controller
 
     public function show(SpotterSubmission $submission)
     {
+        $scope = $this->spotterScope();
+
+        if ($scope['isSalesRep'] && ! $scope['spotterIds']->contains($submission->spotter_user_id)) {
+            abort(403, 'You do not have access to this submission.');
+        }
+        if ($scope['isCC'] && $submission->county !== $scope['county']) {
+            abort(403, 'You do not have access to this submission.');
+        }
+
         $submission->load('followUp', 'duplicateReviews.reviewer', 'spotter:id,name');
 
         return view('admin.spotter.submissions.show', compact('submission'));

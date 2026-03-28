@@ -3,18 +3,31 @@
 namespace App\Http\Controllers\Web;
 
 use App\Http\Controllers\Controller;
+use App\Http\Controllers\Web\Concerns\HasSpotterScope;
 use App\Jobs\SpotterRegistrySnapshotJob;
 use App\Models\SpotterDuplicateReview;
 use Illuminate\Http\Request;
 
 class SpotterDuplicateController extends Controller
 {
+    use HasSpotterScope;
+
     public function index()
     {
-        $reviews = SpotterDuplicateReview::with(['submission.spotter:id,name', 'matchedSubmission'])
-            ->where('decision', 'pending')
-            ->oldest()
-            ->paginate(15);
+        $scope = $this->spotterScope();
+
+        $query = SpotterDuplicateReview::with(['submission.spotter:id,name', 'matchedSubmission'])
+            ->where('decision', 'pending');
+
+        if ($scope['isSalesRep']) {
+            $query->where('tier', 'sr')
+                ->whereHas('submission', fn ($q) => $q->whereIn('spotter_user_id', $scope['spotterIds']));
+        } elseif ($scope['isCC']) {
+            $query->where('tier', 'cc')
+                ->whereHas('submission', fn ($q) => $q->where('county', $scope['county']));
+        }
+
+        $reviews = $query->oldest()->paginate(15);
 
         return view('admin.spotter.duplicates.index', compact('reviews'));
     }
@@ -25,6 +38,19 @@ class SpotterDuplicateController extends Controller
             'decision' => 'required|in:confirmed_duplicate,not_duplicate',
             'notes' => 'nullable|string',
         ]);
+
+        $user = auth()->user();
+        $tier = $review->tier->value;
+
+        if ($tier === 'sr' && ! $user->hasRole('sales_rep') && ! $user->hasAnyRole(['admin', 'super_admin'])) {
+            abort(403, 'You are not authorised to review this tier.');
+        }
+        if ($tier === 'cc' && ! $user->hasRole('county_coordinator') && ! $user->hasAnyRole(['admin', 'super_admin'])) {
+            abort(403, 'You are not authorised to review this tier.');
+        }
+        if ($tier === 'admin' && ! $user->hasAnyRole(['admin', 'super_admin'])) {
+            abort(403, 'You are not authorised to review this tier.');
+        }
 
         $review->update([
             'decision' => $request->decision,

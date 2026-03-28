@@ -17,5 +17,6 @@ class DatabaseSeeder extends Seeder
         $this->call(ProductsSeeder::class);              // 7 — 49-SKU pilot catalogue
         $this->call(PpbRegistryCacheSeeder::class);      // 8 — 7,382 PPB registry records (needs CSV files)
         $this->call(TestUsersSeeder::class);             // 9 — 14 test accounts (dev/QA only, skips in production)
+        $this->call(ProductAndPriceSeeder::class);       // 10 — products from CSV + wholesale price lists
     }
 }

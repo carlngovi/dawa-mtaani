@@ -112,6 +112,11 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
             Route::post('duplicates/{review}/decide', [\App\Http\Controllers\Web\SpotterDuplicateController::class, 'decide'])->name('duplicates.decide');
             Route::get('attendance', [\App\Http\Controllers\Web\SpotterAttendanceController::class, 'index'])->name('attendance.index');
             Route::get('followups', [\App\Http\Controllers\Web\SpotterFollowUpController::class, 'index'])->name('followups.index');
+            Route::get('leaderboard', [\App\Http\Controllers\Web\SpotterLeaderboardController::class, 'index'])->name('leaderboard.index');
+            Route::get('map', [\App\Http\Controllers\Web\SpotterMapController::class, 'index'])->name('map.index');
+            Route::resource('profiles', \App\Http\Controllers\Web\SpotterProfileController::class)
+                ->names('profiles')
+                ->except(['show', 'destroy']);
         });
     });
 
@@ -249,6 +254,36 @@ Route::middleware(['auth', 'portal'])->prefix('tech')->group(function () {
     Route::get('/write', [\App\Http\Controllers\Web\TechWriteController::class, 'index']);
     Route::get('/incidents', [\App\Http\Controllers\Web\TechIncidentsController::class, 'index']);
 });
+
+// ── Sales Rep portal ────────────────────────────────────────────────────
+Route::middleware(['auth', 'portal', 'auth.sales_rep'])
+    ->prefix('sales')
+    ->name('sales.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Sales\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('submissions', [\App\Http\Controllers\Sales\SubmissionController::class, 'index'])->name('submissions.index');
+        Route::get('submissions/{submission}', [\App\Http\Controllers\Sales\SubmissionController::class, 'show'])->name('submissions.show');
+        Route::get('duplicates', [\App\Http\Controllers\Sales\DuplicateController::class, 'index'])->name('duplicates.index');
+        Route::post('duplicates/{review}/decide', [\App\Http\Controllers\Sales\DuplicateController::class, 'decide'])->name('duplicates.decide');
+        Route::get('attendance', [\App\Http\Controllers\Sales\AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('followups', [\App\Http\Controllers\Sales\FollowUpController::class, 'index'])->name('followups.index');
+        Route::get('leaderboard', [\App\Http\Controllers\Sales\LeaderboardController::class, 'index'])->name('leaderboard.index');
+    });
+
+// ── County Coordinator portal ───────────────────────────────────────────
+Route::middleware(['auth', 'portal', 'auth.county'])
+    ->prefix('county')
+    ->name('county.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\County\DashboardController::class, 'index'])->name('dashboard');
+        Route::get('submissions', [\App\Http\Controllers\County\SubmissionController::class, 'index'])->name('submissions.index');
+        Route::get('submissions/{submission}', [\App\Http\Controllers\County\SubmissionController::class, 'show'])->name('submissions.show');
+        Route::get('duplicates', [\App\Http\Controllers\County\DuplicateController::class, 'index'])->name('duplicates.index');
+        Route::post('duplicates/{review}/decide', [\App\Http\Controllers\County\DuplicateController::class, 'decide'])->name('duplicates.decide');
+        Route::get('attendance', [\App\Http\Controllers\County\AttendanceController::class, 'index'])->name('attendance.index');
+        Route::get('followups', [\App\Http\Controllers\County\FollowUpController::class, 'index'])->name('followups.index');
+        Route::get('leaderboard', [\App\Http\Controllers\County\LeaderboardController::class, 'index'])->name('leaderboard.index');
+    });
 
 // ── Spotter Field App (PWA — no auth middleware, uses own token auth) ────
 Route::get('/spotter', [\App\Http\Controllers\SpotterAppController::class, 'index'])->name('spotter.app');

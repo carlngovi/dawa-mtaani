@@ -1,5 +1,12 @@
 <?php
 
+/**
+ * @deprecated-spotter
+ * This file has been migrated to dawa-spotter/.
+ * It remains here temporarily to preserve existing admin panel routes.
+ * Remove after dawa-spotter is confirmed live.
+ */
+
 namespace App\Http\Controllers\Api\V1\Spotter;
 
 use App\Http\Controllers\Controller;
@@ -157,6 +164,25 @@ class SubmissionController extends Controller
                 ),
             ))
             ->orderByDesc('created_at')
+            ->get();
+
+        return response()->json([
+            'submissions' => $submissions,
+            'total' => $submissions->count(),
+        ]);
+    }
+
+    public function wardSubmissions(Request $request): JsonResponse
+    {
+        $spotter = $request->spotter_token->spotter;
+        $token = $request->spotter_token;
+        $ward = $token->ward;
+
+        $submissions = SpotterSubmission::where('ward', $ward)
+            ->where('spotter_user_id', '!=', $spotter->id)
+            ->whereIn('status', ['submitted', 'accepted'])
+            ->select(['id', 'pharmacy', 'town', 'address', 'potential', 'next_step', 'follow_up_date', 'submitted_at'])
+            ->orderByDesc('submitted_at')
             ->get();
 
         return response()->json([

@@ -9,6 +9,7 @@
     $isRetail     = $user && $user->hasRole('retail_facility');
     $isFieldAgent = $user && $user->hasRole('network_field_agent');
     $isSalesRep   = $user && $user->hasRole('sales_rep');
+    $isCountyCoord = $user && $user->hasRole('county_coordinator');
     $isFinance    = $user && $user->hasRole('shared_accountant');
     $isSupport    = $user && $user->hasRole('admin_support');
     $isAssistant  = $user && $user->hasRole('assistant_admin');
@@ -25,10 +26,11 @@
               : ($isWholesale  ? '/wholesale/orders'
               : ($isLogistics  ? '/logistics/deliveries'
               : ($isFieldAgent ? '/field/pharmacies'
-              : ($isSalesRep   ? '/rep/pharmacies'
+              : ($isCountyCoord ? '/county'
+              : ($isSalesRep   ? '/sales'
               : ($isGroupOwner ? '/group/dashboard'
               : ($isPatient    ? '/store'
-              : '/retail/dashboard')))))))))));
+              : '/retail/dashboard'))))))))))));
 @endphp
 
 <aside id="sidebar"
@@ -106,6 +108,10 @@
 
                 @if($isSalesRep)
                     @include('layouts.sidebar-sections.sales-rep')
+                @endif
+
+                @if($isCountyCoord)
+                    @include('layouts.sidebar-sections.county-coordinator')
                 @endif
 
                 @if($isFinance)
