@@ -13,7 +13,7 @@ class FacilitySettlementJob extends MonitoredJob
     {
         $yesterday = now()->subDay()->toDateString();
 
-        $settlements = DB::table('patient_orders')
+        $settlements = DB::table('customer_orders')
             ->where('status', 'COLLECTED')
             ->whereDate('collected_at', $yesterday)
             ->groupBy('facility_id')

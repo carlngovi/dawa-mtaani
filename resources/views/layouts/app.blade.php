@@ -57,9 +57,9 @@
                 }
             });
 
-            Alpine.store('patientCart', {
+            Alpine.store('customerCart', {
                 open: false, items: [], count: 0, total: 0,
-                KEY: 'dm_patient_cart',
+                KEY: 'dm_customer_cart',
                 load() { try { this.items = JSON.parse(localStorage.getItem(this.KEY) || '[]'); } catch(e) { this.items = []; } this.recalc(); },
                 recalc() { this.count = this.items.reduce((s,i) => s + (i.qty||1), 0); this.total = this.items.reduce((s,i) => s + ((i.price||0)*(i.qty||1)), 0); },
                 save() { localStorage.setItem(this.KEY, JSON.stringify(this.items)); this.recalc(); },
@@ -72,7 +72,7 @@
         });
     </script>
 </head>
-<body class="bg-white dark:bg-gray-900 text-gray-900 dark:text-gray-100 min-h-screen"
+<body class="bg-gray-800 text-white min-h-screen"
       x-data="{ loaded: true }"
       x-init="
         $store.sidebar.isExpanded = window.innerWidth >= 1280;
@@ -90,7 +90,7 @@
     {{-- Page load spinner --}}
     <div x-show="loaded"
          x-init="window.addEventListener('DOMContentLoaded', () => { setTimeout(() => loaded = false, 350) })"
-         class="fixed left-0 top-0 z-[999999] flex h-screen w-screen items-center justify-center bg-white dark:bg-gray-900">
+         class="fixed left-0 top-0 z-[999999] flex h-screen w-screen items-center justify-center bg-gray-800">
         <div class="h-16 w-16 animate-spin rounded-full border-4 border-solid border-yellow-400 border-t-transparent"></div>
     </div>
 
@@ -118,7 +118,7 @@
 
             <div class="px-4 md:px-6 pt-4 pb-8">
                 @if(session('success'))
-                <div class="rounded-lg bg-green-900/20 border border-green-800 px-4 py-3 text-sm text-green-300 flex items-center gap-2 mb-4">
+                <div class="rounded-lg bg-green-900/20 border border-gray-700 px-4 py-3 text-sm text-green-300 flex items-center gap-2 mb-4">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>
@@ -126,7 +126,7 @@
                 </div>
                 @endif
                 @if(session('error'))
-                <div class="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3 text-sm text-red-300 flex items-center gap-2 mb-4">
+                <div class="rounded-lg bg-red-900/20 border border-gray-700 px-4 py-3 text-sm text-red-300 flex items-center gap-2 mb-4">
                     <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
                     </svg>

@@ -47,36 +47,35 @@ class KenyaGeographySeeder extends Seeder
             $constituencyName    = trim($record['Constituency Name'] ?? '');
             $wardCode            = (int) trim($record['Ward Code'] ?? '');
             $wardName            = trim($record['Ward Name'] ?? '');
-            $registeredVoters    = (int) trim($record['Registered Voters'] ?? 0);
 
             if (! $countyCode || ! $countyName) continue;
 
             // Collect unique counties
             if (! isset($counties[$countyCode])) {
                 $counties[$countyCode] = [
-                    'code'       => $countyCode,
-                    'name'       => $countyName,
-                    'created_at' => $now,
-                    'updated_at' => $now,
+                    'county_code' => $countyCode,
+                    'county_name' => $countyName,
+                    'created_at'  => $now,
+                    'updated_at'  => $now,
                 ];
             }
 
             // Collect unique constituencies
             if ($constituencyCode && ! isset($constituencies[$constituencyCode])) {
                 $constituencies[$constituencyCode] = [
-                    'code'        => $constituencyCode,
-                    'county_code' => $countyCode,
-                    'name'        => $constituencyName,
+                    'constituency_code' => $constituencyCode,
+                    'constituency_name' => $constituencyName,
+                    'county_code'       => $countyCode,
                 ];
             }
 
-            // All wards (duplicates possible if ward code reused across constituencies)
+            // All wards
             if ($wardCode && $wardName) {
-                $wards[] = [
+                $wards[$wardCode] = [
+                    'ward_code'         => $wardCode,
+                    'ward_name'         => $wardName,
                     'constituency_code' => $constituencyCode,
                     'county_code'       => $countyCode,
-                    'name'              => $wardName,
-                    'registered_voters' => $registeredVoters,
                 ];
             }
         }
@@ -84,24 +83,68 @@ class KenyaGeographySeeder extends Seeder
         // Insert counties
         DB::table('kenya_counties')->upsert(
             array_values($counties),
-            ['code'],
-            ['name', 'updated_at']
+            ['county_code'],
+            ['county_name', 'updated_at']
         );
         $this->command->info('Counties seeded: ' . count($counties));
 
-        // Insert constituencies
-        DB::table('kenya_constituencies')->upsert(
-            array_values($constituencies),
-            ['code'],
-            ['name']
-        );
-        $this->command->info('Constituencies seeded: ' . count($constituencies));
+        // Build county_code -> id map
+        $countyIdMap = DB::table('kenya_counties')
+            ->pluck('id', 'county_code')
+            ->toArray();
 
-        // Insert wards in chunks (large dataset)
-        $wardChunks = array_chunk($wards, 200);
-        foreach ($wardChunks as $chunk) {
-            DB::table('kenya_wards')->insert($chunk);
+        // Insert constituencies with foreign key
+        $constRecords = [];
+        foreach ($constituencies as $c) {
+            $countyId = $countyIdMap[$c['county_code']] ?? null;
+            if (! $countyId) continue;
+
+            $constRecords[] = [
+                'constituency_code' => $c['constituency_code'],
+                'constituency_name' => $c['constituency_name'],
+                'kenya_county_id'   => $countyId,
+                'created_at'        => $now,
+                'updated_at'        => $now,
+            ];
         }
-        $this->command->info('Wards seeded: ' . count($wards));
+
+        DB::table('kenya_constituencies')->upsert(
+            $constRecords,
+            ['constituency_code'],
+            ['constituency_name', 'updated_at']
+        );
+        $this->command->info('Constituencies seeded: ' . count($constRecords));
+
+        // Build constituency_code -> id map
+        $constIdMap = DB::table('kenya_constituencies')
+            ->pluck('id', 'constituency_code')
+            ->toArray();
+
+        // Insert wards with foreign keys
+        $wardRecords = [];
+        foreach ($wards as $w) {
+            $countyId = $countyIdMap[$w['county_code']] ?? null;
+            $constId  = $constIdMap[$w['constituency_code']] ?? null;
+            if (! $countyId || ! $constId) continue;
+
+            $wardRecords[] = [
+                'ward_code'              => $w['ward_code'],
+                'ward_name'              => $w['ward_name'],
+                'kenya_constituency_id'  => $constId,
+                'kenya_county_id'        => $countyId,
+                'created_at'             => $now,
+                'updated_at'             => $now,
+            ];
+        }
+
+        $wardChunks = array_chunk($wardRecords, 200);
+        foreach ($wardChunks as $chunk) {
+            DB::table('kenya_wards')->upsert(
+                $chunk,
+                ['ward_code'],
+                ['ward_name', 'updated_at']
+            );
+        }
+        $this->command->info('Wards seeded: ' . count($wardRecords));
     }
 }

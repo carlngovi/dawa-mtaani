@@ -13,10 +13,10 @@ class StoreCounterfeitController extends Controller
     {
         $user = Auth::user();
 
-        $reports = DB::table('patient_counterfeit_reports as r')
+        $reports = DB::table('customer_counterfeit_reports as r')
             ->leftJoin('facilities as f', 'r.facility_id', '=', 'f.id')
             ->leftJoin('products as p', 'r.product_id', '=', 'p.id')
-            ->where('r.patient_phone', $user->phone ?? '')
+            ->where('r.customer_phone', $user->phone ?? '')
             ->select([
                 'r.id', 'r.report_notes', 'r.status', 'r.created_at',
                 'f.facility_name',
@@ -38,10 +38,10 @@ class StoreCounterfeitController extends Controller
             'report_notes' => 'required|string|min:10|max:1000',
         ]);
 
-        DB::table('patient_counterfeit_reports')->insert([
+        DB::table('customer_counterfeit_reports')->insert([
             'facility_id'  => $request->facility_id,
             'product_id'   => $request->product_id,
-            'patient_phone' => $user->phone ?? '',
+            'customer_phone' => $user->phone ?? '',
             'report_notes' => $request->report_notes,
             'status'       => 'OPEN',
             'created_at'   => now(),

@@ -9,11 +9,11 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
-class PatientRegistrationController extends Controller
+class CustomerRegistrationController extends Controller
 {
     public function create()
     {
-        return view('auth.register-patient');
+        return view('auth.register-customer');
     }
 
     public function store(Request $request)
@@ -36,7 +36,7 @@ class PatientRegistrationController extends Controller
                 'email_verified_at' => now(),
             ]);
 
-            $user->assignRole('patient');
+            $user->assignRole('customer');
 
             return $user;
         });

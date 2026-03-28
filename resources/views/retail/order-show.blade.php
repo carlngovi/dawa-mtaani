@@ -4,10 +4,10 @@
 <div class="space-y-6" x-data="{ showDisputeModal: false }">
 
     @if(session('success'))
-    <div class="bg-green-900/20 border border-green-800 text-green-300 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
+    <div class="bg-green-900/20 border border-gray-700 text-green-300 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
     @endif
     @if(session('error'))
-    <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">{{ session('error') }}</div>
+    <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">{{ session('error') }}</div>
     @endif
 
     {{-- Header --}}
@@ -40,8 +40,8 @@
             <div class="flex flex-col items-center flex-1">
                 <div @class([
                     'flex h-8 w-8 items-center justify-center rounded-full text-xs font-bold',
-                    'bg-yellow-400 text-gray-900' => $idx <= $currentIdx,
-                    'bg-gray-200 text-gray-400' => $idx > $currentIdx,
+                    'bg-yellow-400 text-white' => $idx <= $currentIdx,
+                    'bg-gray-700/50 text-gray-400' => $idx > $currentIdx,
                     'ring-4 ring-green-200' => $idx === $currentIdx,
                 ])>{{ $idx + 1 }}</div>
                 <span @class([
@@ -54,7 +54,7 @@
             <div @class([
                 'h-0.5 flex-1 -mt-5 mx-1 rounded',
                 'bg-green-500' => $idx < $currentIdx,
-                'bg-gray-200' => $idx >= $currentIdx,
+                'bg-gray-700/50' => $idx >= $currentIdx,
             ])></div>
             @endif
             @endforeach
@@ -172,7 +172,7 @@
     @if($canDispute)
     <div class="flex justify-end">
         <button @click="showDisputeModal = true"
-                class="px-4 py-2 border border-red-800 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
+                class="px-4 py-2 border border-gray-700 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
             Raise Dispute
         </button>
     </div>

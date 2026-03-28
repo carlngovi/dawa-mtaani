@@ -22,14 +22,14 @@
                     <td class="px-5 py-3 font-medium text-gray-200">{{ $product->generic_name }}</td>
                     <td class="px-5 py-3 text-gray-400">{{ $product->brand_name ?? '—' }}</td>
                     <td class="px-5 py-3">
-                        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-900/30 text-blue-400 border border-blue-800">
+                        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-blue-900/30 text-blue-400 border border-gray-700">
                             {{ $product->therapeutic_category }}
                         </span>
                     </td>
                     <td class="px-5 py-3 text-xs text-gray-400">{{ $product->unit_size }}</td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $product->is_active ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">
+                            {{ $product->is_active ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                             {{ $product->is_active ? 'Active' : 'Inactive' }}
                         </span>
                     </td>

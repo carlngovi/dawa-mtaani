@@ -15,7 +15,7 @@
             </span>
         </div>
         <a href="/admin/invitations"
-           class="px-4 py-2.5 bg-yellow-400 text-gray-900 font-medium rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+           class="px-4 py-2.5 bg-yellow-400 text-white font-medium rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             + Invite User
         </a>
     </div>
@@ -45,7 +45,7 @@
                placeholder="Search name or email..."
                class="px-3 py-2.5 border border-gray-600 bg-gray-800 text-white placeholder-gray-500 rounded-lg text-sm w-56 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 font-medium rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white font-medium rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Filter
         </button>
         @if(request()->hasAny(['role', 'search']))
@@ -138,7 +138,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm font-bold hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm font-bold hover:bg-yellow-500">
                         Save Role
                     </button>
                     <button type="button" @click="changeId = null"

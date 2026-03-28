@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PatientOrder extends Model
+class CustomerOrder extends Model
 {
     protected $fillable = [
-        'ulid', 'user_id', 'patient_phone', 'patient_name', 'facility_id', 'status',
+        'ulid', 'user_id', 'customer_phone', 'customer_name', 'facility_id', 'status',
         'subtotal_amount', 'discount_amount', 'total_amount',
         'platform_fee_pct', 'platform_fee_amount', 'facility_net_amount',
         'promo_code_id', 'collection_window_start', 'collection_window_end',
@@ -30,7 +30,7 @@ class PatientOrder extends Model
 
     public function lines()
     {
-        return $this->hasMany(PatientOrderLine::class);
+        return $this->hasMany(CustomerOrderLine::class);
     }
 
     public function facility()

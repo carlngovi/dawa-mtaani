@@ -4,21 +4,19 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PatientFavourite extends Model
+class CustomerBasket extends Model
 {
-    public $timestamps = false;
-
     protected $fillable = [
-        'patient_phone', 'product_id', 'facility_id', 'added_at',
+        'customer_phone', 'facility_id', 'session_token', 'reserved_until',
     ];
 
     protected $casts = [
-        'added_at' => 'datetime',
+        'reserved_until' => 'datetime',
     ];
 
-    public function product()
+    public function lines()
     {
-        return $this->belongsTo(Product::class);
+        return $this->hasMany(CustomerBasketLine::class, 'basket_id');
     }
 
     public function facility()

@@ -29,7 +29,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         After submission the application will be queued for PPB verification and then mandatory admin review.
         No facility goes ACTIVE automatically.
     </div>
@@ -41,13 +41,13 @@
             <div class="h-7 w-7 rounded-full flex items-center justify-center text-xs font-bold"
                  :class="step >= {{ $n }}
                      ? 'bg-yellow-400 text-white'
-                     : 'bg-gray-200 text-gray-400'">
+                     : 'bg-gray-700/50 text-gray-400'">
                 {{ $n }}
             </div>
             <span class="text-xs text-gray-400 hidden sm:block">{{ $label }}</span>
         </div>
         @if($n < 3)
-        <div class="flex-1 h-px bg-gray-200 max-w-[40px]"></div>
+        <div class="flex-1 h-px bg-gray-700/50 max-w-[40px]"></div>
         @endif
         @endforeach
     </div>
@@ -83,7 +83,7 @@
             </div>
             <div class="pt-2">
                 <button type="button" @click="step = 2"
-                        class="w-full px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                        class="w-full px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                     Next: Location →
                 </button>
             </div>
@@ -193,7 +193,7 @@
                     ← Back
                 </button>
                 <button type="button" @click="step = 3"
-                        class="flex-1 px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                        class="flex-1 px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                     Next: Review →
                 </button>
             </div>
@@ -213,7 +213,7 @@
                     ← Back
                 </button>
                 <button type="submit"
-                        class="flex-1 px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                        class="flex-1 px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                     Submit Registration
                 </button>
             </div>

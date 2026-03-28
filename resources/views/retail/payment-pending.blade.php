@@ -21,7 +21,7 @@
 
         {{-- SUCCESS --}}
         <div x-show="paid" x-cloak>
-            <div class="w-20 h-20 rounded-full border-2 border-green-600 bg-green-900/20 flex items-center justify-center mx-auto">
+            <div class="w-20 h-20 rounded-full border-2 border-gray-700 bg-green-900/20 flex items-center justify-center mx-auto">
                 <svg class="w-10 h-10 text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                 </svg>
@@ -33,14 +33,14 @@
 
         {{-- FAILED --}}
         <div x-show="failed" x-cloak>
-            <div class="w-20 h-20 rounded-full border-2 border-red-700 bg-red-900/20 flex items-center justify-center mx-auto">
+            <div class="w-20 h-20 rounded-full border-2 border-gray-700 bg-red-900/20 flex items-center justify-center mx-auto">
                 <svg class="w-10 h-10 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
                 </svg>
             </div>
             <h1 class="text-xl font-semibold text-white mt-4">Payment Failed</h1>
             <p class="text-red-400 text-sm font-medium mt-2" x-text="failureReason || 'Payment was not completed'"></p>
-            <div class="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3 text-xs text-red-300 text-left mt-4">
+            <div class="rounded-lg bg-red-900/20 border border-gray-700 px-4 py-3 text-xs text-red-300 text-left mt-4">
                 Your order was <strong>not confirmed</strong>. No funds were deducted. You can try again.
             </div>
         </div>
@@ -66,13 +66,13 @@
                 <span x-show="!checking">Check Payment Status</span>
                 <span x-show="checking">Checking...</span>
             </button>
-            <a x-show="paid" x-cloak :href="redirectUrl || '/retail/orders'" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl text-center transition-colors">View Order →</a>
-            <a x-show="failed" x-cloak href="/retail/basket" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-900 font-semibold rounded-xl text-center transition-colors">Try Again →</a>
+            <a x-show="paid" x-cloak :href="redirectUrl || '/retail/orders'" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-xl text-center transition-colors">View Order →</a>
+            <a x-show="failed" x-cloak href="/retail/basket" class="block w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-white font-semibold rounded-xl text-center transition-colors">Try Again →</a>
             <button x-show="failed" x-cloak @click="pollCount = 0; timedOut = false; failed = false; failureReason = null; check()"
                     class="w-full py-3 bg-gray-700 hover:bg-gray-600 text-white text-sm font-medium rounded-xl transition-colors">
                 Re-check Payment Status
             </button>
-            <a href="/retail/orders" class="block text-xs text-gray-600 hover:text-gray-400 text-center transition-colors">View My Orders</a>
+            <a href="/retail/orders" class="block text-xs text-gray-300 hover:text-gray-400 text-center transition-colors">View My Orders</a>
         </div>
     </div>
 

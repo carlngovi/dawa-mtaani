@@ -27,8 +27,8 @@
                      },
                      body: JSON.stringify({
                          session_token: '{{ $basket->session_token }}',
-                         patient_phone: this.phone,
-                         patient_name: '{{ addslashes($user->name ?? '') }}',
+                         customer_phone: this.phone,
+                         customer_name: '{{ addslashes($user->name ?? '') }}',
                          promo_code: this.promoCode || null,
                      })
                  });
@@ -54,7 +54,7 @@
     </div>
 
     {{-- Error --}}
-    <div x-show="error" x-cloak class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+    <div x-show="error" x-cloak class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
         <span x-text="error"></span>
     </div>
 
@@ -131,7 +131,7 @@
 
         <button @click="pay()"
                 :disabled="paying"
-                class="w-full py-3 bg-yellow-400 text-gray-900 rounded-lg font-semibold text-sm hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
+                class="w-full py-3 bg-yellow-400 text-white rounded-lg font-semibold text-sm hover:bg-yellow-500 transition-colors disabled:opacity-50 disabled:cursor-not-allowed">
             <span x-show="!paying">Pay {{ $currency['symbol'] }} {{ number_format($total, $currency['decimal_places']) }} via M-Pesa</span>
             <span x-show="paying" class="flex items-center justify-center gap-2">
                 <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -143,7 +143,7 @@
             You will receive an M-Pesa STK push on your phone. Enter your PIN to complete payment.
         </p>
 
-        <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-xs px-3 py-2 rounded-lg">
+        <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-xs px-3 py-2 rounded-lg">
             Your items will be held for 15 minutes after payment is initiated.
         </div>
     </div>

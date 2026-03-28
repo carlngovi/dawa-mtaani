@@ -13,7 +13,7 @@
         </span>
     </div>
 
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Design fees are released per credit tranche milestone.
         Manual release triggers payment to NILA Pharmaceuticals.
         Actual fee amounts are configured in platform_fee_config.
@@ -38,7 +38,7 @@
                     </td>
                     <td class="px-5 py-3">
                         <button @click="releaseId = {{ $tranche->id }}; releaseName = '{{ addslashes($tranche->name) }}'"
-                                class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs font-bold hover:bg-yellow-500 transition-colors">
+                                class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs font-bold hover:bg-yellow-500 transition-colors">
                             Release Fee
                         </button>
                     </td>
@@ -69,7 +69,7 @@
                       class="flex-1">
                     @csrf
                     <button type="submit"
-                            class="w-full px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm font-bold hover:bg-yellow-500">
+                            class="w-full px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm font-bold hover:bg-yellow-500">
                         Confirm Release
                     </button>
                 </form>

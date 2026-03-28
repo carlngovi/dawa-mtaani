@@ -26,7 +26,7 @@
 
     {{-- Flash messages --}}
     @if(session('error'))
-    <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
         {{ session('error') }}
     </div>
     @endif
@@ -42,13 +42,13 @@
     @if($categories->isNotEmpty())
     <div class="flex gap-2 flex-wrap">
         <button @click="filterCategory = ''"
-                :class="filterCategory === '' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                :class="filterCategory === '' ? 'bg-yellow-400 text-white' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700/50'"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors">
             All
         </button>
         @foreach($categories as $cat)
         <button @click="filterCategory = '{{ addslashes($cat) }}'"
-                :class="filterCategory === '{{ addslashes($cat) }}' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-100 text-gray-400 hover:bg-gray-200'"
+                :class="filterCategory === '{{ addslashes($cat) }}' ? 'bg-yellow-400 text-white' : 'bg-gray-700/50 text-gray-400 hover:bg-gray-700/50'"
                 class="px-3 py-1.5 rounded-full text-xs font-medium transition-colors">
             {{ $cat }}
         </button>
@@ -78,8 +78,8 @@
                         $stockBadge = match($product->stock_status) {
                             'IN_STOCK'     => 'bg-green-900/30 text-green-400',
                             'LOW_STOCK'    => 'bg-amber-900/30 text-amber-400',
-                            'OUT_OF_STOCK' => 'bg-gray-100 text-gray-400',
-                            default        => 'bg-gray-100 text-gray-400',
+                            'OUT_OF_STOCK' => 'bg-gray-700/50 text-gray-400',
+                            default        => 'bg-gray-700/50 text-gray-400',
                         };
                     @endphp
                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $stockBadge }}">
@@ -91,14 +91,14 @@
                 <div class="flex items-center gap-2">
                     <div class="flex items-center border border-gray-600 rounded-lg">
                         <button @click="decQty({{ $product->product_id }})"
-                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-100 rounded-l-lg text-sm">-</button>
+                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-700/50 rounded-l-lg text-sm">-</button>
                         <span class="w-8 text-center text-sm font-medium" x-text="getQty({{ $product->product_id }})"></span>
                         <button @click="incQty({{ $product->product_id }})"
-                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-100 rounded-r-lg text-sm">+</button>
+                                class="px-2.5 py-1.5 text-gray-400 hover:bg-gray-700/50 rounded-r-lg text-sm">+</button>
                     </div>
                     <button @click="addToBasket({{ $product->product_id }}, '{{ addslashes($product->generic_name) }}', {{ $product->unit_price }})"
                             :disabled="adding === {{ $product->product_id }}"
-                            class="flex-1 px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50">
+                            class="flex-1 px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs font-medium hover:bg-yellow-500 transition-colors disabled:opacity-50">
                         <span x-show="adding !== {{ $product->product_id }} && !justAdded.includes({{ $product->product_id }})">Add to Basket</span>
                         <span x-show="adding === {{ $product->product_id }}">
                             <svg class="h-4 w-4 animate-spin inline" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
@@ -107,7 +107,7 @@
                     </button>
                 </div>
                 @else
-                <button disabled class="w-full px-3 py-1.5 bg-gray-100 text-gray-400 rounded-lg text-xs cursor-not-allowed">
+                <button disabled class="w-full px-3 py-1.5 bg-gray-700/50 text-gray-400 rounded-lg text-xs cursor-not-allowed">
                     Out of Stock
                 </button>
                 @endif
@@ -133,7 +133,7 @@
             <p class="text-xs text-gray-400" x-text="subtotal"></p>
         </div>
         <button @click="open = true"
-                class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-yellow-500">
+                class="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm font-medium hover:bg-yellow-500">
             View Basket
         </button>
     </div>
@@ -173,7 +173,7 @@ function storefront() {
     const headers = { 'X-CSRF-TOKEN': csrf, 'Content-Type': 'application/json', 'Accept': 'application/json' };
     const facilityId = {{ $facility->id }};
     const facilityUlid = '{{ $facility->ulid }}';
-    const patientPhone = '{{ $user->phone ?? '' }}';
+    const customerPhone = '{{ $user->phone ?? '' }}';
 
     return {
         filterText: '',
@@ -214,7 +214,7 @@ function storefront() {
                 const res = await fetch('/api/store/basket/add', {
                     method: 'POST', headers,
                     body: JSON.stringify({
-                        patient_phone: patientPhone,
+                        customer_phone: customerPhone,
                         facility_id: facilityId,
                         product_id: productId,
                         quantity: this.qtys[productId] || 1,
@@ -265,7 +265,7 @@ function storefront() {
                 await fetch('/api/store/basket/add', {
                     method: 'POST', headers,
                     body: JSON.stringify({
-                        patient_phone: patientPhone,
+                        customer_phone: customerPhone,
                         facility_id: facilityId,
                         product_id: item.product_ulid, // API uses product_id but we need actual id
                         quantity: newQty,

@@ -9,7 +9,7 @@
         <a href="/admin/facilities" class="text-sm text-gray-400 hover:text-gray-400">← Facilities</a>
         <h1 class="text-2xl font-bold text-white">{{ $facility->facility_name }}</h1>
         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-            {{ $facility->facility_status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800' }}">
+            {{ $facility->facility_status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-red-900/30 text-red-400 border border-gray-700' }}">
             {{ $facility->facility_status }}
         </span>
     </div>
@@ -108,7 +108,7 @@
                         <td class="px-5 py-3 font-mono text-xs text-gray-400">{{ substr($order->ulid, -8) }}</td>
                         <td class="px-5 py-3">
                             <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                                {{ $order->status === 'DELIVERED' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">
+                                {{ $order->status === 'DELIVERED' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                                 {{ $order->status }}
                             </span>
                         </td>

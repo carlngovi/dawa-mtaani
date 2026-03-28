@@ -19,13 +19,13 @@ Route::middleware('guest')->group(function () {
     Route::get('/auth/google/facility', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'facilityRedirect'])->name('auth.google.facility');
     Route::get('/auth/google/facility/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'facilityCallback'])->name('auth.google.facility.callback');
 
-    // Patient registration
-    Route::get('/register/patient', [\App\Http\Controllers\Auth\PatientRegistrationController::class, 'create'])->name('register.patient');
-    Route::post('/register/patient', [\App\Http\Controllers\Auth\PatientRegistrationController::class, 'store'])->name('register.patient.store');
+    // Customer registration
+    Route::get('/register/customer', [\App\Http\Controllers\Auth\CustomerRegistrationController::class, 'create'])->name('register.customer');
+    Route::post('/register/customer', [\App\Http\Controllers\Auth\CustomerRegistrationController::class, 'store'])->name('register.customer.store');
 
-    // Google OAuth for patient registration
-    Route::get('/auth/google/patient', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'patientRedirect'])->name('auth.google.patient');
-    Route::get('/auth/google/patient/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'patientCallback'])->name('auth.google.patient.callback');
+    // Google OAuth for customer registration
+    Route::get('/auth/google/customer', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'customerRedirect'])->name('auth.google.customer');
+    Route::get('/auth/google/customer/callback', [\App\Http\Controllers\Auth\GoogleAuthController::class, 'customerCallback'])->name('auth.google.customer.callback');
 });
 
 // -------------------------------------------------------
@@ -236,7 +236,7 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])->prefix('super')->gro
     Route::post('/design-fee/{tranche}/release', [\App\Http\Controllers\Web\SuperDesignFeeController::class, 'release']);
 });
 
-// ── Patient portal (B2C store) ────────────────────────────────────────────
+// ── Customer portal (B2C store) ────────────────────────────────────────────
 Route::middleware(['auth', 'portal'])->prefix('store')->group(function () {
     Route::get('/', [\App\Http\Controllers\Web\StoreBrowseController::class, 'index']);
     Route::get('/orders', [\App\Http\Controllers\Web\StoreOrdersController::class, 'index']);
@@ -244,7 +244,7 @@ Route::middleware(['auth', 'portal'])->prefix('store')->group(function () {
     Route::get('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'index']);
     Route::post('/report/counterfeit', [\App\Http\Controllers\Web\StoreCounterfeitController::class, 'store']);
     Route::get('/basket', [\App\Http\Controllers\Web\StoreBrowseController::class, 'basket'])->name('store.basket');
-    Route::post('/basket/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'patientCheckout'])->name('store.basket.checkout');
+    Route::post('/basket/checkout', [\App\Http\Controllers\Web\StoreBrowseController::class, 'customerCheckout'])->name('store.basket.checkout');
     Route::get('/orders/{ulid}/pending', [\App\Http\Controllers\Web\StoreBrowseController::class, 'paymentPending'])->name('store.payment-pending');
     Route::get('/orders/{ulid}/payment-status', [\App\Http\Controllers\Web\StoreBrowseController::class, 'orderStatus'])->name('store.order.status');
     Route::post('/orders/{ulid}/check-payment', [\App\Http\Controllers\Web\StoreBrowseController::class, 'checkPayment'])->name('store.check-payment');
@@ -289,6 +289,14 @@ Route::middleware(['auth', 'portal', 'auth.county'])
         Route::get('attendance', [\App\Http\Controllers\County\AttendanceController::class, 'index'])->name('attendance.index');
         Route::get('followups', [\App\Http\Controllers\County\FollowUpController::class, 'index'])->name('followups.index');
         Route::get('leaderboard', [\App\Http\Controllers\County\LeaderboardController::class, 'index'])->name('leaderboard.index');
+    });
+
+// ── Manufacturer Portal ──────────────────────────────────────────────────
+Route::middleware(['auth', 'portal'])
+    ->prefix('manufacturer')
+    ->name('manufacturer.')
+    ->group(function () {
+        Route::get('/', [\App\Http\Controllers\Web\ManufacturerDashboardController::class, 'index'])->name('dashboard');
     });
 
 // ── Spotter Field App (PWA — no auth middleware, uses own token auth) ────

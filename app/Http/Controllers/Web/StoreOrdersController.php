@@ -15,7 +15,7 @@ class StoreOrdersController extends Controller
         $user     = Auth::user();
         $currency = CurrencyConfig::get();
 
-        $orders = DB::table('patient_orders as po')
+        $orders = DB::table('customer_orders as po')
             ->leftJoin('facilities as f', 'po.facility_id', '=', 'f.id')
             ->where('po.user_id', $user->id)
             ->when($request->filled('status'), fn($q) => $q->where('po.status', $request->status))
@@ -29,9 +29,9 @@ class StoreOrdersController extends Controller
             ->paginate(15)->withQueryString();
 
         $stats = [
-            'total'     => DB::table('patient_orders')->where('user_id', $user->id)->count(),
-            'pending'   => DB::table('patient_orders')->where('user_id', $user->id)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED', 'READY'])->count(),
-            'collected' => DB::table('patient_orders')->where('user_id', $user->id)->where('status', 'COLLECTED')->count(),
+            'total'     => DB::table('customer_orders')->where('user_id', $user->id)->count(),
+            'pending'   => DB::table('customer_orders')->where('user_id', $user->id)->whereIn('status', ['PAYMENT_PENDING', 'CONFIRMED', 'READY'])->count(),
+            'collected' => DB::table('customer_orders')->where('user_id', $user->id)->where('status', 'COLLECTED')->count(),
         ];
 
         return view('store.orders', compact('orders', 'stats', 'currency'));
@@ -42,7 +42,7 @@ class StoreOrdersController extends Controller
         $user     = Auth::user();
         $currency = CurrencyConfig::get();
 
-        $order = DB::table('patient_orders as po')
+        $order = DB::table('customer_orders as po')
             ->leftJoin('facilities as f', 'po.facility_id', '=', 'f.id')
             ->where('po.ulid', $ulid)
             ->where('po.user_id', $user->id)
@@ -54,9 +54,9 @@ class StoreOrdersController extends Controller
 
         abort_if(! $order, 404);
 
-        $lines = DB::table('patient_order_lines as pol')
+        $lines = DB::table('customer_order_lines as pol')
             ->join('products as p', 'p.id', '=', 'pol.product_id')
-            ->where('pol.patient_order_id', $order->id)
+            ->where('pol.customer_order_id', $order->id)
             ->select([
                 'p.generic_name', 'p.brand_name', 'p.unit_size',
                 'pol.quantity', 'pol.unit_price', 'pol.line_total',

@@ -46,7 +46,7 @@
                     </td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $flag->flag_type === 'SUSPECTED_COUNTERFEIT' ? 'bg-red-900/30 text-red-400 border border-red-800' : 'bg-gray-700 text-gray-400' }}">
+                            {{ $flag->flag_type === 'SUSPECTED_COUNTERFEIT' ? 'bg-red-900/30 text-red-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                             {{ str_replace('_', ' ', $flag->flag_type) }}
                         </span>
                     </td>
@@ -55,9 +55,9 @@
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
                             {{ match($flag->status) {
                                 'OPEN' => 'bg-amber-900/30 text-amber-400 border border-amber-800',
-                                'CONFIRMED' => 'bg-red-900/30 text-red-400 border border-red-800',
+                                'CONFIRMED' => 'bg-red-900/30 text-red-400 border border-gray-700',
                                 'DISMISSED' => 'bg-gray-700 text-gray-400',
-                                default => 'bg-blue-900/30 text-blue-400 border border-blue-800'
+                                default => 'bg-blue-900/30 text-blue-400 border border-gray-700'
                             } }}">
                             {{ $flag->status }}
                         </span>

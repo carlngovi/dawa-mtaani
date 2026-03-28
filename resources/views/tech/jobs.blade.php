@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-white">Job Health Monitor</h1>
             <p class="text-sm text-gray-400 mt-1">Scheduled job heartbeats and failed jobs</p>
         </div>
-        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">
+        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-gray-700">
             Tier 0
         </span>
     </div>
@@ -96,8 +96,8 @@
 
     {{-- Failed jobs --}}
     @if($failedJobs->isNotEmpty())
-    <div class="bg-gray-800 rounded-xl border border-red-800 overflow-hidden">
-        <div class="px-5 py-4 border-b border-red-800 bg-red-900/20">
+    <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">
+        <div class="px-5 py-4 border-b border-gray-700 bg-red-900/20">
             <h3 class="text-sm font-semibold text-red-400">Failed Jobs (last 20)</h3>
         </div>
         <div class="overflow-x-auto">

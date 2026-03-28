@@ -13,7 +13,7 @@
         </span>
     </div>
 
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Review requests carefully. Approvals are logged to the security audit trail and cannot be undone.
     </div>
 
@@ -63,13 +63,13 @@
                                 <button @click="confirmId = {{ $approval->id }};
                                                 confirmOp = '{{ addslashes($approval->operation_type ?? '') }}';
                                                 confirmAction = 'confirm'"
-                                        class="px-3 py-1.5 bg-yellow-400 text-gray-900 font-medium rounded-lg text-xs hover:bg-yellow-500">
+                                        class="px-3 py-1.5 bg-yellow-400 text-white font-medium rounded-lg text-xs hover:bg-yellow-500">
                                     Approve
                                 </button>
                                 <button @click="confirmId = {{ $approval->id }};
                                                 confirmOp = '{{ addslashes($approval->operation_type ?? '') }}';
                                                 confirmAction = 'reject'"
-                                        class="px-3 py-1.5 border border-red-800 text-red-400 rounded-lg text-xs hover:bg-red-900/20">
+                                        class="px-3 py-1.5 border border-gray-700 text-red-400 rounded-lg text-xs hover:bg-red-900/20">
                                     Reject
                                 </button>
                             </div>

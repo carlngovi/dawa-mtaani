@@ -12,13 +12,13 @@
             <p class="text-sm text-gray-400 mt-1">Assign county, ward, and sales rep to field agents</p>
         </div>
         <a href="{{ route('admin.spotter.profiles.create') }}"
-           class="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-lg text-sm hover:bg-yellow-300 transition">
+           class="bg-yellow-400 text-white font-bold px-4 py-2 rounded-lg text-sm hover:bg-yellow-300 transition">
             + New Profile
         </a>
     </div>
 
     @if(session('success'))
-        <div class="bg-green-400/10 border border-green-400/30 text-green-400 rounded-lg px-4 py-3 text-sm">
+        <div class="bg-green-400/10 border border-gray-700/30 text-green-400 rounded-lg px-4 py-3 text-sm">
             {{ session('success') }}
         </div>
     @endif

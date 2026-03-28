@@ -20,7 +20,7 @@
             <p class="text-xs text-gray-400">Total Accounts</p>
             <p class="text-3xl font-bold text-white mt-1">{{ $summary->total ?? 0 }}</p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Active</p>
             <p class="text-3xl font-bold text-green-400 mt-1">{{ $summary->active_count ?? 0 }}</p>
         </div>
@@ -59,7 +59,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
             Filter
         </button>
         @if(request()->hasAny(['status','county']))

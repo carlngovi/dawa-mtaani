@@ -22,7 +22,7 @@
                     <td class="px-5 py-3 text-gray-400">{{ $row->county }}</td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $row->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">
+                            {{ $row->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                             {{ $row->network_membership }}
                         </span>
                     </td>

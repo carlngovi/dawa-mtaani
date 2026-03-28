@@ -22,13 +22,13 @@
         </div>
         <button x-show="selected.length > 0"
                 @click="showConfirm = true"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Dispatch Selected (<span x-text="selected.length"></span>)
         </button>
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Dispatching notifies SGA Courier and generates a dispatch note per order.
         Bulk dispatch sends all selected orders in a single operation.
     </div>
@@ -97,7 +97,7 @@
                                 @csrf
                                 <input type="hidden" name="order_ids[]" value="{{ $order->id }}">
                                 <button type="submit"
-                                        class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs hover:bg-yellow-500 transition-colors">
+                                        class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs hover:bg-yellow-500 transition-colors">
                                     Dispatch →
                                 </button>
                             </form>
@@ -134,7 +134,7 @@
                         <input type="hidden" name="order_ids[]" :value="id">
                     </template>
                     <button type="submit"
-                            class="w-full px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="w-full px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Confirm Dispatch
                     </button>
                 </form>

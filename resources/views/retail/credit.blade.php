@@ -11,9 +11,9 @@
   {{-- Health badge --}}
   <div @class([
     'rounded-xl px-5 py-4 border flex items-start gap-4',
-    'bg-green-900/20 border-green-800' => $healthStatus === 'ON_TRACK',
+    'bg-green-900/20 border-gray-700' => $healthStatus === 'ON_TRACK',
     'bg-amber-900/20 border-amber-800' => $healthStatus === 'AT_RISK',
-    'bg-red-900/20 border-red-800' => $healthStatus === 'SUSPENDED',
+    'bg-red-900/20 border-gray-700' => $healthStatus === 'SUSPENDED',
   ])>
     <div @class(['text-2xl', 'text-green-500'=>$healthStatus==='ON_TRACK', 'text-amber-500'=>$healthStatus==='AT_RISK', 'text-red-500'=>$healthStatus==='SUSPENDED'])>
       @if($healthStatus === 'ON_TRACK') ✓ @elseif($healthStatus === 'AT_RISK') ⚠ @else ✕ @endif

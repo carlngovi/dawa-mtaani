@@ -35,7 +35,7 @@ class AnonymisationService
         try {
             $processed = match ($dataCategory) {
                 'facilities'       => $this->anonymiseFacilities($batchSize),
-                'patient_orders'   => $this->anonymisePatientOrders($batchSize),
+                'customer_orders'  => $this->anonymiseCustomerOrders($batchSize),
                 'pharmacy_groups'  => $this->anonymisePharmacyGroups($batchSize),
                 'recruiter_agents' => $this->anonymiseRecruiterAgents($batchSize),
                 'whatsapp_messages' => $this->anonymiseWhatsappMessages($batchSize),
@@ -72,30 +72,30 @@ class AnonymisationService
         return $processed;
     }
 
-    public function anonymisePatientForDeletion(string $patientPhoneHash, string $batchId): int
+    public function anonymiseCustomerForDeletion(string $customerPhoneHash, string $batchId): int
     {
         $startedAt = Carbon::now('UTC');
         $processed = 0;
 
         try {
-            // Anonymise patient_orders where patient_phone matches
+            // Anonymise customer_orders where customer_phone matches
             // We store hashed phone — match against hash
-            $processed += DB::table('patient_orders')
-                ->whereRaw('SHA2(CONCAT(patient_phone, ?), 256) = ?', [
+            $processed += DB::table('customer_orders')
+                ->whereRaw('SHA2(CONCAT(customer_phone, ?), 256) = ?', [
                     $this->salt,
-                    $patientPhoneHash,
+                    $customerPhoneHash,
                 ])
                 ->where('is_anonymised', false)
                 ->update([
-                    'patient_phone'    => $this->hash('ANONYMISED'),
-                    'patient_name'     => null,
+                    'customer_phone'   => $this->hash('ANONYMISED'),
+                    'customer_name'    => null,
                     'is_anonymised'    => true,
                     'anonymised_at'    => Carbon::now('UTC'),
                 ]);
 
-            $this->logBatch($batchId, 'patient_deletion', $processed, $startedAt, 'DELETION_REQUEST');
+            $this->logBatch($batchId, 'customer_deletion', $processed, $startedAt, 'DELETION_REQUEST');
         } catch (\Throwable $e) {
-            Log::error('AnonymisationService: patient deletion failed', [
+            Log::error('AnonymisationService: customer deletion failed', [
                 'error' => $e->getMessage(),
             ]);
         }
@@ -184,17 +184,17 @@ class AnonymisationService
         return 1;
     }
 
-    private function anonymisePatientOrders(int $batchSize): int
+    private function anonymiseCustomerOrders(int $batchSize): int
     {
         $cutoff = Carbon::now('UTC')->subYears(2);
 
-        return DB::table('patient_orders')
+        return DB::table('customer_orders')
             ->where('created_at', '<=', $cutoff)
             ->where('is_anonymised', false)
             ->limit($batchSize)
             ->update([
-                'patient_phone'  => DB::raw('SHA2(CONCAT(patient_phone, "' . $this->salt . '"), 256)'),
-                'patient_name'   => null,
+                'customer_phone' => DB::raw('SHA2(CONCAT(customer_phone, "' . $this->salt . '"), 256)'),
+                'customer_name'  => null,
                 'is_anonymised'  => true,
                 'anonymised_at'  => Carbon::now('UTC'),
             ]);

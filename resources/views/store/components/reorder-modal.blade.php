@@ -37,7 +37,7 @@
                 <button @click="show = false" class="rounded-lg border border-gray-600 px-4 py-2 text-sm font-medium text-gray-300 hover:bg-gray-900">
                     Cancel
                 </button>
-                <button @click="reorderAll(); show = false" class="rounded-lg bg-yellow-400 px-4 py-2 text-sm font-medium text-gray-900 hover:bg-yellow-500">
+                <button @click="reorderAll(); show = false" class="rounded-lg bg-yellow-400 px-4 py-2 text-sm font-medium text-white hover:bg-yellow-500">
                     Reorder All
                 </button>
             </div>

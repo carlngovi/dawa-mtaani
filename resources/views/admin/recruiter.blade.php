@@ -10,10 +10,10 @@
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         @forelse($firms as $firm)
         <a href="/admin/recruiter?firm_id={{ $firm->id }}"
-           class="bg-gray-800 rounded-xl border {{ isset($selectedFirmId) && $selectedFirmId == $firm->id ? 'border-blue-400 ring-2 ring-blue-800' : 'border-gray-700' }} p-5 hover:border-blue-300 transition-all">
+           class="bg-gray-800 rounded-xl border {{ isset($selectedFirmId) && $selectedFirmId == $firm->id ? 'border-gray-700 ring-2 ring-blue-800' : 'border-gray-700' }} p-5 hover:border-gray-700 transition-all">
             <div class="flex items-start justify-between">
                 <p class="font-semibold text-gray-200">{{ $firm->firm_name }}</p>
-                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $firm->status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">{{ $firm->status }}</span>
+                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $firm->status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">{{ $firm->status }}</span>
             </div>
             <div class="grid grid-cols-3 gap-3 mt-4">
                 <div class="text-center"><p class="text-xl font-bold text-gray-200">{{ $agentCounts[$firm->id] ?? 0 }}</p><p class="text-xs text-gray-400">Agents</p></div>
@@ -39,7 +39,7 @@
                         <p class="text-xs text-gray-400">{{ $agent->agent_phone }} · {{ $agent->agent_role_label }}</p>
                         @if($agent->parent_name)<p class="text-xs text-gray-400">↳ {{ $agent->parent_name }}</p>@endif
                     </div>
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $agent->status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">{{ $agent->status }}</span>
+                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $agent->status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">{{ $agent->status }}</span>
                 </div>
                 @empty
                 <div class="px-5 py-8 text-center text-gray-400 text-sm">No agents</div>

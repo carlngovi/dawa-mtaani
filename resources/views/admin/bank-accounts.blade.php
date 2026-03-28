@@ -33,13 +33,13 @@
                     </td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $account->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">
+                            {{ $account->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                             {{ $account->network_membership }}
                         </span>
                     </td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $account->facility_status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800' }}">
+                            {{ $account->facility_status === 'ACTIVE' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-red-900/30 text-red-400 border border-gray-700' }}">
                             {{ $account->facility_status }}
                         </span>
                     </td>

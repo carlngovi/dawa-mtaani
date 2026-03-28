@@ -21,13 +21,13 @@
             <p class="text-xs text-gray-400">Total Outlets</p>
             <p class="text-3xl font-bold text-white mt-1">{{ $outlets->count() }}</p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Active Outlets</p>
             <p class="text-3xl font-bold text-green-400 mt-1">
                 {{ $outlets->where('facility_status', 'ACTIVE')->count() }}
             </p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Credit Active</p>
             <p class="text-3xl font-bold text-green-400 mt-1">
                 {{ $creditSummary->active_count ?? 0 }}
@@ -43,7 +43,7 @@
 
     {{-- Placer authority notice --}}
     @if($authorisedOutletIds->isEmpty())
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         ℹ You are not yet an authorised placer for any outlet. Contact Network Admin to be added.
         Group owner identity does not automatically grant order placement authority.
     </div>
@@ -119,7 +119,7 @@
                         <td class="px-5 py-3">
                             @if($isAuthorised)
                                 <a href="/group/order?outlet={{ $outlet->ulid }}"
-                                   class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs hover:bg-yellow-500 transition-colors">
+                                   class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs hover:bg-yellow-500 transition-colors">
                                     Place Order
                                 </a>
                             @else

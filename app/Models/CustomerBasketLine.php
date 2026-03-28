@@ -4,7 +4,7 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PatientBasketLine extends Model
+class CustomerBasketLine extends Model
 {
     protected $fillable = [
         'basket_id', 'product_id', 'quantity', 'added_at',
@@ -16,7 +16,7 @@ class PatientBasketLine extends Model
 
     public function basket()
     {
-        return $this->belongsTo(PatientBasket::class, 'basket_id');
+        return $this->belongsTo(CustomerBasket::class, 'basket_id');
     }
 
     public function product()

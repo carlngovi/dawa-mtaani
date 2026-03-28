@@ -17,8 +17,8 @@
     </button>
 
     {{-- Expanded timeline panel --}}
-    <div x-show="expanded" x-collapse class="mt-3 rounded-xl border border-green-800 bg-gray-800 p-4 shadow-sm">
-        <ol class="relative border-l-2 border-green-300 ml-3 space-y-6">
+    <div x-show="expanded" x-collapse class="mt-3 rounded-xl border border-gray-700 bg-gray-800 p-4 shadow-sm">
+        <ol class="relative border-l-2 border-gray-700 ml-3 space-y-6">
             @foreach ($chain as $event)
                 <li class="ml-6">
                     {{-- Green checkmark --}}

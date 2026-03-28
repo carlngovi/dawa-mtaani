@@ -16,7 +16,7 @@
             {{-- Mobile sign out --}}
             <form method="POST" action="{{ route('logout') }}" class="flex xl:hidden ml-auto">
                 @csrf
-                <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-gray-400 hover:text-red-400 transition-colors text-xs rounded-lg border border-gray-700 hover:border-red-800">
+                <button type="submit" class="flex items-center gap-1.5 px-3 py-1.5 text-gray-400 hover:text-red-400 transition-colors text-xs rounded-lg border border-gray-700 hover:border-gray-700">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
                     Sign Out
                 </button>
@@ -129,7 +129,7 @@
             <div class="relative" x-data="{ open: false }" @click.away="open = false">
                 <button class="flex items-center gap-2 text-gray-300" @click.prevent="open = !open">
                     <div class="h-9 w-9 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0">
-                        <span class="text-sm font-bold text-gray-900">{{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}</span>
+                        <span class="text-sm font-bold text-white">{{ strtoupper(substr(Auth::user()->name ?? 'U', 0, 1)) }}</span>
                     </div>
                     <span class="hidden md:block font-medium text-sm">{{ Auth::user()->name ?? '' }}</span>
                     <svg class="w-4 h-4 transition-transform" :class="{ 'rotate-180': open }" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/></svg>

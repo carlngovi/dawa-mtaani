@@ -13,7 +13,7 @@
             <input type="date" name="date_from" value="{{ request('date_from') }}"
                    class="px-3 py-2 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
             <div></div>
-            <button type="submit" class="px-4 py-2 bg-yellow-400 text-gray-900 font-medium text-sm rounded-lg hover:bg-yellow-500">Filter</button>
+            <button type="submit" class="px-4 py-2 bg-yellow-400 text-white font-medium text-sm rounded-lg hover:bg-yellow-500">Filter</button>
         </div>
     </form>
 

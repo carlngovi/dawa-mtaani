@@ -9,7 +9,7 @@
     <h1 class="text-2xl font-bold text-white">Pending Duplicate Reviews</h1>
 
     @if(session('success'))
-        <div class="bg-green-900/20 border border-green-800 text-green-400 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
+        <div class="bg-green-900/20 border border-gray-700 text-green-400 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
     @endif
 
     @forelse($reviews as $review)

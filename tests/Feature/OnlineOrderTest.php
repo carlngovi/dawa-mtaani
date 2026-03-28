@@ -3,9 +3,9 @@
 namespace Tests\Feature;
 
 use App\Models\Facility;
-use App\Models\PatientBasket;
-use App\Models\PatientBasketLine;
-use App\Models\PatientOrder;
+use App\Models\CustomerBasket;
+use App\Models\CustomerBasketLine;
+use App\Models\CustomerOrder;
 use App\Models\Product;
 use App\Models\PromoCode;
 use App\Services\Integrations\MpesaDarajaService;
@@ -81,15 +81,15 @@ class OnlineOrderTest extends TestCase
         return [$facility, $product];
     }
 
-    private function createBasketWithItem(Facility $facility, Product $product, int $qty = 2): PatientBasket
+    private function createBasketWithItem(Facility $facility, Product $product, int $qty = 2): CustomerBasket
     {
-        $basket = PatientBasket::create([
-            'patient_phone' => '+254712345678',
-            'facility_id'   => $facility->id,
-            'session_token' => 'test-token-' . uniqid(),
+        $basket = CustomerBasket::create([
+            'customer_phone' => '+254712345678',
+            'facility_id'    => $facility->id,
+            'session_token'  => 'test-token-' . uniqid(),
         ]);
 
-        PatientBasketLine::create([
+        CustomerBasketLine::create([
             'basket_id'  => $basket->id,
             'product_id' => $product->id,
             'quantity'   => $qty,
@@ -104,9 +104,9 @@ class OnlineOrderTest extends TestCase
         [$facility, $product] = $this->createFacilityWithStock();
 
         $response = $this->postJson('/api/store/basket/add', [
-            'patient_phone' => '+254712345678',
-            'facility_id'   => $facility->id,
-            'product_id'    => $product->id,
+            'customer_phone' => '+254712345678',
+            'facility_id'    => $facility->id,
+            'product_id'     => $product->id,
             'quantity'       => 3,
         ]);
 
@@ -114,13 +114,13 @@ class OnlineOrderTest extends TestCase
             ->assertJsonPath('status', 'success')
             ->assertJsonStructure(['data' => ['basket_token']]);
 
-        $this->assertDatabaseHas('patient_baskets', [
-            'patient_phone' => '+254712345678',
-            'facility_id'   => $facility->id,
+        $this->assertDatabaseHas('customer_baskets', [
+            'customer_phone' => '+254712345678',
+            'facility_id'    => $facility->id,
         ]);
 
-        $basket = PatientBasket::where('patient_phone', '+254712345678')->first();
-        $this->assertDatabaseHas('patient_basket_lines', [
+        $basket = CustomerBasket::where('customer_phone', '+254712345678')->first();
+        $this->assertDatabaseHas('customer_basket_lines', [
             'basket_id'  => $basket->id,
             'product_id' => $product->id,
             'quantity'   => 3,
@@ -175,16 +175,16 @@ class OnlineOrderTest extends TestCase
         });
 
         $response = $this->postJson('/api/store/orders/checkout', [
-            'session_token' => $basket->session_token,
-            'patient_phone' => '+254712345678',
-            'patient_name'  => 'Test Patient',
+            'session_token'  => $basket->session_token,
+            'customer_phone' => '+254712345678',
+            'customer_name'  => 'Test Customer',
         ]);
 
         $response->assertOk()
             ->assertJsonPath('status', 'success')
             ->assertJsonStructure(['data' => ['order_ulid', 'total', 'mpesa_prompt']]);
 
-        $order = PatientOrder::where('ulid', $response->json('data.order_ulid'))->first();
+        $order = CustomerOrder::where('ulid', $response->json('data.order_ulid'))->first();
         $this->assertNotNull($order);
         $this->assertEquals('PAYMENT_PENDING', $order->status);
         // 150 * 2 = 300 subtotal
@@ -200,9 +200,9 @@ class OnlineOrderTest extends TestCase
     {
         [$facility, $product] = $this->createFacilityWithStock(500);
 
-        $order = PatientOrder::create([
+        $order = CustomerOrder::create([
             'ulid'                      => '01htest000000000000000001',
-            'patient_phone'             => '+254712345678',
+            'customer_phone'            => '+254712345678',
             'facility_id'               => $facility->id,
             'status'                    => 'PAYMENT_PENDING',
             'subtotal_amount'           => 300,
@@ -256,9 +256,9 @@ class OnlineOrderTest extends TestCase
     {
         [$facility, $product] = $this->createFacilityWithStock(500);
 
-        $order = PatientOrder::create([
+        $order = CustomerOrder::create([
             'ulid'                      => '01htest000000000000000002',
-            'patient_phone'             => '+254712345678',
+            'customer_phone'            => '+254712345678',
             'facility_id'               => $facility->id,
             'status'                    => 'CONFIRMED',
             'subtotal_amount'           => 300,
@@ -312,8 +312,8 @@ class OnlineOrderTest extends TestCase
         $basket->update(['reserved_until' => now()->subMinutes(5)]);
 
         $response = $this->postJson('/api/store/orders/checkout', [
-            'session_token' => $basket->session_token,
-            'patient_phone' => '+254712345678',
+            'session_token'  => $basket->session_token,
+            'customer_phone' => '+254712345678',
         ]);
 
         $response->assertStatus(422)
@@ -344,15 +344,15 @@ class OnlineOrderTest extends TestCase
         });
 
         $response = $this->postJson('/api/store/orders/checkout', [
-            'session_token' => $basket->session_token,
-            'patient_phone' => '+254712345678',
-            'promo_code'    => 'SAVE10',
+            'session_token'  => $basket->session_token,
+            'customer_phone' => '+254712345678',
+            'promo_code'     => 'SAVE10',
         ]);
 
         $response->assertOk()
             ->assertJsonPath('status', 'success');
 
-        $order = PatientOrder::where('ulid', $response->json('data.order_ulid'))->first();
+        $order = CustomerOrder::where('ulid', $response->json('data.order_ulid'))->first();
         // Subtotal: 150 * 2 = 300, Discount: 10% = 30, Total: 270
         $this->assertEquals(300.00, (float) $order->subtotal_amount);
         $this->assertEquals(30.00, (float) $order->discount_amount);

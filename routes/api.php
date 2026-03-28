@@ -17,7 +17,7 @@ use Illuminate\Support\Facades\Route;
 */
 
 // -------------------------------------------------------
-// Module 15 — Patient Search & Availability Engine
+// Module 15 — Customer Search & Availability Engine
 // -------------------------------------------------------
 Route::prefix('store')->group(function () {
     Route::get('/search', [StoreSearchController::class, 'search']);

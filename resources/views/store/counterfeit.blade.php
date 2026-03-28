@@ -20,7 +20,7 @@
         <h3 class="text-sm font-semibold text-gray-300 mb-4">Submit a Report</h3>
 
         @if(session('success'))
-        <div class="bg-green-900/20 border border-green-800 text-green-300 text-sm px-4 py-3 rounded-lg mb-4">
+        <div class="bg-green-900/20 border border-gray-700 text-green-300 text-sm px-4 py-3 rounded-lg mb-4">
             {{ session('success') }}
         </div>
         @endif
@@ -81,7 +81,7 @@
             </div>
 
             <button type="submit"
-                    class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                    class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                 Submit Report
             </button>
         </form>
@@ -121,8 +121,8 @@
                                     'SUBMITTED'    => 'bg-amber-900/30 text-amber-400',
                                     'INVESTIGATING'=> 'bg-blue-900/30 text-blue-400',
                                     'CONFIRMED'    => 'bg-red-900/30 text-red-400',
-                                    'DISMISSED'    => 'bg-gray-100 text-gray-400',
-                                    default        => 'bg-gray-100 text-gray-400',
+                                    'DISMISSED'    => 'bg-gray-700/50 text-gray-400',
+                                    default        => 'bg-gray-700/50 text-gray-400',
                                 };
                             @endphp
                             <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $badge }}">

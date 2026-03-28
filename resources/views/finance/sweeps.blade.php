@@ -15,7 +15,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Weekly atomic settlement with NILA Pharmaceuticals. Processed every Friday.
     </div>
 

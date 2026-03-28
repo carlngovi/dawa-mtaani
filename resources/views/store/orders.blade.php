@@ -21,7 +21,7 @@
                 {{ $stats['pending'] }}
             </p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Collected</p>
             <p class="text-3xl font-bold text-green-400 mt-1">{{ $stats['collected'] }}</p>
         </div>
@@ -37,7 +37,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
             Filter
         </button>
         @if(request('status'))
@@ -68,7 +68,7 @@
                         'PAYMENT_FAILED'  => 'bg-red-900/30 text-red-400',
                         'PAYMENT_PENDING' => 'bg-amber-900/30 text-amber-400',
                         'PENDING'         => 'bg-amber-900/30 text-amber-400',
-                        default           => 'bg-gray-100 text-gray-400',
+                        default           => 'bg-gray-700/50 text-gray-400',
                     };
                 @endphp
                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $badge }}">
@@ -102,7 +102,7 @@
     <div class="bg-gray-800 rounded-xl border border-gray-700 p-12 text-center">
         <p class="text-gray-400 text-sm">No orders yet. Browse medicines to place your first order.</p>
         <a href="/store"
-           class="inline-block mt-4 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+           class="inline-block mt-4 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
             Browse Medicines
         </a>
     </div>

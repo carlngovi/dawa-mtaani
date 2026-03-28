@@ -4,7 +4,7 @@ namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
 use App\Jobs\NotifyPpbOfCounterfeitJob;
-use App\Models\PatientCounterfeitReport;
+use App\Models\CustomerCounterfeitReport;
 use App\Models\User;
 use App\Notifications\CounterfeitReportedNotification;
 use Illuminate\Http\JsonResponse;
@@ -145,11 +145,11 @@ class CustodyChainController extends Controller
         $validated = $request->validate([
             'facility_id'  => 'required|exists:facilities,id',
             'product_id'   => 'required|exists:products,id',
-            'patient_phone' => 'required|string',
+            'customer_phone' => 'required|string',
             'report_notes' => 'nullable|string|max:1000',
         ]);
 
-        $report = PatientCounterfeitReport::create($validated);
+        $report = CustomerCounterfeitReport::create($validated);
 
         // Notify all network_admin users
         $roleExists = \Spatie\Permission\Models\Role::where('name', 'network_admin')

@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-white">Network Stock</h1>
             <p class="text-sm text-gray-400 mt-1">Real-time stock availability across all network wholesalers</p>
         </div>
-        <a href="/retail/catalogue" class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+        <a href="/retail/catalogue" class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             Place Order
         </a>
@@ -55,7 +55,7 @@
                 <option value="LOW_STOCK" {{ $status == 'LOW_STOCK' ? 'selected' : '' }}>Low Stock</option>
                 <option value="OUT_OF_STOCK" {{ $status == 'OUT_OF_STOCK' ? 'selected' : '' }}>Out of Stock</option>
             </select>
-            <button type="submit" class="h-10 px-5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors whitespace-nowrap">Filter</button>
+            <button type="submit" class="h-10 px-5 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">Filter</button>
             @if($search || $category || $status)<a href="/retail/stock" class="h-10 px-4 flex items-center border border-gray-600 rounded-lg text-sm text-gray-400 hover:bg-gray-900 whitespace-nowrap">Clear</a>@endif
         </form>
     </div>

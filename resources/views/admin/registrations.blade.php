@@ -5,7 +5,7 @@
 
     {{-- Flash messages --}}
     @if(session('success'))
-    <div class="bg-green-900/20 border border-green-800 text-green-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-green-900/20 border border-gray-700 text-green-300 text-sm px-4 py-3 rounded-lg">
         {{ session('success') }}
     </div>
     @endif
@@ -36,7 +36,7 @@
             <p class="text-xs text-gray-400 mt-1">Awaiting PPB verification</p>
         </a>
         <a href="/admin/registrations?stage=PPB_VERIFIED"
-           class="bg-gray-800 rounded-xl border border-blue-800 p-5 hover:shadow-md transition-shadow block {{ request('stage') === 'PPB_VERIFIED' ? 'ring-2 ring-green-500' : '' }}">
+           class="bg-gray-800 rounded-xl border border-gray-700 p-5 hover:shadow-md transition-shadow block {{ request('stage') === 'PPB_VERIFIED' ? 'ring-2 ring-green-500' : '' }}">
             <p class="text-xs text-blue-400 uppercase tracking-wider">PPB Verified</p>
             <p class="text-3xl font-bold text-blue-400 mt-1">{{ $counts['ppb_verified'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Ready for admin review</p>
@@ -61,7 +61,7 @@
                placeholder="Name, PPB licence, owner, phone..."
                class="px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm w-72 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Filter
         </button>
         @if(request()->hasAny(['stage', 'search']))
@@ -114,9 +114,9 @@
                         <td class="px-5 py-3">
                             @php
                                 $ppbBadge = match($facility->ppb_licence_status) {
-                                    'VALID'     => 'bg-green-900/30 text-green-400 border border-green-800',
-                                    'EXPIRED'   => 'bg-red-900/30 text-red-400 border border-red-800',
-                                    'SUSPENDED' => 'bg-orange-900/30 text-orange-400 border border-orange-800',
+                                    'VALID'     => 'bg-green-900/30 text-green-400 border border-gray-700',
+                                    'EXPIRED'   => 'bg-red-900/30 text-red-400 border border-gray-700',
+                                    'SUSPENDED' => 'bg-orange-900/30 text-orange-400 border border-gray-700',
                                     default     => 'bg-gray-700 text-gray-400',
                                 };
                             @endphp
@@ -128,7 +128,7 @@
                             @php
                                 $stageClass = match($facility->onboarding_status) {
                                     'APPLIED'        => 'bg-gray-700 text-gray-400',
-                                    'PPB_VERIFIED'   => 'bg-blue-900/30 text-blue-400 border border-blue-800',
+                                    'PPB_VERIFIED'   => 'bg-blue-900/30 text-blue-400 border border-gray-700',
                                     'ACCOUNT_LINKED' => 'bg-amber-900/30 text-amber-400 border border-amber-800',
                                     default          => 'bg-gray-700 text-gray-400',
                                 };
@@ -139,7 +139,7 @@
                         </td>
                         <td class="px-5 py-3">
                             <a href="/admin/registrations/{{ $facility->ulid }}"
-                               class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs hover:bg-yellow-500 transition-colors">
+                               class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs hover:bg-yellow-500 transition-colors">
                                 Review →
                             </a>
                         </td>

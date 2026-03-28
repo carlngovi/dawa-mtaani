@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-white">Write Operations</h1>
             <p class="text-sm text-gray-400 mt-1">Submit a request — super_admin approval required before execution</p>
         </div>
-        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">
+        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-gray-700">
             Tier 0
         </span>
     </div>

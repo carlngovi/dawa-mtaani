@@ -20,7 +20,7 @@
                placeholder="Facility name, PPB licence, or phone (min 3 characters)..."
                class="flex-1 px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Search
         </button>
         @if(request('search'))

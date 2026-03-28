@@ -274,18 +274,18 @@ class SupplyChainBadgeTest extends TestCase
         $response = $this->postJson('/api/store/counterfeit-reports', [
             'facility_id'   => $facility->id,
             'product_id'    => $product->id,
-            'patient_phone' => '+254712345678',
+            'customer_phone' => '+254712345678',
             'report_notes'  => 'Suspicious packaging',
         ]);
 
         $response->assertOk()
             ->assertJsonPath('status', 'success');
 
-        $report = DB::table('patient_counterfeit_reports')->first();
+        $report = DB::table('customer_counterfeit_reports')->first();
         $this->assertNotNull($report);
         // Phone should be hashed, NOT stored as plain text
-        $this->assertNotEquals('+254712345678', $report->patient_phone);
-        $this->assertTrue(Hash::check('+254712345678', $report->patient_phone));
+        $this->assertNotEquals('+254712345678', $report->customer_phone);
+        $this->assertTrue(Hash::check('+254712345678', $report->customer_phone));
     }
 
     public function test_counterfeit_report_notifies_network_admin_users(): void
@@ -304,7 +304,7 @@ class SupplyChainBadgeTest extends TestCase
         $response = $this->postJson('/api/store/counterfeit-reports', [
             'facility_id'   => $facility->id,
             'product_id'    => $product->id,
-            'patient_phone' => '+254700000000',
+            'customer_phone' => '+254700000000',
         ]);
 
         $response->assertOk();
@@ -323,7 +323,7 @@ class SupplyChainBadgeTest extends TestCase
         $response = $this->postJson('/api/store/counterfeit-reports', [
             'facility_id'   => $facility->id,
             'product_id'    => $product->id,
-            'patient_phone' => '+254700000000',
+            'customer_phone' => '+254700000000',
         ]);
 
         $response->assertOk();

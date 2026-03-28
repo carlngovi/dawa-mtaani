@@ -41,7 +41,7 @@
         </p>
 
         {{-- Notice --}}
-        <div class="rounded-lg bg-blue-900/20 border border-blue-800 p-4 mb-6">
+        <div class="rounded-lg bg-blue-900/20 border border-gray-700 p-4 mb-6">
             <div class="flex gap-3">
                 <svg class="w-5 h-5 text-blue-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/>
@@ -72,7 +72,7 @@
 
         {{-- Google prefill badge --}}
         @if ($prefill)
-        <div class="flex items-center gap-3 rounded-lg border border-green-800 bg-green-900/20 p-3 mb-6">
+        <div class="flex items-center gap-3 rounded-lg border border-gray-700 bg-green-900/20 p-3 mb-6">
             <svg class="w-5 h-5 text-green-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
             </svg>
@@ -283,7 +283,7 @@
 
             {{-- Submit --}}
             <button type="submit"
-                    class="flex w-full items-center justify-center rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors">
+                    class="flex w-full items-center justify-center rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors">
                 Submit Registration
             </button>
         </form>

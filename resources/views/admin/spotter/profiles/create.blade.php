@@ -12,7 +12,7 @@
     </div>
 
     @if($errors->any())
-        <div class="bg-red-400/10 border border-red-400/30 text-red-400 rounded-lg px-4 py-3 text-sm">
+        <div class="bg-red-400/10 border border-gray-700/30 text-red-400 rounded-lg px-4 py-3 text-sm">
             <ul class="list-disc list-inside">
                 @foreach($errors->all() as $error)
                     <li>{{ $error }}</li>
@@ -65,7 +65,7 @@
         </div>
 
         <div class="flex gap-3 pt-2">
-            <button type="submit" class="bg-yellow-400 text-gray-900 font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-yellow-300 transition">Save Profile</button>
+            <button type="submit" class="bg-yellow-400 text-white font-bold px-6 py-2.5 rounded-xl text-sm hover:bg-yellow-300 transition">Save Profile</button>
             <a href="{{ route('admin.spotter.profiles.index') }}" class="border border-gray-600 text-gray-300 px-6 py-2.5 rounded-xl text-sm hover:bg-gray-700 transition">Cancel</a>
         </div>
     </form>

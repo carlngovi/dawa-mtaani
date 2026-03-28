@@ -4,7 +4,7 @@
 <div class="space-y-6">
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
         <div><h1 class="text-2xl font-bold text-white">Favourite Products</h1><p class="text-sm text-gray-400 mt-1">Your saved products for quick ordering</p></div>
-        <a href="/retail/catalogue" class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">Browse Catalogue</a>
+        <a href="/retail/catalogue" class="inline-flex items-center gap-2 px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors">Browse Catalogue</a>
     </div>
 
     <div class="bg-gray-800 rounded-xl border border-gray-700 overflow-hidden">

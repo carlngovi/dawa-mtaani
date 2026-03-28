@@ -15,7 +15,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Commissions are calculated by RecruiterCommissionService.
         Payment is processed by Network Admin. This is a read-only view.
     </div>
@@ -53,9 +53,9 @@
                         <td class="px-5 py-3">
                             @php
                                 $badge = match($entry->entry_type ?? '') {
-                                    'COMMISSION' => 'bg-green-900/30 text-green-400 border border-green-800',
-                                    'BONUS'      => 'bg-blue-900/30 text-blue-400 border border-blue-800',
-                                    'CLAWBACK'   => 'bg-red-900/30 text-red-400 border border-red-800',
+                                    'COMMISSION' => 'bg-green-900/30 text-green-400 border border-gray-700',
+                                    'BONUS'      => 'bg-blue-900/30 text-blue-400 border border-gray-700',
+                                    'CLAWBACK'   => 'bg-red-900/30 text-red-400 border border-gray-700',
                                     default      => 'bg-gray-700 text-gray-400',
                                 };
                             @endphp

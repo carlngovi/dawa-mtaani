@@ -129,41 +129,41 @@ class GoogleAuthController extends Controller
         return redirect()->route('register.facility');
     }
 
-    public function patientRedirect()
+    public function customerRedirect()
     {
-        session(['google_intent' => 'patient_registration']);
+        session(['google_intent' => 'customer_registration']);
 
-        $redirectUrl = config('app.url') . '/auth/google/patient/callback';
-        Log::info('Patient Google Redirect', ['redirect_url' => $redirectUrl]);
+        $redirectUrl = config('app.url') . '/auth/google/customer/callback';
+        Log::info('Customer Google Redirect', ['redirect_url' => $redirectUrl]);
 
         return Socialite::driver('google')
             ->redirectUrl($redirectUrl)
             ->redirect();
     }
 
-    public function patientCallback()
+    public function customerCallback()
     {
         try {
-            $redirectUrl = config('app.url') . '/auth/google/patient/callback';
-            
-            Log::info('Patient Google Callback Started', [
+            $redirectUrl = config('app.url') . '/auth/google/customer/callback';
+
+            Log::info('Customer Google Callback Started', [
                 'redirect_url' => $redirectUrl,
                 'request_url' => request()->fullUrl(),
                 'all_params' => request()->all()
             ]);
-            
+
             $googleUser = Socialite::driver('google')
                 ->redirectUrl($redirectUrl)
                 ->user();
-                
-            Log::info('Patient Google User Retrieved', ['email' => $googleUser->getEmail()]);
-                
+
+            Log::info('Customer Google User Retrieved', ['email' => $googleUser->getEmail()]);
+
         } catch (\Exception $e) {
-            Log::error('Google Patient OAuth Error', [
+            Log::error('Google Customer OAuth Error', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTraceAsString()
             ]);
-            return redirect()->route('register.patient')
+            return redirect()->route('register.customer')
                 ->with('status', 'Google sign-up failed. Please try again. Error: ' . $e->getMessage());
         }
 
@@ -171,42 +171,42 @@ class GoogleAuthController extends Controller
 
         if ($existingUser) {
             Log::info('Existing user found', [
-                'user_id' => $existingUser->id, 
+                'user_id' => $existingUser->id,
                 'email' => $existingUser->email,
                 'role' => $existingUser->roles->pluck('name')->toArray(),
-                'has_patient_role' => $existingUser->hasRole('patient')
+                'has_customer_role' => $existingUser->hasRole('customer')
             ]);
-            
-            if ($existingUser->hasRole('patient')) {
+
+            if ($existingUser->hasRole('customer')) {
                 if (! $existingUser->google_id) {
                     $existingUser->update([
                         'google_id'        => $googleUser->getId(),
                         'google_avatar'    => $googleUser->getAvatar(),
                         'google_linked_at' => now(),
                     ]);
-                    Log::info('Linked Google account to existing patient', ['user_id' => $existingUser->id]);
+                    Log::info('Linked Google account to existing customer', ['user_id' => $existingUser->id]);
                 }
 
                 Auth::login($existingUser, remember: true);
-                
+
                 $redirectUrl = url('/store');
-                Log::info('Existing patient logged in, redirecting to', ['url' => $redirectUrl]);
-                
+                Log::info('Existing customer logged in, redirecting to', ['url' => $redirectUrl]);
+
                 return redirect($redirectUrl);
             }
 
-            Log::warning('Existing user found but not a patient', [
+            Log::warning('Existing user found but not a customer', [
                 'user_id' => $existingUser->id,
                 'role' => $existingUser->roles->pluck('name')->toArray()
             ]);
-            
+
             return redirect()->route('login')->withErrors([
                 'email' => 'An account with this email already exists. Please sign in.',
             ]);
         }
 
-        Log::info('Creating new patient user');
-        
+        Log::info('Creating new customer user');
+
         $user = \Illuminate\Support\Facades\DB::transaction(function () use ($googleUser) {
             $user = User::create([
                 'name'              => $googleUser->getName(),
@@ -218,10 +218,10 @@ class GoogleAuthController extends Controller
                 'password'          => null,
             ]);
 
-            $user->assignRole('patient');
-            
-            Log::info('New patient created', [
-                'user_id' => $user->id, 
+            $user->assignRole('customer');
+
+            Log::info('New customer created', [
+                'user_id' => $user->id,
                 'email' => $user->email,
                 'name' => $user->name
             ]);
@@ -230,13 +230,13 @@ class GoogleAuthController extends Controller
         });
 
         Auth::login($user, remember: true);
-        
+
         // TEMPORARY: Redirect to test page instead of store to debug
         // Comment this line and uncomment the next line to test
         $redirectUrl = url('/store');
         // $redirectUrl = url('/google-test-success');
-        
-        Log::info('New patient logged in, redirecting to', ['url' => $redirectUrl]);
+
+        Log::info('New customer logged in, redirecting to', ['url' => $redirectUrl]);
 
         return redirect($redirectUrl);
     }

@@ -2,7 +2,7 @@
 @section('title', 'Browse Medicines — Dawa Mtaani')
 @section('content')
 <div class="space-y-6"
-     x-init="$store.patientCart.load()"
+     x-init="$store.customerCart.load()"
      x-data>
 
     {{-- Header --}}
@@ -74,7 +74,7 @@
                                         class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">+</button>
                             </div>
                             <button @click="
-                                        $store.patientCart.add(
+                                        $store.customerCart.add(
                                             item.product_id,
                                             item.generic_name,
                                             parseFloat(item.unit_price),
@@ -84,7 +84,7 @@
                                         added = true;
                                         qty = 1;
                                         setTimeout(() => added = false, 1500)"
-                                    class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+                                    class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors">
                                 <span x-show="!added">+ Add to Cart</span>
                                 <span x-show="added" x-cloak>Added ✓</span>
                             </button>
@@ -117,7 +117,7 @@
                         <p class="text-xs text-gray-400 mt-0.5">{{ $ef->county }}</p>
                     </div>
                     @if($ef->network_membership === 'NETWORK')
-                    <span class="inline-flex items-center gap-1 rounded-full bg-green-900/20 px-2 py-0.5 text-xs font-medium text-green-400 border border-green-800">
+                    <span class="inline-flex items-center gap-1 rounded-full bg-green-900/20 px-2 py-0.5 text-xs font-medium text-green-400 border border-gray-700">
                         Verified
                     </span>
                     @endif
@@ -144,7 +144,7 @@
                     <option value="{{ $cat }}" {{ request('category') === $cat ? 'selected' : '' }}>{{ $cat }}</option>
                 @endforeach
             </select>
-            <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">Filter</button>
+            <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">Filter</button>
             @if(request()->hasAny(['search', 'category']))
                 <a href="/store" class="px-4 py-2.5 border border-gray-600 text-gray-400 rounded-lg text-sm hover:bg-gray-900">Clear</a>
             @endif
@@ -189,7 +189,7 @@
                                     class="w-8 h-8 flex items-center justify-center text-gray-300 hover:text-white hover:bg-gray-700 transition-colors font-bold text-lg">+</button>
                         </div>
                         <button @click="
-                                    $store.patientCart.add(
+                                    $store.customerCart.add(
                                         {{ $product->id }},
                                         '{{ addslashes($product->generic_name) }}',
                                         {{ $product->unit_price }},
@@ -199,7 +199,7 @@
                                     added = true;
                                     qty = 1;
                                     setTimeout(() => added = false, 1500)"
-                                class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+                                class="flex-1 py-2 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors">
                             <span x-show="!added">+ Add to Cart</span>
                             <span x-show="added" x-cloak>Added ✓</span>
                         </button>
@@ -219,10 +219,10 @@
 
 {{-- Floating cart button → goes to /store/basket --}}
 <a href="/store/basket" x-data
-   class="fixed bottom-6 right-6 z-[99990] w-14 h-14 bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95">
+   class="fixed bottom-6 right-6 z-[99990] w-14 h-14 bg-yellow-400 hover:bg-yellow-500 text-white rounded-full shadow-xl flex items-center justify-center transition-all hover:scale-105 active:scale-95">
     <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-4H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-    <span x-show="$store.patientCart.count > 0"
-          x-text="$store.patientCart.count"
+    <span x-show="$store.customerCart.count > 0"
+          x-text="$store.customerCart.count"
           class="absolute -top-2 -right-2 min-w-[22px] h-[22px] bg-red-500 text-white text-xs rounded-full flex items-center justify-center font-bold px-1 shadow-lg"
           x-cloak></span>
 </a>

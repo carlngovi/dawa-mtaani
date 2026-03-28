@@ -3,8 +3,8 @@
 namespace App\Http\Controllers\Store;
 
 use App\Http\Controllers\Controller;
-use App\Models\PatientBasket;
-use App\Models\PatientBasketLine;
+use App\Models\CustomerBasket;
+use App\Models\CustomerBasketLine;
 use App\Services\CurrencyConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,21 +16,21 @@ class BasketController extends Controller
     public function addItem(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'patient_phone' => 'required|string|max:20',
+            'customer_phone' => 'required|string|max:20',
             'facility_id'   => 'required|exists:facilities,id',
             'product_id'    => 'required|exists:products,id',
             'quantity'       => 'required|integer|min:1',
         ]);
 
-        $basket = PatientBasket::firstOrCreate(
+        $basket = CustomerBasket::firstOrCreate(
             [
-                'patient_phone' => $validated['patient_phone'],
+                'customer_phone' => $validated['customer_phone'],
                 'facility_id'   => $validated['facility_id'],
             ],
             ['session_token' => Str::random(60)]
         );
 
-        PatientBasketLine::updateOrCreate(
+        CustomerBasketLine::updateOrCreate(
             [
                 'basket_id'  => $basket->id,
                 'product_id' => $validated['product_id'],
@@ -55,7 +55,7 @@ class BasketController extends Controller
             'product_id'    => 'required|integer',
         ]);
 
-        $basket = PatientBasket::where('session_token', $validated['session_token'])->first();
+        $basket = CustomerBasket::where('session_token', $validated['session_token'])->first();
 
         if (! $basket) {
             return response()->json([
@@ -65,7 +65,7 @@ class BasketController extends Controller
             ], 404);
         }
 
-        PatientBasketLine::where('basket_id', $basket->id)
+        CustomerBasketLine::where('basket_id', $basket->id)
             ->where('product_id', $validated['product_id'])
             ->delete();
 
@@ -86,7 +86,7 @@ class BasketController extends Controller
             'session_token' => 'required|string',
         ]);
 
-        $basket = PatientBasket::where('session_token', $validated['session_token'])->first();
+        $basket = CustomerBasket::where('session_token', $validated['session_token'])->first();
 
         if (! $basket) {
             return response()->json([
@@ -96,7 +96,7 @@ class BasketController extends Controller
             ], 404);
         }
 
-        $lines = DB::table('patient_basket_lines as pbl')
+        $lines = DB::table('customer_basket_lines as pbl')
             ->join('products as p', 'p.id', '=', 'pbl.product_id')
             ->join('wholesale_price_lists as wpl', function ($join) use ($basket) {
                 $join->on('wpl.product_id', '=', 'p.id')
@@ -128,7 +128,7 @@ class BasketController extends Controller
         $subtotal = $lines->sum(fn ($l) => (float) filter_var($l['line_total'], FILTER_SANITIZE_NUMBER_FLOAT, FILTER_FLAG_ALLOW_FRACTION));
 
         // Recalculate subtotal from raw values for accuracy
-        $rawSubtotal = DB::table('patient_basket_lines as pbl')
+        $rawSubtotal = DB::table('customer_basket_lines as pbl')
             ->join('wholesale_price_lists as wpl', function ($join) use ($basket) {
                 $join->on('wpl.product_id', '=', 'pbl.product_id')
                     ->where('wpl.wholesale_facility_id', $basket->facility_id)
@@ -156,7 +156,7 @@ class BasketController extends Controller
             'session_token' => 'required|string',
         ]);
 
-        $basket = PatientBasket::where('session_token', $validated['session_token'])->first();
+        $basket = CustomerBasket::where('session_token', $validated['session_token'])->first();
 
         if (! $basket) {
             return response()->json([

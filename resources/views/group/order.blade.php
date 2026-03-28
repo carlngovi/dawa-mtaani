@@ -34,7 +34,7 @@
 
     @if($authorisedOutlets->isEmpty())
     {{-- No authorised outlets --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         You have no authorised outlets. Contact Network Admin to be added as an authorised placer for an outlet.
     </div>
 
@@ -159,7 +159,7 @@
                         </select>
                     </div>
                     <button type="submit"
-                            class="w-full mt-3 px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                            class="w-full mt-3 px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Submit Order
                     </button>
                 </form>

@@ -24,7 +24,7 @@ class EnforcePortalRole
      */
     private const PORTAL_ROLES = [
         'admin'     => ['network_admin', 'admin', 'super_admin', 'technical_admin',
-                        'assistant_admin', 'admin_support', 'shared_accountant'],
+                        'assistant_admin', 'admin_support', 'shared_accountant', 'system'],
         'super'     => ['super_admin', 'technical_admin'],
         'tech'      => ['technical_admin'],
         'finance'   => ['shared_accountant', 'admin', 'network_admin', 'super_admin'],
@@ -38,7 +38,8 @@ class EnforcePortalRole
         'rep'       => ['sales_rep'],
         'sales'     => ['sales_rep'],
         'county'    => ['county_coordinator'],
-        'store'     => ['patient', 'retail_facility', 'group_owner'],
+        'store'        => ['customer', 'retail_facility', 'group_owner'],
+        'manufacturer' => ['manufacturer'],
     ];
 
     public function handle(Request $request, Closure $next): Response

@@ -15,7 +15,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Financial data is visible from Tier 2 (admin) and above.
         This dashboard shows operational metrics only.
     </div>

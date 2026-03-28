@@ -5,7 +5,7 @@
     <div><h1 class="text-2xl font-bold text-white">Quality Reports</h1><p class="text-sm text-gray-400 mt-1">Report suspected counterfeit or quality issues</p></div>
 
     @if(session('success'))
-    <div class="bg-green-900/20 border border-green-800 rounded-xl p-4 text-sm text-green-300">{{ session('success') }}</div>
+    <div class="bg-green-900/20 border border-gray-700 rounded-xl p-4 text-sm text-green-300">{{ session('success') }}</div>
     @endif
 
     <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -19,6 +19,7 @@
                         body: JSON.stringify({product_id:parseInt($el.querySelector('[name=product_id]').value),flag_type:$el.querySelector('[name=flag_type]').value,notes:$el.querySelector('[name=notes]').value})
                     }).then(r=>r.json()).then(d=>{alert(d.message||'Submitted');location.reload()}).catch(()=>alert('Error submitting'))
                   ">
+                @csrf
                 <div>
                     <label class="block text-xs font-medium text-gray-400 mb-1">Product *</label>
                     <select name="product_id" required class="h-10 w-full rounded-lg border border-gray-600 bg-gray-800 px-3 text-sm text-white focus:border-yellow-400 focus:outline-none focus:ring-1 focus:ring-yellow-400">

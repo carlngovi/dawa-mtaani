@@ -8,7 +8,7 @@
             <h1 class="text-2xl font-bold text-white">System Diagnostics</h1>
             <p class="text-sm text-gray-400 mt-1">Integration health and read-only query console</p>
         </div>
-        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">
+        <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-gray-700">
             Tier 0
         </span>
     </div>
@@ -18,9 +18,9 @@
         @foreach($integrations as $name => $status)
         @php
             $cardClass = match($status) {
-                'OK'    => 'border-green-800 bg-green-900/20',
+                'OK'    => 'border-gray-700 bg-green-900/20',
                 'WARN'  => 'border-yellow-800 bg-yellow-900/20',
-                'ERROR' => 'border-red-800 bg-red-900/20',
+                'ERROR' => 'border-gray-700 bg-red-900/20',
                 default => 'border-gray-700 bg-gray-800',
             };
             $badgeClass = match($status) {
@@ -77,16 +77,16 @@
                 <div class="space-y-3">
                     <textarea name="sql" rows="4"
                               placeholder="SELECT * FROM facilities WHERE facility_status = 'ACTIVE' LIMIT 10"
-                              class="w-full px-3 py-2.5 border border-gray-600 bg-gray-900 rounded-lg text-sm text-green-400 font-mono placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 focus:border-green-500">{{ $querySQL ?? '' }}</textarea>
+                              class="w-full px-3 py-2.5 border border-gray-600 bg-gray-900 rounded-lg text-sm text-green-400 font-mono placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 focus:border-gray-700">{{ $querySQL ?? '' }}</textarea>
                     <button type="submit"
-                            class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                            class="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Run Query
                     </button>
                 </div>
             </form>
 
             @if(session('error'))
-            <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+            <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
                 {{ session('error') }}
             </div>
             @endif

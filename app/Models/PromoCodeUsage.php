@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PromoCodeUsage extends Model
 {
     protected $fillable = [
-        'promo_code_id', 'patient_phone', 'patient_order_id', 'used_at',
+        'promo_code_id', 'customer_phone', 'customer_order_id', 'used_at',
     ];
 
     protected $casts = [
@@ -21,6 +21,6 @@ class PromoCodeUsage extends Model
 
     public function order()
     {
-        return $this->belongsTo(PatientOrder::class, 'patient_order_id');
+        return $this->belongsTo(CustomerOrder::class, 'customer_order_id');
     }
 }

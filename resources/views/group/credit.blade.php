@@ -15,7 +15,7 @@
     </div>
 
     {{-- Info banner --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Credit limits, increases, and suspensions are managed exclusively by Network Admin.
         This is a read-only view — no changes can be made here.
     </div>
@@ -30,8 +30,8 @@
         @foreach($creditAccounts as $account)
         @php
             $badge = match($account->account_status) {
-                'ACTIVE'             => 'bg-green-900/30 text-green-400 border-green-800',
-                'SUSPENDED'          => 'bg-red-900/30 text-red-400 border-red-800',
+                'ACTIVE'             => 'bg-green-900/30 text-green-400 border-gray-700',
+                'SUSPENDED'          => 'bg-red-900/30 text-red-400 border-gray-700',
                 'PENDING_ASSESSMENT' => 'bg-amber-900/30 text-amber-400 border-amber-800',
                 'CLOSED'             => 'bg-gray-700 text-gray-400 border-gray-700',
                 default              => 'bg-gray-700 text-gray-400 border-gray-700',

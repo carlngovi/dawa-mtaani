@@ -10,13 +10,13 @@
             <p class="text-sm text-gray-400 mt-1">Submit periodic invoices for delivery services</p>
         </div>
         <button @click="open = true"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             + Submit New Invoice
         </button>
     </div>
 
     {{-- Note --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Invoices require admin matching before processing.
         Matched invoices are processed in the next settlement cycle.
     </div>
@@ -134,7 +134,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Submit Invoice
                     </button>
                     <button type="button" @click="open = false"

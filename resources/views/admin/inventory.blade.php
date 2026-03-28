@@ -40,9 +40,9 @@
                     <td class="px-5 py-3 text-xs text-gray-400">{{ $item->therapeutic_category }}</td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $item->stock_status === 'IN_STOCK' ? 'bg-green-900/30 text-green-400 border border-green-800' :
+                            {{ $item->stock_status === 'IN_STOCK' ? 'bg-green-900/30 text-green-400 border border-gray-700' :
                                ($item->stock_status === 'LOW_STOCK' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' :
-                               'bg-red-900/30 text-red-400 border border-red-800') }}">
+                               'bg-red-900/30 text-red-400 border border-gray-700') }}">
                             {{ str_replace('_',' ',$item->stock_status) }}
                         </span>
                     </td>

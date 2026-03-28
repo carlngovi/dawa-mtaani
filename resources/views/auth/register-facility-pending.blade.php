@@ -43,7 +43,7 @@
         </p>
 
         <a href="{{ route('login') }}"
-           class="inline-flex items-center justify-center rounded-lg bg-yellow-400 px-6 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-500 transition-colors">
+           class="inline-flex items-center justify-center rounded-lg bg-yellow-400 px-6 py-3 text-sm font-bold text-white hover:bg-yellow-500 transition-colors">
             Back to Sign In
         </a>
     </div>

@@ -58,7 +58,7 @@
             <div class="flex gap-2 flex-wrap">
                 @foreach(['device' => 'Device', 'map' => 'Map Pin', 'manual' => 'Manual', 'bulk' => 'Bulk'] as $t => $label)
                 <button type="button" @click="tab = '{{ $t }}'"
-                        :class="tab === '{{ $t }}' ? 'bg-yellow-400 text-gray-900' : 'border border-gray-600 text-gray-400 hover:bg-gray-900'"
+                        :class="tab === '{{ $t }}' ? 'bg-yellow-400 text-white' : 'border border-gray-600 text-gray-400 hover:bg-gray-900'"
                         class="px-4 py-2 rounded-lg text-sm transition-colors">
                     {{ $label }}
                 </button>
@@ -70,14 +70,14 @@
                 <h3 class="text-sm font-semibold text-gray-300">Device Auto-Detect</h3>
                 <p class="text-xs text-gray-400">50m accuracy threshold required. Locations over 50m will be flagged for review.</p>
                 <button type="button" @click="getLocation()" :disabled="locating"
-                        class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors disabled:opacity-50">
+                        class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors disabled:opacity-50">
                     <span x-show="!locating">Request My Location</span>
                     <span x-show="locating" class="flex items-center gap-2">
                         <svg class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>
                         Locating...
                     </span>
                 </button>
-                <div x-show="locError" class="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3 text-sm text-red-300">
+                <div x-show="locError" class="rounded-lg bg-red-900/20 border border-gray-700 px-4 py-3 text-sm text-red-300">
                     <span x-text="locError"></span>
                 </div>
                 <div x-show="lat !== null" class="space-y-2">
@@ -101,7 +101,7 @@
                         <input type="hidden" name="longitude" :value="lng">
                         <input type="hidden" name="accuracy"  :value="accuracy">
                         <button type="submit"
-                                class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                                class="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                             Save Location
                         </button>
                     </form>
@@ -141,7 +141,7 @@
                         </div>
                     </div>
                     <button type="submit"
-                            class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Save Location
                     </button>
                 </form>
@@ -153,7 +153,7 @@
             {{-- Tab: Bulk Upload --}}
             <div x-show="tab === 'bulk'" class="bg-gray-800 rounded-xl border border-gray-700 p-6 space-y-4">
                 <h3 class="text-sm font-semibold text-gray-300">Bulk CSV Upload</h3>
-                <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+                <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
                     Bulk GPS upload via CSV is an admin-only operation and is not available in this portal.
                 </div>
                 <a href="/admin/facilities"

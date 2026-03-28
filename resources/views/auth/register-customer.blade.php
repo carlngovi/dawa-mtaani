@@ -57,7 +57,7 @@
         @endif
 
         {{-- Registration form --}}
-        <form method="POST" action="{{ route('register.patient.store') }}" class="space-y-5">
+        <form method="POST" action="{{ route('register.customer.store') }}" class="space-y-5">
             @csrf
 
             {{-- First + Last name --}}
@@ -136,7 +136,7 @@
 
             {{-- Submit --}}
             <button type="submit"
-                    class="flex w-full items-center justify-center rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors">
+                    class="flex w-full items-center justify-center rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors">
                 Create Account
             </button>
         </form>
@@ -151,7 +151,7 @@
             </div>
         </div>
 
-        <a href="{{ route('auth.google.patient') }}"
+        <a href="{{ route('auth.google.customer') }}"
            class="flex w-full items-center justify-center gap-3 rounded-lg border border-gray-600 bg-gray-800 px-4 py-3 text-sm font-medium text-gray-300 hover:bg-gray-900 transition-colors">
             <svg width="20" height="20" viewBox="0 0 20 20" fill="none">
                 <path d="M19.6 10.23c0-.68-.06-1.36-.18-2H10v3.79h5.38a4.6 4.6 0 01-2 3.02v2.5h3.22c1.89-1.74 2.98-4.3 2.98-7.31z" fill="#4285F4"/>

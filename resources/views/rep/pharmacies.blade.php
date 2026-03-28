@@ -37,7 +37,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Filter
         </button>
         @if(request()->hasAny(['search', 'status']))

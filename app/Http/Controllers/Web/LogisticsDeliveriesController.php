@@ -31,12 +31,12 @@ class LogisticsDeliveriesController extends Controller
                 'o.ulid as order_ulid', 'o.status', 'o.total_amount',
                 'o.created_at', 'o.updated_at',
                 'retail.facility_name', 'retail.county', 'retail.ward',
-                DB::raw('NULL as patient_name'),
+                DB::raw('NULL as customer_name'),
                 'o.delivery_address', 'o.delivery_lat', 'o.delivery_lng',
             ]);
 
-        // ── B2C patient orders ───────────────────────────────────────
-        $b2c = DB::table('patient_orders as po')
+        // ── B2C customer orders ──────────────────────────────────────
+        $b2c = DB::table('customer_orders as po')
             ->join('facilities as f', 'po.facility_id', '=', 'f.id')
             ->whereIn('po.status', ['CONFIRMED', 'PREPARING', 'READY', 'COLLECTED'])
             ->when($request->filled('county'), fn($q) => $q->where('f.county', $request->county))
@@ -48,7 +48,7 @@ class LogisticsDeliveriesController extends Controller
                 'po.ulid as order_ulid', 'po.status', 'po.total_amount',
                 'po.created_at', 'po.updated_at',
                 'f.facility_name', 'f.county', 'f.ward',
-                'po.patient_name',
+                'po.customer_name',
                 'po.delivery_address', 'po.delivery_lat', 'po.delivery_lng',
             ]);
 
@@ -67,7 +67,7 @@ class LogisticsDeliveriesController extends Controller
         $b2bPending = DB::table('orders')
             ->whereIn('status', ['CONFIRMED', 'PACKED', 'DISPATCHED'])
             ->whereNull('deleted_at')->count();
-        $b2cPending = DB::table('patient_orders')
+        $b2cPending = DB::table('customer_orders')
             ->whereIn('status', ['CONFIRMED', 'PREPARING', 'READY'])->count();
 
         $stats = [
@@ -87,7 +87,7 @@ class LogisticsDeliveriesController extends Controller
             'lng'      => (float) $d->delivery_lng,
             'type'     => $d->order_type,
             'status'   => $d->status,
-            'name'     => $d->patient_name ?? $d->facility_name,
+            'name'     => $d->customer_name ?? $d->facility_name,
             'address'  => $d->delivery_address,
             'amount'   => (float) $d->total_amount,
         ])->values();

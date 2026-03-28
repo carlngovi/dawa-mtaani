@@ -43,10 +43,10 @@ class StoreBrowseController extends Controller
             ->orderBy('therapeutic_category')
             ->pluck('therapeutic_category');
 
-        $basketCount = DB::table('patient_baskets')
-            ->where('patient_phone', $user->phone ?? '')
-            ->join('patient_basket_lines', 'patient_baskets.id', '=', 'patient_basket_lines.basket_id')
-            ->sum('patient_basket_lines.quantity');
+        $basketCount = DB::table('customer_baskets')
+            ->where('customer_phone', $user->phone ?? '')
+            ->join('customer_basket_lines', 'customer_baskets.id', '=', 'customer_basket_lines.basket_id')
+            ->sum('customer_basket_lines.quantity');
 
         // Eligible pharmacies for linking from search results
         $eligibleFacilities = DB::table('online_store_eligible_facilities as osef')
@@ -68,7 +68,7 @@ class StoreBrowseController extends Controller
         return view('store.basket', compact('currency'));
     }
 
-    public function patientCheckout(Request $request)
+    public function customerCheckout(Request $request)
     {
         $request->validate([
             'phone'                 => 'required|string|max:20',
@@ -105,11 +105,11 @@ class StoreBrowseController extends Controller
 
         DB::beginTransaction();
         try {
-            $orderId = DB::table('patient_orders')->insertGetId([
+            $orderId = DB::table('customer_orders')->insertGetId([
                 'ulid'                  => $ulid,
                 'user_id'               => Auth::id(),
-                'patient_phone'         => $phone,
-                'patient_name'          => $request->first_name . ' ' . $request->last_name,
+                'customer_phone'         => $phone,
+                'customer_name'          => $request->first_name . ' ' . $request->last_name,
                 'facility_id'           => $facilityId,
                 'status'                => 'PAYMENT_PENDING',
                 'subtotal_amount'       => $total,
@@ -131,8 +131,8 @@ class StoreBrowseController extends Controller
             ]);
 
             foreach ($request->items as $item) {
-                DB::table('patient_order_lines')->insert([
-                    'patient_order_id' => $orderId,
+                DB::table('customer_order_lines')->insert([
+                    'customer_order_id' => $orderId,
                     'product_id'       => $item['product_id'],
                     'quantity'         => $item['qty'],
                     'unit_price'       => $item['price'],
@@ -146,7 +146,7 @@ class StoreBrowseController extends Controller
             DB::commit();
         } catch (\Throwable $e) {
             DB::rollBack();
-            \Illuminate\Support\Facades\Log::error('Patient order failed', ['error' => $e->getMessage()]);
+            \Illuminate\Support\Facades\Log::error('Customer order failed', ['error' => $e->getMessage()]);
             return response()->json(['success' => false, 'message' => 'Order creation failed.'], 500);
         }
 
@@ -155,9 +155,9 @@ class StoreBrowseController extends Controller
             $mpesa = app(\App\Services\Integrations\MpesaDarajaService::class);
             $stkResult = $mpesa->initiateSTKPush($phone, $total, $ulid);
 
-            \Illuminate\Support\Facades\Log::info('Patient STK Push', ['ulid' => $ulid, 'result' => $stkResult]);
+            \Illuminate\Support\Facades\Log::info('Customer STK Push', ['ulid' => $ulid, 'result' => $stkResult]);
 
-            DB::table('patient_orders')->where('ulid', $ulid)->update(array_filter([
+            DB::table('customer_orders')->where('ulid', $ulid)->update(array_filter([
                 'mpesa_checkout_request_id'  => $stkResult['CheckoutRequestID'] ?? null,
                 'mpesa_merchant_request_id'  => $stkResult['MerchantRequestID'] ?? null,
                 'updated_at'                 => now(),
@@ -169,7 +169,7 @@ class StoreBrowseController extends Controller
                 'message'      => 'M-Pesa prompt sent!',
             ]);
         } catch (\Throwable $e) {
-            \Illuminate\Support\Facades\Log::error('Patient STK failed', ['ulid' => $ulid, 'error' => $e->getMessage()]);
+            \Illuminate\Support\Facades\Log::error('Customer STK failed', ['ulid' => $ulid, 'error' => $e->getMessage()]);
             return response()->json([
                 'success'      => true,
                 'redirect_url' => "/store/orders/{$ulid}?pending=true",
@@ -181,12 +181,12 @@ class StoreBrowseController extends Controller
     public function paymentPending(string $ulid)
     {
         $user = Auth::user();
-        $order = DB::table('patient_orders')
+        $order = DB::table('customer_orders')
             ->where('ulid', $ulid)
             ->where('user_id', $user->id)
             ->first();
 
-        if (! $order) $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        if (! $order) $order = DB::table('customer_orders')->where('ulid', $ulid)->first();
         abort_if(! $order, 404);
 
         $currency = CurrencyConfig::get();
@@ -195,7 +195,7 @@ class StoreBrowseController extends Controller
 
     public function orderStatus(string $ulid)
     {
-        $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+        $order = DB::table('customer_orders')->where('ulid', $ulid)->first();
         abort_if(! $order, 404);
 
         if ($order->status === 'PAYMENT_PENDING') {
@@ -217,7 +217,7 @@ class StoreBrowseController extends Controller
                         || ($resultCode === 1032 && stripos($resultDesc, 'processing') !== false);
 
                     if ($resultCode === 0) {
-                        DB::table('patient_orders')->where('ulid', $ulid)->update([
+                        DB::table('customer_orders')->where('ulid', $ulid)->update([
                             'status'               => 'CONFIRMED',
                             'mpesa_result_code'    => $resultCode,
                             'mpesa_result_desc'    => $resultDesc,
@@ -235,7 +235,7 @@ class StoreBrowseController extends Controller
                             2001 => 'Incorrect M-Pesa PIN entered.',
                             default => $resultDesc ?: 'Payment failed.',
                         };
-                        DB::table('patient_orders')->where('ulid', $ulid)->update([
+                        DB::table('customer_orders')->where('ulid', $ulid)->update([
                             'status'                 => 'PAYMENT_FAILED',
                             'rejection_reason'       => $reason,
                             'payment_failure_reason'  => $reason,
@@ -256,7 +256,7 @@ class StoreBrowseController extends Controller
             if (! $updated) {
                 $age = \Carbon\Carbon::parse($order->created_at)->diffInSeconds(now());
                 if ($age > 120) {
-                    DB::table('patient_orders')->where('ulid', $ulid)->update([
+                    DB::table('customer_orders')->where('ulid', $ulid)->update([
                         'status'                 => 'PAYMENT_FAILED',
                         'rejection_reason'       => 'M-Pesa prompt timed out. Please try again.',
                         'payment_failure_reason'  => 'M-Pesa prompt timed out. Please try again.',
@@ -268,7 +268,7 @@ class StoreBrowseController extends Controller
             }
 
             if ($updated) {
-                $order = DB::table('patient_orders')->where('ulid', $ulid)->first();
+                $order = DB::table('customer_orders')->where('ulid', $ulid)->first();
             }
         }
 
@@ -338,8 +338,8 @@ class StoreBrowseController extends Controller
         $categories = $products->pluck('therapeutic_category')->filter()->unique()->sort()->values();
 
         // Load existing basket for this facility
-        $basket = DB::table('patient_baskets')
-            ->where('patient_phone', $user->phone ?? '')
+        $basket = DB::table('customer_baskets')
+            ->where('customer_phone', $user->phone ?? '')
             ->where('facility_id', $facility->id)
             ->first();
 
@@ -363,8 +363,8 @@ class StoreBrowseController extends Controller
 
         abort_if(! $facility, 404);
 
-        $basket = DB::table('patient_baskets')
-            ->where('patient_phone', $user->phone ?? '')
+        $basket = DB::table('customer_baskets')
+            ->where('customer_phone', $user->phone ?? '')
             ->where('facility_id', $facility->id)
             ->first();
 
@@ -372,7 +372,7 @@ class StoreBrowseController extends Controller
             return redirect("/store/{$facilityUlid}")->with('error', 'Your basket is empty.');
         }
 
-        $lines = DB::table('patient_basket_lines as pbl')
+        $lines = DB::table('customer_basket_lines as pbl')
             ->join('products as p', 'p.id', '=', 'pbl.product_id')
             ->join('wholesale_price_lists as wpl', function ($join) use ($facility) {
                 $join->on('wpl.product_id', '=', 'p.id')

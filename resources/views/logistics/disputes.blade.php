@@ -47,7 +47,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
             Filter
         </button>
         @if(request('status'))
@@ -114,7 +114,7 @@
                         <td class="px-5 py-3">
                             @if(in_array($dispute->status, ['OPEN', 'UNDER_REVIEW']))
                                 <button @click="respondId = {{ $dispute->id }}; respondText = ''"
-                                        class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs hover:bg-yellow-500 transition-colors">
+                                        class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs hover:bg-yellow-500 transition-colors">
                                     Respond
                                 </button>
                             @else
@@ -159,7 +159,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Submit Response
                     </button>
                     <button type="button" @click="respondId = null"

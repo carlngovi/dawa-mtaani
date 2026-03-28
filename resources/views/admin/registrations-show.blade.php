@@ -5,12 +5,12 @@
 
     {{-- Flash messages --}}
     @if(session('success'))
-    <div class="bg-green-900/20 border border-green-800 text-green-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-green-900/20 border border-gray-700 text-green-300 text-sm px-4 py-3 rounded-lg">
         {{ session('success') }}
     </div>
     @endif
     @if(session('error'))
-    <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
         {{ session('error') }}
     </div>
     @endif
@@ -24,9 +24,9 @@
                 @php
                     $stageBadge = match($facility->onboarding_status) {
                         'APPLIED'        => 'bg-gray-700 text-gray-400',
-                        'PPB_VERIFIED'   => 'bg-blue-900/30 text-blue-400 border border-blue-800',
+                        'PPB_VERIFIED'   => 'bg-blue-900/30 text-blue-400 border border-gray-700',
                         'ACCOUNT_LINKED' => 'bg-amber-900/30 text-amber-400 border border-amber-800',
-                        'ACTIVE'         => 'bg-green-900/30 text-green-400 border border-green-800',
+                        'ACTIVE'         => 'bg-green-900/30 text-green-400 border border-gray-700',
                         default          => 'bg-gray-700 text-gray-400',
                     };
                 @endphp
@@ -90,7 +90,7 @@
                         <dt class="text-xs text-gray-400">Network Membership</dt>
                         <dd>
                             <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                                {{ $facility->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">
+                                {{ $facility->network_membership === 'NETWORK' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">
                                 {{ $facility->network_membership ?? '—' }}
                             </span>
                         </dd>
@@ -104,9 +104,9 @@
                     <h3 class="text-sm font-semibold text-gray-300">PPB Verification</h3>
                     @php
                         $ppbBadge = match($facility->ppb_licence_status) {
-                            'VALID'     => 'bg-green-900/30 text-green-400 border border-green-800',
-                            'EXPIRED'   => 'bg-red-900/30 text-red-400 border border-red-800',
-                            'SUSPENDED' => 'bg-orange-900/30 text-orange-400 border border-orange-800',
+                            'VALID'     => 'bg-green-900/30 text-green-400 border border-gray-700',
+                            'EXPIRED'   => 'bg-red-900/30 text-red-400 border border-gray-700',
+                            'SUSPENDED' => 'bg-orange-900/30 text-orange-400 border border-gray-700',
                             default     => 'bg-gray-700 text-gray-400',
                         };
                     @endphp
@@ -127,7 +127,7 @@
                     <form method="POST" action="/admin/registrations/{{ $facility->ulid }}/verify-ppb">
                         @csrf
                         <button type="submit"
-                                class="px-3 py-1.5 border border-blue-800 text-blue-400 rounded-lg text-xs hover:bg-blue-900/20 transition-colors">
+                                class="px-3 py-1.5 border border-gray-700 text-blue-400 rounded-lg text-xs hover:bg-blue-900/20 transition-colors">
                             Re-run PPB Check
                         </button>
                     </form>
@@ -231,7 +231,7 @@
                 <h3 class="text-sm font-semibold text-gray-300">Actions</h3>
 
                 @if(! $canWrite)
-                <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-xs px-3 py-2 rounded-lg">
+                <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-xs px-3 py-2 rounded-lg">
                     Read-only access. Only Tier 3+ can approve or reject.
                 </div>
                 @endif
@@ -245,7 +245,7 @@
                 <form method="POST" action="/admin/registrations/{{ $facility->ulid }}/verify-ppb">
                     @csrf
                     <button type="submit"
-                            class="w-full px-4 py-2.5 border border-blue-800 text-blue-400 rounded-lg text-sm hover:bg-blue-900/20 transition-colors">
+                            class="w-full px-4 py-2.5 border border-gray-700 text-blue-400 rounded-lg text-sm hover:bg-blue-900/20 transition-colors">
                         Re-run PPB Check
                     </button>
                 </form>
@@ -257,12 +257,12 @@
                 <form method="POST" action="/admin/registrations/{{ $facility->ulid }}/approve">
                     @csrf
                     <button type="submit"
-                            class="w-full px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                            class="w-full px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Approve — Move to Account Linked
                     </button>
                 </form>
                 <button @click="showRejectModal = true"
-                        class="w-full px-4 py-2.5 border border-red-800 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
+                        class="w-full px-4 py-2.5 border border-gray-700 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
                     Reject Registration
                 </button>
                 @endif
@@ -272,7 +272,7 @@
                 <form method="POST" action="/admin/registrations/{{ $facility->ulid }}/activate">
                     @csrf
                     <button type="submit"
-                            class="w-full px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                            class="w-full px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Activate Facility
                     </button>
                 </form>
@@ -283,14 +283,14 @@
                 <p class="text-xs text-red-400">PPB licence is {{ $facility->ppb_licence_status ?? 'unknown' }} — activation will be blocked.</p>
                 @endif
                 <button @click="showRejectModal = true"
-                        class="w-full px-4 py-2.5 border border-red-800 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
+                        class="w-full px-4 py-2.5 border border-gray-700 text-red-400 rounded-lg text-sm hover:bg-red-900/20 transition-colors">
                     Reject Registration
                 </button>
                 @endif
 
                 {{-- ACTIVE --}}
                 @if($facility->onboarding_status === 'ACTIVE')
-                <div class="bg-green-900/20 border border-green-800 text-green-300 text-xs px-3 py-3 rounded-lg">
+                <div class="bg-green-900/20 border border-gray-700 text-green-300 text-xs px-3 py-3 rounded-lg">
                     This facility is already ACTIVE. No further actions required.
                 </div>
                 @endif

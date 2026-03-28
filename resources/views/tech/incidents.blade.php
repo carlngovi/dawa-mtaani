@@ -9,12 +9,12 @@
                 <h1 class="text-2xl font-bold text-white">Incident Log</h1>
                 <p class="text-sm text-gray-400 mt-1">Security events and platform incidents</p>
             </div>
-            <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">
+            <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-gray-700">
                 Tier 0
             </span>
         </div>
         <button @click="logOpen = true"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             + Log Incident
         </button>
     </div>
@@ -109,7 +109,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Log Incident
                     </button>
                     <button type="button" @click="logOpen = false"

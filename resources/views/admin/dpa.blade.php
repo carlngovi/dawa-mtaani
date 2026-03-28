@@ -17,7 +17,7 @@
             <div class="overflow-x-auto"><table class="w-full text-sm min-w-[400px]"><thead class="bg-gray-900/50 text-xs text-gray-400 uppercase"><tr><th class="px-4 py-3 text-left">ULID</th><th class="px-4 py-3 text-left">Status</th><th class="px-4 py-3 text-left">Date</th></tr></thead>
             <tbody class="divide-y divide-gray-700">
                 @forelse($deletionRequests as $req)
-                <tr class="hover:bg-gray-900"><td class="px-4 py-3 font-mono text-xs text-gray-400">{{ substr($req->ulid ?? '', -8) ?: $req->id }}</td><td class="px-4 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $req->status === 'COMPLETED' ? 'bg-green-900/30 text-green-400 border border-green-800' : ($req->status === 'PENDING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-gray-700 text-gray-400') }}">{{ $req->status }}</span></td><td class="px-4 py-3 text-xs text-gray-400">{{ \Carbon\Carbon::parse($req->created_at)->format('d M Y') }}</td></tr>
+                <tr class="hover:bg-gray-900"><td class="px-4 py-3 font-mono text-xs text-gray-400">{{ substr($req->ulid ?? '', -8) ?: $req->id }}</td><td class="px-4 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $req->status === 'COMPLETED' ? 'bg-green-900/30 text-green-400 border border-gray-700' : ($req->status === 'PENDING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-gray-700 text-gray-400') }}">{{ $req->status }}</span></td><td class="px-4 py-3 text-xs text-gray-400">{{ \Carbon\Carbon::parse($req->created_at)->format('d M Y') }}</td></tr>
                 @empty<tr><td colspan="3" class="px-4 py-8 text-center text-gray-400">No deletion requests</td></tr>@endforelse
             </tbody></table></div>
             <div class="px-5 py-3 border-t border-gray-700">{{ $deletionRequests->links() }}</div>
@@ -28,7 +28,7 @@
             <div class="overflow-x-auto"><table class="w-full text-sm min-w-[400px]"><thead class="bg-gray-900/50 text-xs text-gray-400 uppercase"><tr><th class="px-4 py-3 text-left">ULID</th><th class="px-4 py-3 text-left">Status</th><th class="px-4 py-3 text-left">Date</th></tr></thead>
             <tbody class="divide-y divide-gray-700">
                 @forelse($exportRequests as $req)
-                <tr class="hover:bg-gray-900"><td class="px-4 py-3 font-mono text-xs text-gray-400">{{ substr($req->ulid ?? '', -8) ?: $req->id }}</td><td class="px-4 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $req->status === 'READY' ? 'bg-green-900/30 text-green-400 border border-green-800' : ($req->status === 'PENDING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-gray-700 text-gray-400') }}">{{ $req->status }}</span></td><td class="px-4 py-3 text-xs text-gray-400">{{ \Carbon\Carbon::parse($req->created_at)->format('d M Y') }}</td></tr>
+                <tr class="hover:bg-gray-900"><td class="px-4 py-3 font-mono text-xs text-gray-400">{{ substr($req->ulid ?? '', -8) ?: $req->id }}</td><td class="px-4 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $req->status === 'READY' ? 'bg-green-900/30 text-green-400 border border-gray-700' : ($req->status === 'PENDING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-gray-700 text-gray-400') }}">{{ $req->status }}</span></td><td class="px-4 py-3 text-xs text-gray-400">{{ \Carbon\Carbon::parse($req->created_at)->format('d M Y') }}</td></tr>
                 @empty<tr><td colspan="3" class="px-4 py-8 text-center text-gray-400">No export requests</td></tr>@endforelse
             </tbody></table></div>
             <div class="px-5 py-3 border-t border-gray-700">{{ $exportRequests->links() }}</div>
@@ -40,7 +40,7 @@
         <div class="overflow-x-auto"><table class="w-full text-sm min-w-[500px]"><thead class="bg-gray-900/50 text-xs text-gray-400 uppercase"><tr><th class="px-5 py-3 text-left">Category</th><th class="px-5 py-3 text-left">Retention</th><th class="px-5 py-3 text-left">Action</th><th class="px-5 py-3 text-left">Status</th></tr></thead>
         <tbody class="divide-y divide-gray-700">
             @forelse($retentionPolicies as $p)
-            <tr class="hover:bg-gray-900"><td class="px-5 py-3 font-medium text-gray-200">{{ $p->data_category }}</td><td class="px-5 py-3 text-gray-400">{{ $p->retention_years }} years</td><td class="px-5 py-3 text-gray-400">{{ $p->action_on_expiry }}</td><td class="px-5 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $p->is_active ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">{{ $p->is_active ? 'Active' : 'Inactive' }}</span></td></tr>
+            <tr class="hover:bg-gray-900"><td class="px-5 py-3 font-medium text-gray-200">{{ $p->data_category }}</td><td class="px-5 py-3 text-gray-400">{{ $p->retention_years }} years</td><td class="px-5 py-3 text-gray-400">{{ $p->action_on_expiry }}</td><td class="px-5 py-3"><span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $p->is_active ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">{{ $p->is_active ? 'Active' : 'Inactive' }}</span></td></tr>
             @empty<tr><td colspan="4" class="px-5 py-8 text-center text-gray-400">No policies</td></tr>@endforelse
         </tbody></table></div>
     </div>

@@ -12,14 +12,14 @@
 
     @if(session('success'))
     <div x-data="{ show: true, copied: false }" x-show="show"
-         class="bg-green-900/20 border border-green-800 rounded-xl p-4">
+         class="bg-green-900/20 border border-gray-700 rounded-xl p-4">
         <div class="flex items-start justify-between gap-4">
             <p class="text-sm text-green-300 flex-1 break-all">{{ session('success') }}</p>
             <div class="flex gap-2 flex-shrink-0">
                 @php preg_match('/https?:\/\/\S+/', session('success'), $m); $link = $m[0] ?? ''; @endphp
                 @if($link)
                 <button @click="navigator.clipboard.writeText('{{ $link }}'); copied = true; setTimeout(() => copied = false, 2000)"
-                        class="px-3 py-1 bg-yellow-400 text-gray-900 text-xs rounded-lg hover:bg-yellow-500">
+                        class="px-3 py-1 bg-yellow-400 text-white text-xs rounded-lg hover:bg-yellow-500">
                     <span x-show="!copied">Copy Link</span>
                     <span x-show="copied">Copied!</span>
                 </button>
@@ -35,7 +35,7 @@
     @endif
 
     @if($errors->any())
-    <div class="bg-red-900/20 border border-red-800 rounded-xl p-4">
+    <div class="bg-red-900/20 border border-gray-700 rounded-xl p-4">
         <p class="text-sm text-red-400">{{ $errors->first() }}</p>
     </div>
     @endif
@@ -79,7 +79,7 @@
                     </select>
                 </div>
                 <button type="submit"
-                        class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-medium rounded-lg transition-colors">
+                        class="w-full py-2.5 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-medium rounded-lg transition-colors">
                     Send Invitation
                 </button>
             </form>
@@ -118,9 +118,9 @@
                             </td>
                             <td class="px-4 py-3">
                                 @if($inv->accepted_at)
-                                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400 border border-green-800">Accepted</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400 border border-gray-700">Accepted</span>
                                 @elseif(\Carbon\Carbon::parse($inv->expires_at)->isPast())
-                                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-red-800">Expired</span>
+                                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-red-900/30 text-red-400 border border-gray-700">Expired</span>
                                 @else
                                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-amber-900/30 text-amber-400">Pending</span>
                                 @endif
@@ -140,7 +140,7 @@
                                         @csrf
                                         @method('DELETE')
                                         <button type="submit"
-                                                class="text-xs px-2 py-1 border border-red-800 rounded text-red-400 hover:bg-red-900/20">
+                                                class="text-xs px-2 py-1 border border-gray-700 rounded text-red-400 hover:bg-red-900/20">
                                             Revoke
                                         </button>
                                     </form>

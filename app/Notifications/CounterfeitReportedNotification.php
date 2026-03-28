@@ -2,7 +2,7 @@
 
 namespace App\Notifications;
 
-use App\Models\PatientCounterfeitReport;
+use App\Models\CustomerCounterfeitReport;
 use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
@@ -11,7 +11,7 @@ class CounterfeitReportedNotification extends Notification
 {
     use Queueable;
 
-    public function __construct(public PatientCounterfeitReport $report)
+    public function __construct(public CustomerCounterfeitReport $report)
     {
     }
 

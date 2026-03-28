@@ -17,7 +17,7 @@
                 </div>
                 <p class="mt-1 text-xs text-gray-400" x-text="fav.brand_name"></p>
                 <p class="mt-auto pt-2 text-sm font-semibold text-yellow-600" x-text="fav.unit_price"></p>
-                <button @click="addToBasket(fav)" class="mt-2 rounded-md bg-yellow-400 px-3 py-1.5 text-xs font-medium text-gray-900 hover:bg-yellow-500 transition">
+                <button @click="addToBasket(fav)" class="mt-2 rounded-md bg-yellow-400 px-3 py-1.5 text-xs font-medium text-white hover:bg-yellow-500 transition">
                     Add to Basket
                 </button>
             </div>

@@ -9,7 +9,7 @@ class PromoCode extends Model
     protected $fillable = [
         'code', 'discount_type', 'discount_value', 'min_order_value',
         'buy_quantity', 'get_quantity', 'is_automatic', 'auto_trigger_condition',
-        'valid_from', 'valid_until', 'usage_cap_total', 'usage_cap_per_patient',
+        'valid_from', 'valid_until', 'usage_cap_total', 'usage_cap_per_customer',
         'stackable', 'created_by',
     ];
 

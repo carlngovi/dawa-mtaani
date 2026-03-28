@@ -141,7 +141,7 @@
       </div>
 
       {{-- Submit --}}
-      <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-300 text-gray-900 font-bold py-3 rounded-xl transition-colors">
+      <button type="submit" class="w-full bg-yellow-400 hover:bg-yellow-300 text-white font-bold py-3 rounded-xl transition-colors">
         Register Pharmacy
       </button>
 

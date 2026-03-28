@@ -61,7 +61,7 @@
                         </td>
                         <td class="px-5 py-3">
                             <button @click="findingId = {{ $dispute->id }}; findingText = ''"
-                                    class="px-3 py-1.5 bg-yellow-400 text-gray-900 rounded-lg text-xs hover:bg-yellow-500 transition-colors">
+                                    class="px-3 py-1.5 bg-yellow-400 text-white rounded-lg text-xs hover:bg-yellow-500 transition-colors">
                                 Submit Finding
                             </button>
                         </td>
@@ -102,7 +102,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Submit Finding
                     </button>
                     <button type="button" @click="findingId = null"

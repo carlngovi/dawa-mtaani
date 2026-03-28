@@ -4,9 +4,9 @@ namespace App\Http\Controllers\Store;
 
 use App\Events\OrderConfirmed;
 use App\Http\Controllers\Controller;
-use App\Models\PatientBasket;
-use App\Models\PatientOrder;
-use App\Models\PatientOrderLine;
+use App\Models\CustomerBasket;
+use App\Models\CustomerOrder;
+use App\Models\CustomerOrderLine;
 use App\Models\PromoCode;
 use App\Models\PromoCodeUsage;
 use App\Services\CurrencyConfig;
@@ -23,12 +23,12 @@ class OrderController extends Controller
     {
         $validated = $request->validate([
             'session_token' => 'required|string',
-            'patient_phone' => 'required|string|max:20',
-            'patient_name'  => 'nullable|string|max:255',
+            'customer_phone' => 'required|string|max:20',
+            'customer_name'  => 'nullable|string|max:255',
             'promo_code'    => 'nullable|string|max:50',
         ]);
 
-        $basket = PatientBasket::where('session_token', $validated['session_token'])->first();
+        $basket = CustomerBasket::where('session_token', $validated['session_token'])->first();
 
         if (! $basket) {
             return response()->json([
@@ -55,7 +55,7 @@ class OrderController extends Controller
         if (! empty($validated['promo_code'])) {
             [$promoCode, $discountAmount, $promoError] = $this->validatePromo(
                 $validated['promo_code'],
-                $validated['patient_phone'],
+                $validated['customer_phone'],
                 $basket
             );
 
@@ -108,11 +108,11 @@ class OrderController extends Controller
             $platformFeeAmount = round($total * $platformFeePct / 100, 2);
             $facilityNet = round($total - $platformFeeAmount, 2);
 
-            $order = PatientOrder::create([
+            $order = CustomerOrder::create([
                 'ulid'                => strtolower(Str::ulid()),
                 'user_id'             => auth()->id(),
-                'patient_phone'       => $validated['patient_phone'],
-                'patient_name'        => $validated['patient_name'] ?? null,
+                'customer_phone'       => $validated['customer_phone'],
+                'customer_name'        => $validated['customer_name'] ?? null,
                 'facility_id'         => $basket->facility_id,
                 'status'              => 'PAYMENT_PENDING',
                 'subtotal_amount'     => $subtotal,
@@ -125,23 +125,23 @@ class OrderController extends Controller
             ]);
 
             foreach ($orderLines as $lineData) {
-                PatientOrderLine::create(array_merge($lineData, [
-                    'patient_order_id' => $order->id,
+                CustomerOrderLine::create(array_merge($lineData, [
+                    'customer_order_id' => $order->id,
                 ]));
             }
 
             if ($promoCode) {
                 PromoCodeUsage::create([
                     'promo_code_id'    => $promoCode->id,
-                    'patient_phone'    => $validated['patient_phone'],
-                    'patient_order_id' => $order->id,
+                    'customer_phone'    => $validated['customer_phone'],
+                    'customer_order_id' => $order->id,
                     'used_at'          => now(),
                 ]);
             }
 
             $mpesa = app(MpesaDarajaService::class);
             $stkResponse = $mpesa->initiateSTKPush(
-                $validated['patient_phone'],
+                $validated['customer_phone'],
                 $total,
                 $order->ulid
             );
@@ -162,7 +162,7 @@ class OrderController extends Controller
             'data'    => [
                 'order_ulid'  => $order->ulid,
                 'total'       => CurrencyConfig::format((float) $order->total_amount),
-                'mpesa_prompt' => "STK push sent to {$validated['patient_phone']}",
+                'mpesa_prompt' => "STK push sent to {$validated['customer_phone']}",
                 'checkout_request_id' => $order->mpesa_checkout_request_id,
             ],
             'message' => '',
@@ -171,7 +171,7 @@ class OrderController extends Controller
 
     public function mpesaCallback(Request $request): JsonResponse
     {
-        Log::info('M-Pesa Patient Callback Received', [
+        Log::info('M-Pesa Customer Callback Received', [
             'payload' => $request->all(),
             'ip' => $request->ip(),
             'headers' => $request->headers->all()
@@ -197,7 +197,7 @@ class OrderController extends Controller
         ]);
 
         // Find order by either checkout request ID or merchant request ID
-        $order = PatientOrder::where('mpesa_checkout_request_id', $checkoutRequestId)
+        $order = CustomerOrder::where('mpesa_checkout_request_id', $checkoutRequestId)
             ->orWhere('mpesa_merchant_request_id', $merchantRequestId)
             ->first();
 
@@ -238,7 +238,7 @@ class OrderController extends Controller
             }
 
             // Check for duplicate receipt
-            if ($receiptNumber && PatientOrder::where('mpesa_receipt_number', $receiptNumber)->exists()) {
+            if ($receiptNumber && CustomerOrder::where('mpesa_receipt_number', $receiptNumber)->exists()) {
                 Log::warning('Duplicate receipt number detected', ['receipt' => $receiptNumber]);
                 return response()->json(['ResultCode' => 0, 'ResultDesc' => 'Duplicate receipt'], 200);
             }
@@ -306,7 +306,7 @@ class OrderController extends Controller
 
     public function getOrderStatus(string $ulid): JsonResponse
     {
-        $order = PatientOrder::where('ulid', $ulid)->first();
+        $order = CustomerOrder::where('ulid', $ulid)->first();
 
         if (! $order) {
             return response()->json([
@@ -342,7 +342,7 @@ class OrderController extends Controller
 
     public function markCollected(Request $request, string $ulid): JsonResponse
     {
-        $order = PatientOrder::where('ulid', $ulid)->first();
+        $order = CustomerOrder::where('ulid', $ulid)->first();
 
         if (! $order) {
             return response()->json([
@@ -374,7 +374,7 @@ class OrderController extends Controller
         ]);
     }
 
-    private function validatePromo(string $code, string $phone, PatientBasket $basket): array
+    private function validatePromo(string $code, string $phone, CustomerBasket $basket): array
     {
         $promo = PromoCode::where('code', $code)->first();
 
@@ -397,17 +397,17 @@ class OrderController extends Controller
             }
         }
 
-        if ($promo->usage_cap_per_patient !== null) {
-            $patientUsed = PromoCodeUsage::where('promo_code_id', $promo->id)
-                ->where('patient_phone', $phone)
+        if ($promo->usage_cap_per_customer !== null) {
+            $customerUsed = PromoCodeUsage::where('promo_code_id', $promo->id)
+                ->where('customer_phone', $phone)
                 ->count();
-            if ($patientUsed >= $promo->usage_cap_per_patient) {
+            if ($customerUsed >= $promo->usage_cap_per_customer) {
                 return [null, 0, 'You have already used this promo code.'];
             }
         }
 
         // Calculate subtotal to check min_order_value
-        $subtotal = (float) DB::table('patient_basket_lines as pbl')
+        $subtotal = (float) DB::table('customer_basket_lines as pbl')
             ->join('wholesale_price_lists as wpl', function ($join) use ($basket) {
                 $join->on('wpl.product_id', '=', 'pbl.product_id')
                     ->where('wpl.wholesale_facility_id', $basket->facility_id)

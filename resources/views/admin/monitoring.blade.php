@@ -16,7 +16,7 @@
             <div class="px-5 py-3 flex items-center justify-between">
                 <div>
                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium mr-2
-                        {{ $alert->severity === 'CRITICAL' ? 'bg-red-900/30 text-red-400 border border-red-800' : ($alert->severity === 'WARNING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-blue-900/30 text-blue-400 border border-blue-800') }}">
+                        {{ $alert->severity === 'CRITICAL' ? 'bg-red-900/30 text-red-400 border border-gray-700' : ($alert->severity === 'WARNING' ? 'bg-amber-900/30 text-amber-400 border border-amber-800' : 'bg-blue-900/30 text-blue-400 border border-gray-700') }}">
                         {{ $alert->severity }}
                     </span>
                     <span class="text-sm text-gray-200">{{ $alert->metric_name }}</span>
@@ -58,7 +58,7 @@
                     </td>
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                            {{ $job->last_status === 'COMPLETED' ? 'bg-green-900/30 text-green-400 border border-green-800' : ($job->last_status === 'FAILED' ? 'bg-red-900/30 text-red-400 border border-red-800' : 'bg-amber-900/30 text-amber-400 border border-amber-800') }}">
+                            {{ $job->last_status === 'COMPLETED' ? 'bg-green-900/30 text-green-400 border border-gray-700' : ($job->last_status === 'FAILED' ? 'bg-red-900/30 text-red-400 border border-gray-700' : 'bg-amber-900/30 text-amber-400 border border-amber-800') }}">
                             {{ $job->last_status ?? 'UNKNOWN' }}
                         </span>
                     </td>
@@ -93,7 +93,7 @@
                     </span>
                     <span class="text-xs text-gray-400">target {{ $latest->slo_target_pct }}%</span>
                     <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
-                        {{ $latest->is_compliant ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-red-900/30 text-red-400 border border-red-800' }}">
+                        {{ $latest->is_compliant ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-red-900/30 text-red-400 border border-gray-700' }}">
                         {{ $latest->is_compliant ? 'COMPLIANT' : 'BREACHED' }}
                     </span>
                 </div>

@@ -46,10 +46,10 @@
                     <td class="px-5 py-3">
                         <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium
                             {{ match($event->severity) {
-                                'CRITICAL' => 'bg-red-900/30 text-red-400 border border-red-800',
-                                'HIGH'     => 'bg-orange-900/30 text-orange-400 border border-orange-800',
+                                'CRITICAL' => 'bg-red-900/30 text-red-400 border border-gray-700',
+                                'HIGH'     => 'bg-orange-900/30 text-orange-400 border border-gray-700',
                                 'MEDIUM'   => 'bg-amber-900/30 text-amber-400 border border-amber-800',
-                                'LOW'      => 'bg-blue-900/30 text-blue-400 border border-blue-800',
+                                'LOW'      => 'bg-blue-900/30 text-blue-400 border border-gray-700',
                                 default    => 'bg-gray-700 text-gray-400'
                             } }}">{{ $event->severity }}</span>
                     </td>

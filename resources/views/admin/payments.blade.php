@@ -7,7 +7,7 @@
 
     {{-- Co-pay alert banner --}}
     @if($copay['failed'] > 0 || $copay['escalated'] > 0)
-    <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
         {{ $copay['failed'] }} co-pay payment(s) failed, {{ $copay['escalated'] }} escalated. Review required.
     </div>
     @endif
@@ -19,7 +19,7 @@
             <p class="text-3xl font-bold text-{{ $stats['pending'] > 0 ? 'amber-400' : 'white' }} mt-1">{{ $stats['pending'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Needs processing</p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-blue-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-gray-400">In Processing</p>
             <p class="text-3xl font-bold text-white mt-1">{{ $stats['processing'] }}</p>
         </div>
@@ -28,7 +28,7 @@
             <p class="text-3xl font-bold text-{{ $stats['manual_review'] > 0 ? 'red-400' : 'white' }} mt-1">{{ $stats['manual_review'] }}</p>
             <p class="text-xs text-gray-400 mt-1">Needs human action</p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Completed Today</p>
             <p class="text-3xl font-bold text-green-400 mt-1">{{ $stats['completed_today'] }}</p>
         </div>
@@ -42,7 +42,7 @@
                 <option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ str_replace('_', ' ', $s) }}</option>
             @endforeach
         </select>
-        <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-gray-900 font-medium rounded-lg text-sm hover:bg-yellow-500">Filter</button>
+        <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-white font-medium rounded-lg text-sm hover:bg-yellow-500">Filter</button>
         @if(request('status'))
             <a href="/admin/payments" class="px-4 py-2.5 border border-gray-600 text-gray-400 rounded-lg text-sm hover:bg-gray-900">Clear</a>
         @endif
@@ -77,10 +77,10 @@
                             @php
                                 $badge = match($pi->status) {
                                     'PENDING'       => 'bg-amber-900/30 text-amber-400 border border-amber-800',
-                                    'PROCESSING'    => 'bg-blue-900/30 text-blue-400 border border-blue-800',
-                                    'COMPLETED'     => 'bg-green-900/30 text-green-400 border border-green-800',
-                                    'FAILED'        => 'bg-red-900/30 text-red-400 border border-red-800',
-                                    'MANUAL_REVIEW' => 'bg-orange-900/30 text-orange-400 border border-orange-800',
+                                    'PROCESSING'    => 'bg-blue-900/30 text-blue-400 border border-gray-700',
+                                    'COMPLETED'     => 'bg-green-900/30 text-green-400 border border-gray-700',
+                                    'FAILED'        => 'bg-red-900/30 text-red-400 border border-gray-700',
+                                    'MANUAL_REVIEW' => 'bg-orange-900/30 text-orange-400 border border-gray-700',
                                     default         => 'bg-gray-700 text-gray-400',
                                 };
                             @endphp
@@ -150,9 +150,9 @@
                     <td class="px-5 py-3">
                         @php
                             $rpBadge = match($rp->status ?? '') {
-                                'PAID'    => 'bg-green-900/30 text-green-400 border border-green-800',
+                                'PAID'    => 'bg-green-900/30 text-green-400 border border-gray-700',
                                 'PENDING' => 'bg-amber-900/30 text-amber-400 border border-amber-800',
-                                'OVERDUE' => 'bg-red-900/30 text-red-400 border border-red-800',
+                                'OVERDUE' => 'bg-red-900/30 text-red-400 border border-gray-700',
                                 default   => 'bg-gray-700 text-gray-400',
                             };
                         @endphp
@@ -176,7 +176,7 @@
                 <dt class="text-gray-400">Environment</dt>
                 <dd>
                     @php $mpesaEnv = config('daraja.env', 'not set'); @endphp
-                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $mpesaEnv === 'production' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-amber-900/30 text-amber-400 border border-amber-800' }}">
+                    <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium {{ $mpesaEnv === 'production' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-amber-900/30 text-amber-400 border border-amber-800' }}">
                         {{ strtoupper($mpesaEnv) }}
                     </span>
                 </dd>

@@ -27,7 +27,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Visit reports are advisory. Findings are forwarded to Network Admin for review.
         They do not automatically affect facility status.
     </div>
@@ -106,7 +106,7 @@
                     </div>
 
                     <button type="submit"
-                            class="w-full px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                            class="w-full px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                         Submit Report
                     </button>
                 </form>

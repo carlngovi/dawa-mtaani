@@ -21,7 +21,7 @@
 
     {{-- PPB warning --}}
     @if($facility->ppb_licence_status !== 'VALID')
-        <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+        <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
             ⚠ Your PPB licence status is <strong>{{ $facility->ppb_licence_status }}</strong>.
             Contact your network administrator.
         </div>
@@ -55,7 +55,7 @@
 
     {{-- Quick actions --}}
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        <a href="/retail/catalogue" class="bg-yellow-400 hover:bg-yellow-500 text-gray-900 rounded-xl p-5 text-center transition-colors">
+        <a href="/retail/catalogue" class="bg-yellow-400 hover:bg-yellow-500 text-white rounded-xl p-5 text-center transition-colors">
             <p class="text-2xl mb-1">🛒</p>
             <p class="text-sm font-medium">Order Medicines</p>
         </a>

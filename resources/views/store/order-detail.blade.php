@@ -62,7 +62,7 @@
                 'READY'           => 'bg-green-900/30 text-green-400',
                 'COLLECTED'       => 'bg-green-900/30 text-green-400',
                 'CANCELLED'       => 'bg-red-900/30 text-red-400',
-                default           => 'bg-gray-100 text-gray-400',
+                default           => 'bg-gray-700/50 text-gray-400',
             };
         @endphp
         <span class="inline-flex px-3 py-1 rounded-full text-xs font-semibold {{ $statusBadge }}">
@@ -77,7 +77,7 @@
             'orderUlid' => $order->ulid,
         ])
     @else
-        <div class="bg-red-900/20 border border-red-800 text-red-300 text-sm px-4 py-3 rounded-lg">
+        <div class="bg-red-900/20 border border-gray-700 text-red-300 text-sm px-4 py-3 rounded-lg">
             This order was cancelled.
             @if($order->rejection_reason)
                 Reason: {{ $order->rejection_reason }}
@@ -87,7 +87,7 @@
 
     {{-- Collection details --}}
     @if(in_array($order->status, ['CONFIRMED', 'PREPARING', 'READY']))
-    <div class="bg-green-900/20 border border-green-800 rounded-xl p-5">
+    <div class="bg-green-900/20 border border-gray-700 rounded-xl p-5">
         <h3 class="text-sm font-semibold text-green-300 mb-2">
             @if($order->status === 'READY')
                 Ready for collection
@@ -188,7 +188,7 @@
     @if(in_array($order->status, ['COLLECTED', 'CANCELLED']))
     <div class="text-center">
         <a href="/store/{{ $order->facility_ulid }}"
-           class="inline-block px-6 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">
+           class="inline-block px-6 py-2.5 bg-yellow-400 text-white rounded-lg text-sm font-medium hover:bg-yellow-500 transition-colors">
             Order Again
         </a>
     </div>

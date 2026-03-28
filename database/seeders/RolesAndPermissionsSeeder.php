@@ -65,7 +65,7 @@ class RolesAndPermissionsSeeder extends Seeder
         Role::firstOrCreate(['name' => 'sales_rep', 'guard_name' => 'web'])
             ->syncPermissions(['view-all-facilities']);
 
-        Role::firstOrCreate(['name' => 'patient', 'guard_name' => 'web'])
+        Role::firstOrCreate(['name' => 'customer', 'guard_name' => 'web'])
             ->syncPermissions([]);
 
         Role::firstOrCreate(['name' => 'admin_support', 'guard_name' => 'web'])

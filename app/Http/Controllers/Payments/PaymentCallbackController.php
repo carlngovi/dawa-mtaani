@@ -66,35 +66,35 @@ class PaymentCallbackController extends Controller
         Log::info("MpesaCallback | {$checkoutId} | {$outcome}");
 
         // =================================================================
-        // 1. Update patient_orders (B2C orders)
+        // 1. Update customer_orders (B2C orders)
         // =================================================================
-        $patientOrder = null;
+        $customerOrder = null;
         if ($checkoutId) {
-            $patientOrder = DB::table('patient_orders')
+            $customerOrder = DB::table('customer_orders')
                 ->where('mpesa_checkout_request_id', $checkoutId)
                 ->first();
         }
-        if (! $patientOrder && $merchantRequestId) {
-            $patientOrder = DB::table('patient_orders')
+        if (! $customerOrder && $merchantRequestId) {
+            $customerOrder = DB::table('customer_orders')
                 ->where('mpesa_merchant_request_id', $merchantRequestId)
                 ->first();
         }
 
-        if ($patientOrder) {
+        if ($customerOrder) {
             if ($resultCode === 0 && $receipt) {
                 // Check for duplicate receipt
-                $duplicate = DB::table('patient_orders')
+                $duplicate = DB::table('customer_orders')
                     ->where('mpesa_receipt_number', $receipt)
-                    ->where('id', '!=', $patientOrder->id)
+                    ->where('id', '!=', $customerOrder->id)
                     ->exists();
-                
+
                 if ($duplicate) {
-                    Log::warning('Duplicate receipt detected for patient order', [
+                    Log::warning('Duplicate receipt detected for customer order', [
                         'receipt' => $receipt,
-                        'order_id' => $patientOrder->id
+                        'order_id' => $customerOrder->id
                     ]);
                 } else {
-                    DB::table('patient_orders')->where('id', $patientOrder->id)->update([
+                    DB::table('customer_orders')->where('id', $customerOrder->id)->update([
                         'status'                => 'CONFIRMED',
                         'mpesa_receipt_number'  => $receipt,
                         'paid_at'               => now(),
@@ -104,14 +104,14 @@ class PaymentCallbackController extends Controller
                         'mpesa_result_desc'     => $resultDesc,
                         'updated_at'            => now(),
                     ]);
-                    
-                    Log::info('Patient order confirmed', [
-                        'order_id' => $patientOrder->id,
+
+                    Log::info('Customer order confirmed', [
+                        'order_id' => $customerOrder->id,
                         'receipt' => $receipt
                     ]);
                 }
             } else {
-                DB::table('patient_orders')->where('id', $patientOrder->id)->update([
+                DB::table('customer_orders')->where('id', $customerOrder->id)->update([
                     'status'                 => 'PAYMENT_FAILED',
                     'rejection_reason'       => $failReason,
                     'payment_failure_reason' => $failReason,
@@ -120,9 +120,9 @@ class PaymentCallbackController extends Controller
                     'failed_at'              => now(),
                     'updated_at'             => now(),
                 ]);
-                
-                Log::warning('Patient order payment failed', [
-                    'order_id' => $patientOrder->id,
+
+                Log::warning('Customer order payment failed', [
+                    'order_id' => $customerOrder->id,
                     'reason' => $failReason,
                     'result_code' => $resultCode
                 ]);

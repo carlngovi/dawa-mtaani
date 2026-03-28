@@ -27,7 +27,7 @@
                 {{ $currency['symbol'] }} {{ number_format($summary->monthly_gross ?? 0, $currency['decimal_places']) }}
             </p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Net Total</p>
             <p class="text-3xl font-bold text-green-400 mt-1">
                 {{ $currency['symbol'] }} {{ number_format($summary->monthly_net ?? 0, $currency['decimal_places']) }}
@@ -46,7 +46,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
             Filter
         </button>
         @if(request('status'))

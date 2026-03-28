@@ -10,17 +10,17 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Str;
 
-class PatientDsarController extends Controller
+class CustomerDsarController extends Controller
 {
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'patient_phone' => 'required|string|max:20',
+            'customer_phone' => 'required|string|max:20',
             'otp'           => 'required|string',
             'request_type'  => 'required|in:ACCESS,EXPORT,DELETION',
         ]);
 
-        $phone = $validated['patient_phone'];
+        $phone = $validated['customer_phone'];
         $rateLimitKey = 'dsar:' . $phone;
 
         if (RateLimiter::tooManyAttempts($rateLimitKey, 3)) {
@@ -59,9 +59,9 @@ class PatientDsarController extends Controller
         $ulid = Str::ulid();
         $slaDeadline = Carbon::now('UTC')->addDays(30);
 
-        DB::table('patient_dsar_requests')->insert([
-            'ulid'               => $ulid,
-            'patient_phone_hash' => $phoneHash,
+        DB::table('customer_dsar_requests')->insert([
+            'ulid'                => $ulid,
+            'customer_phone_hash' => $phoneHash,
             'request_type'       => $validated['request_type'],
             'status'             => 'PENDING',
             'sla_deadline_at'    => $slaDeadline,
@@ -82,7 +82,7 @@ class PatientDsarController extends Controller
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
-        $requests = DB::table('patient_dsar_requests')
+        $requests = DB::table('customer_dsar_requests')
             ->orderBy('created_at', 'desc')
             ->paginate(30);
 
@@ -95,7 +95,7 @@ class PatientDsarController extends Controller
             return response()->json(['message' => 'Forbidden.'], 403);
         }
 
-        $dsarRequest = DB::table('patient_dsar_requests')
+        $dsarRequest = DB::table('customer_dsar_requests')
             ->where('ulid', $ulid)
             ->where('status', 'PENDING')
             ->first();
@@ -104,7 +104,7 @@ class PatientDsarController extends Controller
             return response()->json(['message' => 'Request not found or not pending.'], 404);
         }
 
-        DB::table('patient_dsar_requests')
+        DB::table('customer_dsar_requests')
             ->where('ulid', $ulid)
             ->update([
                 'status'      => 'APPROVED',

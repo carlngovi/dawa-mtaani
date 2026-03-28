@@ -8,7 +8,7 @@
             <option value="">All</option>
             @foreach(['open','overdue','completed'] as $s)<option value="{{ $s }}" {{ request('status') === $s ? 'selected' : '' }}>{{ ucfirst($s) }}</option>@endforeach
         </select>
-        <button class="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-lg text-sm">Filter</button>
+        <button class="bg-yellow-400 text-white font-bold px-4 py-2 rounded-lg text-sm">Filter</button>
     </form>
     <div class="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
         <table class="w-full text-sm">

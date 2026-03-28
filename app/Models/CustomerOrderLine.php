@@ -4,10 +4,10 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
-class PatientOrderLine extends Model
+class CustomerOrderLine extends Model
 {
     protected $fillable = [
-        'patient_order_id', 'product_id', 'quantity',
+        'customer_order_id', 'product_id', 'quantity',
         'unit_price', 'line_discount', 'line_total',
     ];
 
@@ -19,7 +19,7 @@ class PatientOrderLine extends Model
 
     public function order()
     {
-        return $this->belongsTo(PatientOrder::class, 'patient_order_id');
+        return $this->belongsTo(CustomerOrder::class, 'customer_order_id');
     }
 
     public function product()

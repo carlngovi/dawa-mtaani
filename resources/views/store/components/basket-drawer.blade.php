@@ -1,7 +1,7 @@
 {{-- Basket Drawer — slide-out panel --}}
 <div x-data="{ open: false }" x-cloak>
     {{-- Toggle button --}}
-    <button @click="open = true" class="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-yellow-400 px-5 py-3 text-gray-900 shadow-lg hover:bg-yellow-500 transition">
+    <button @click="open = true" class="fixed bottom-6 right-6 z-40 flex items-center gap-2 rounded-full bg-yellow-400 px-5 py-3 text-white shadow-lg hover:bg-yellow-500 transition">
         <svg class="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 100 4 2 2 0 000-4z"/></svg>
         Basket (<span x-text="basketCount">0</span>)
     </button>
@@ -56,7 +56,7 @@
                 <span class="text-gray-300">Subtotal</span>
                 <span class="text-white font-mono" x-text="subtotal"></span>
             </div>
-            <button @click="checkout" class="w-full rounded-xl bg-yellow-400 py-3 text-center font-semibold text-gray-900 hover:bg-yellow-500 transition-colors">
+            <button @click="checkout" class="w-full rounded-xl bg-yellow-400 py-3 text-center font-semibold text-white hover:bg-yellow-500 transition-colors">
                 Proceed to Checkout
             </button>
         </div>

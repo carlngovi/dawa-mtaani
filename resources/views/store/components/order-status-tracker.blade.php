@@ -31,8 +31,8 @@
                 {{-- Circle --}}
                 <div @class([
                     'flex h-10 w-10 items-center justify-center rounded-full text-sm font-bold transition',
-                    'bg-yellow-400 text-gray-900' => $isActive,
-                    'bg-gray-200 text-gray-400' => ! $isActive,
+                    'bg-yellow-400 text-white' => $isActive,
+                    'bg-gray-700/50 text-gray-400' => ! $isActive,
                     'ring-4 ring-yellow-200' => $isCurrent,
                 ])>
                     {{ $idx + 1 }}
@@ -49,7 +49,7 @@
                 <div @class([
                     'h-1 flex-1 -mt-6 mx-1 rounded',
                     'bg-yellow-400' => $idx < $currentIdx,
-                    'bg-gray-200'   => $idx >= $currentIdx,
+                    'bg-gray-700/50'   => $idx >= $currentIdx,
                 ])></div>
             @endif
         @endforeach
@@ -57,7 +57,7 @@
 
     {{-- QR Code when READY --}}
     @if ($status === 'READY')
-        <div class="mt-8 flex flex-col items-center gap-3 rounded-lg border-2 border-dashed border-green-300 bg-green-900/20 p-6">
+        <div class="mt-8 flex flex-col items-center gap-3 rounded-lg border-2 border-dashed border-gray-700 bg-green-900/20 p-6">
             <p class="text-sm font-medium text-green-300">Show this QR code at the pharmacy to collect your order</p>
             <div class="rounded-lg bg-gray-800 p-3 shadow">
                 {!! QrCode::size(180)->generate(route('api.store.order.status', $orderUlid)) !!}

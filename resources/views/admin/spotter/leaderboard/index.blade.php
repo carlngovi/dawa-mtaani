@@ -15,7 +15,7 @@
     <div class="flex gap-2">
         @foreach(['week' => 'This Week', 'month' => 'This Month', 'programme' => 'Programme to Date'] as $key => $label)
             <a href="{{ route('admin.spotter.leaderboard.index', ['period' => $key]) }}"
-               class="px-4 py-2 rounded-full text-sm font-medium transition-all {{ $period === $key ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:border-gray-600' }}">
+               class="px-4 py-2 rounded-full text-sm font-medium transition-all {{ $period === $key ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400 hover:border-gray-600' }}">
                 {{ $label }}
             </a>
         @endforeach

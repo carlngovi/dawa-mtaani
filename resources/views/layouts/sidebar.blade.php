@@ -15,7 +15,7 @@
     $isAssistant  = $user && $user->hasRole('assistant_admin');
     $isSuperAdmin = $user && $user->hasRole('super_admin');
     $isTechAdmin  = $user && $user->hasRole('technical_admin');
-    $isPatient    = $user && $user->hasRole('patient');
+    $isCustomer   = $user && $user->hasRole('customer');
 
     $logoHref = $isTechAdmin   ? '/tech/diagnostics'
               : ($isSuperAdmin ? '/super/settings'
@@ -29,7 +29,7 @@
               : ($isCountyCoord ? '/county'
               : ($isSalesRep   ? '/sales'
               : ($isGroupOwner ? '/group/dashboard'
-              : ($isPatient    ? '/store'
+              : ($isCustomer   ? '/store'
               : '/retail/dashboard'))))))))))));
 @endphp
 
@@ -64,7 +64,7 @@
          :class="($store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen) ? 'border-b border-gray-800 px-3 justify-start' : 'border-b border-transparent justify-center px-0'">
         <a href="{{ $logoHref }}" class="flex items-center gap-3">
             <div class="h-9 w-9 rounded-lg bg-yellow-400 flex items-center justify-center flex-shrink-0">
-                <span class="text-gray-900 font-bold text-sm tracking-tight">DM</span>
+                <span class="text-white font-bold text-sm tracking-tight">DM</span>
             </div>
             <div x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
                  x-transition:enter="transition-opacity duration-200"
@@ -138,8 +138,8 @@
                     @include('layouts.sidebar-sections.admin')
                 @endif
 
-                @if($isPatient)
-                    @include('layouts.sidebar-sections.patient')
+                @if($isCustomer)
+                    @include('layouts.sidebar-sections.customer')
                 @endif
 
             </ul>
@@ -154,7 +154,7 @@
         <div x-show="$store.sidebar.isExpanded || $store.sidebar.isHovered || $store.sidebar.isMobileOpen"
              class="flex items-center gap-3 px-3 pt-3 pb-2">
             <div class="h-8 w-8 rounded-full bg-yellow-400 flex items-center justify-center flex-shrink-0">
-                <span class="text-gray-900 font-bold text-xs">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
+                <span class="text-white font-bold text-xs">{{ strtoupper(substr(auth()->user()->name ?? 'U', 0, 1)) }}</span>
             </div>
             <div class="min-w-0 flex-1">
                 <p class="text-white text-sm font-medium truncate">{{ auth()->user()->name ?? '' }}</p>

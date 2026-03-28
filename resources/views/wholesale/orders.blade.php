@@ -5,7 +5,7 @@
      x-data="{ selected: [], selectAll(ids) { this.selected = ids }, clearAll() { this.selected = [] }, toggle(id) { this.selected.includes(id) ? this.selected = this.selected.filter(x => x !== id) : this.selected.push(id) } }">
 
     @if(session('success'))
-    <div class="bg-green-900/20 border border-green-800 text-green-300 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
+    <div class="bg-green-900/20 border border-gray-700 text-green-300 text-sm px-4 py-3 rounded-lg">{{ session('success') }}</div>
     @endif
 
     <div class="flex items-center justify-between">
@@ -54,7 +54,7 @@
         <input type="text" name="search" value="{{ request('search') }}"
                placeholder="Order ref or pharmacy name..."
                class="px-3 py-2.5 bg-gray-800 border border-gray-600 text-white rounded-lg text-sm w-64 focus:outline-none focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400">
-        <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-gray-900 font-medium rounded-lg text-sm hover:bg-yellow-500">Filter</button>
+        <button type="submit" class="px-4 py-2.5 bg-yellow-400 text-white font-medium rounded-lg text-sm hover:bg-yellow-500">Filter</button>
         @if(request()->hasAny(['status','search']))
             <a href="/wholesale/orders" class="px-4 py-2.5 border border-gray-600 text-gray-400 rounded-lg text-sm hover:bg-gray-900">Clear</a>
         @endif
@@ -137,12 +137,12 @@
                                 @if($order->status === 'PENDING')
                                 <form method="POST" action="/wholesale/orders/{{ $order->ulid }}/confirm" class="inline">
                                     @csrf
-                                    <button class="px-2.5 py-1 bg-yellow-400 text-gray-900 rounded text-xs hover:bg-yellow-500">Confirm</button>
+                                    <button class="px-2.5 py-1 bg-yellow-400 text-white rounded text-xs hover:bg-yellow-500">Confirm</button>
                                 </form>
                                 @elseif($order->status === 'CONFIRMED')
                                 <form method="POST" action="/wholesale/orders/{{ $order->ulid }}/pack" class="inline">
                                     @csrf
-                                    <button class="px-2.5 py-1 bg-yellow-400 text-gray-900 rounded text-xs hover:bg-yellow-500">Pack</button>
+                                    <button class="px-2.5 py-1 bg-yellow-400 text-white rounded text-xs hover:bg-yellow-500">Pack</button>
                                 </form>
                                 @elseif($order->status === 'PACKED')
                                 <form method="POST" action="/wholesale/orders/{{ $order->ulid }}/dispatch" class="inline">

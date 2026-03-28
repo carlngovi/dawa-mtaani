@@ -67,11 +67,11 @@
                             <p class="text-gray-400 text-xs">{{ $p->brand_name ?? '' }} @if($p->sku_code) · {{ $p->sku_code }} @endif</p>
                             <p class="text-yellow-400 text-xs font-mono">{{ $currency['symbol'] }} {{ number_format($p->unit_price, $currency['decimal_places']) }} / {{ $p->unit_size }}</p>
                         </div>
-                        <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $p->stock_status === 'IN_STOCK' ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' }}">
+                        <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium {{ $p->stock_status === 'IN_STOCK' ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' }}">
                             {{ str_replace('_', ' ', $p->stock_status) }}
                         </span>
                         <button onclick="addProduct({{ $p->id }}, {{ $p->price_list_id }}, '{{ addslashes($p->generic_name) }}', {{ $p->unit_price }}, event)"
-                                class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-xs font-medium rounded-lg transition-colors flex-shrink-0">
+                                class="px-3 py-1.5 bg-yellow-400 hover:bg-yellow-500 text-white text-xs font-medium rounded-lg transition-colors flex-shrink-0">
                             + Add
                         </button>
                     </div>
@@ -98,11 +98,11 @@
                 </div>
 
                 <button @click="checkout()" :disabled="items.length === 0 || !phone || placing"
-                        class="w-full py-3.5 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 font-semibold rounded-xl transition-colors text-sm">
+                        class="w-full py-3.5 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold rounded-xl transition-colors text-sm">
                     <span x-show="!placing">Pay via M-Pesa</span>
                     <span x-show="placing">Placing order...</span>
                 </button>
-                <div x-show="error" class="rounded-lg bg-red-900/20 border border-red-800 px-3 py-2 text-xs text-red-300" x-text="error"></div>
+                <div x-show="error" class="rounded-lg bg-red-900/20 border border-gray-700 px-3 py-2 text-xs text-red-300" x-text="error"></div>
                 <p class="text-xs text-gray-500 text-center">An STK push will be sent after clicking Pay</p>
             </div>
         </div>

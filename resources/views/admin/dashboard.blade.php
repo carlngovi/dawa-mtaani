@@ -24,7 +24,7 @@
         <div class="space-y-2">
             @foreach($activeAlerts as $alert)
                 <div class="flex items-center justify-between px-4 py-3 rounded-lg border text-sm
-                    {{ $alert->severity === 'CRITICAL' ? 'bg-red-900/20 border-red-800 text-red-300' : 'bg-amber-900/20 border-amber-800 text-amber-300' }}">
+                    {{ $alert->severity === 'CRITICAL' ? 'bg-red-900/20 border-gray-700 text-red-300' : 'bg-amber-900/20 border-amber-800 text-amber-300' }}">
                     <span><strong>{{ $alert->severity }}</strong> — {{ $alert->metric_name }}
                         (expected {{ number_format($alert->expected_value, 0) }},
                         got {{ number_format($alert->actual_value, 0) }})
@@ -120,9 +120,9 @@
                             <td class="px-5 py-3">
                                 <span class="inline-flex px-2 py-0.5 rounded-full text-xs font-medium
                                     {{ match($order->status) {
-                                        'DELIVERED' => 'bg-green-900/30 text-green-400 border border-green-800',
-                                        'CANCELLED' => 'bg-red-900/30 text-red-400 border border-red-800',
-                                        'DISPATCHED' => 'bg-blue-900/30 text-blue-400 border border-blue-800',
+                                        'DELIVERED' => 'bg-green-900/30 text-green-400 border border-gray-700',
+                                        'CANCELLED' => 'bg-red-900/30 text-red-400 border border-gray-700',
+                                        'DISPATCHED' => 'bg-blue-900/30 text-blue-400 border border-gray-700',
                                         'PENDING' => 'bg-amber-900/30 text-amber-400 border border-amber-800',
                                         default => 'bg-gray-700 text-gray-400'
                                     } }}">
@@ -150,7 +150,7 @@
 
     {{-- Warnings row --}}
     @if($gpsPendingCount > 0)
-        <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+        <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
             {{ $gpsPendingCount }} active {{ Str::plural('facility', $gpsPendingCount) }} have no GPS coordinates.
             <a href="/admin/facilities?gps_pending=1" class="underline ml-1">View GPS pending</a>
         </div>
@@ -169,7 +169,7 @@
                     Stale — upload needed
                 </span>
             @else
-                <span class="inline-flex mt-2 px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400 border border-green-800">
+                <span class="inline-flex mt-2 px-2 py-0.5 rounded text-xs font-medium bg-green-900/30 text-green-400 border border-gray-700">
                     Up to date
                 </span>
             @endif

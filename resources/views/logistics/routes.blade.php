@@ -38,7 +38,7 @@
 
         @if($orders->isEmpty())
         <div class="px-5 py-12 text-center">
-            <svg class="w-10 h-10 text-gray-600 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-10 h-10 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 13l4 4L19 7"/>
             </svg>
             <p class="text-sm font-medium text-gray-400">All packed orders have been dispatched</p>
@@ -61,7 +61,7 @@
                     <div class="flex items-center justify-between text-xs">
                         <span class="text-gray-300 font-mono">{{ strtoupper(substr($order->ulid, -8)) }}</span>
                         <span class="text-gray-400">{{ $order->facility_name }}</span>
-                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $order->status === 'DISPATCHED' ? 'bg-blue-900/30 text-blue-400 border border-blue-800' : 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' }}">
+                        <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium {{ $order->status === 'DISPATCHED' ? 'bg-blue-900/30 text-blue-400 border border-gray-700' : 'bg-yellow-900/30 text-yellow-400 border border-yellow-800' }}">
                             {{ $order->status }}
                         </span>
                     </div>

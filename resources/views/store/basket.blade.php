@@ -1,7 +1,7 @@
 @extends('layouts.app')
 @section('title', 'My Cart — Dawa Mtaani')
 @section('content')
-<div class="max-w-2xl mx-auto space-y-6" x-data="patientBasket()" x-init="init()">
+<div class="max-w-2xl mx-auto space-y-6" x-data="customerBasket()" x-init="init()">
 
     {{-- Header --}}
     <div class="flex items-center justify-between">
@@ -20,7 +20,7 @@
             <p class="text-white font-medium">Your cart is empty</p>
             <p class="text-gray-500 text-sm">Browse medicines and add items to get started</p>
             <a href="/store"
-               class="inline-block px-6 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-xl transition-colors">
+               class="inline-block px-6 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-semibold rounded-xl transition-colors">
                 Browse Medicines →
             </a>
         </div>
@@ -109,15 +109,15 @@
                     <p class="text-xs text-gray-500 mt-1.5">You'll receive an M-Pesa prompt. Enter your PIN to complete payment.</p>
                 </div>
 
-                <div x-show="error" x-transition class="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3 text-sm text-red-300" x-text="error"></div>
+                <div x-show="error" x-transition class="rounded-lg bg-red-900/20 border border-gray-700 px-4 py-3 text-sm text-red-300" x-text="error"></div>
 
                 <button @click="checkout()" :disabled="placing"
-                        class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 font-bold text-base rounded-xl transition-colors">
+                        class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base rounded-xl transition-colors">
                     <span x-show="!placing" x-text="'Pay {{ $currency['symbol'] }} ' + total.toFixed({{ $currency['decimal_places'] }}) + ' via M-Pesa'"></span>
                     <span x-show="placing">Sending M-Pesa prompt...</span>
                 </button>
 
-                <div class="rounded-lg bg-blue-900/20 border border-blue-800 px-4 py-3 text-xs text-blue-300">
+                <div class="rounded-lg bg-blue-900/20 border border-gray-700 px-4 py-3 text-xs text-blue-300">
                     An STK push will be sent to your phone. Check your phone and enter your M-Pesa PIN to complete payment.
                 </div>
             </div>
@@ -128,14 +128,14 @@
 </div>
 
 <script>
-function patientBasket() {
+function customerBasket() {
     return {
         items: [], count: 0, total: 0,
         firstName: '', lastName: '', email: '',
         deliveryAddress: '', deliveryInstructions: '',
         deliveryLat: '', deliveryLng: '', deliveryPlaceId: '',
         phone: '', placing: false, error: null,
-        KEY: 'dm_patient_cart',
+        KEY: 'dm_customer_cart',
 
         init() {
             this.load();

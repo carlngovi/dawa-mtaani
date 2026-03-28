@@ -26,11 +26,11 @@
                 @php
                     $isCurrent = $val === $current;
                     if ($isCurrent) $reached = true;
-                    $color = $isCurrent ? 'bg-yellow-400 text-gray-900' : ($reached ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-gray-300');
+                    $color = $isCurrent ? 'bg-yellow-400 text-white' : ($reached ? 'bg-gray-700 text-gray-500' : 'bg-gray-700 text-gray-300');
                 @endphp
                 <span class="px-3 py-1 rounded text-xs font-medium whitespace-nowrap {{ $color }}">{{ $label }}</span>
                 @if(!$loop->last)
-                    <span class="text-gray-600">&rarr;</span>
+                    <span class="text-gray-300">&rarr;</span>
                 @endif
             @endforeach
         </div>

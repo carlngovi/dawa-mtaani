@@ -63,8 +63,8 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/dpa/export-requests/{ulid}/download', [\App\Http\Controllers\Api\V1\DataExportController::class, 'download']);
 });
 
-// Patient DSAR — no auth (OTP verified inside controller)
-Route::post('/dpa/patient-dsar', [\App\Http\Controllers\Api\V1\PatientDsarController::class, 'store']);
+// Customer DSAR — no auth (OTP verified inside controller)
+Route::post('/dpa/customer-dsar', [\App\Http\Controllers\Api\V1\CustomerDsarController::class, 'store']);
 
 // Admin routes — network_admin only
 Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
@@ -76,8 +76,8 @@ Route::middleware(['auth:sanctum', 'role:network_admin'])->group(function () {
     Route::patch('/admin/dpa/deletion-requests/{ulid}/reject', [\App\Http\Controllers\Api\V1\DeletionRequestController::class, 'reject']);
     Route::get('/admin/dpa/export-requests', [\App\Http\Controllers\Api\V1\DataExportController::class, 'index']);
     Route::patch('/admin/dpa/export-requests/{ulid}/approve', [\App\Http\Controllers\Api\V1\DataExportController::class, 'approve']);
-    Route::get('/admin/dpa/patient-dsar', [\App\Http\Controllers\Api\V1\PatientDsarController::class, 'index']);
-    Route::patch('/admin/dpa/patient-dsar/{ulid}/approve', [\App\Http\Controllers\Api\V1\PatientDsarController::class, 'approve']);
+    Route::get('/admin/dpa/customer-dsar', [\App\Http\Controllers\Api\V1\CustomerDsarController::class, 'index']);
+    Route::patch('/admin/dpa/customer-dsar/{ulid}/approve', [\App\Http\Controllers\Api\V1\CustomerDsarController::class, 'approve']);
 });
 
 // -------------------------------------------------------

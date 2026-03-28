@@ -11,7 +11,7 @@
   </div>
 
   @if(session('success'))
-    <div class="rounded-lg bg-green-900/20 border border-green-800 px-4 py-3 text-sm text-green-400">{{ session('success') }}</div>
+    <div class="rounded-lg bg-green-900/20 border border-gray-700 px-4 py-3 text-sm text-green-400">{{ session('success') }}</div>
   @endif
 
   <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -47,7 +47,7 @@
         <div><label class="block text-xs text-gray-400 mb-1">Product restriction (SKUs, comma-separated)</label><input type="text" name="product_restriction_scope" placeholder="blank = unrestricted" class="w-full text-sm rounded-lg border border-gray-600 bg-gray-800 px-3 py-2"></div>
         <div class="sm:col-span-2 flex items-center gap-4">
           <label class="flex items-center gap-2 text-sm text-gray-300"><input type="checkbox" name="is_fixed" value="1"> Fixed (non-progressive)</label>
-          <button type="submit" class="ml-auto px-4 py-2 bg-yellow-400 text-gray-900 text-sm rounded-lg hover:bg-yellow-500">Create tranche</button>
+          <button type="submit" class="ml-auto px-4 py-2 bg-yellow-400 text-white text-sm rounded-lg hover:bg-yellow-500">Create tranche</button>
         </div>
       </form>
     </div>
@@ -60,7 +60,7 @@
           <div>
             <div class="flex items-center gap-2 flex-wrap">
               <span class="font-medium text-white">{{ $tranche->name }}</span>
-              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs {{ $tranche->is_active ? 'bg-green-900/30 text-green-400 border border-green-800' : 'bg-gray-700 text-gray-400' }}">{{ $tranche->is_active ? 'Active' : 'Inactive' }}</span>
+              <span class="inline-flex items-center px-2 py-0.5 rounded-full text-xs {{ $tranche->is_active ? 'bg-green-900/30 text-green-400 border border-gray-700' : 'bg-gray-700 text-gray-400' }}">{{ $tranche->is_active ? 'Active' : 'Inactive' }}</span>
               <span class="text-xs text-gray-400">{{ $tranche->approval_pathway }}</span>
               @if($tranche->is_fixed)<span class="text-xs text-purple-600">Fixed</span>@endif
             </div>
@@ -89,7 +89,7 @@
             <input type="text" name="party_name" placeholder="Party name" required class="sm:col-span-2 text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
             <input type="text" name="party_type" placeholder="Type" required class="text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
             <input type="number" step="0.01" name="risk_percentage" placeholder="Risk %" required min="0" max="100" class="text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
-            <div class="flex gap-1"><input type="number" step="0.01" name="return_percentage" placeholder="Return %" required min="0" max="100" class="flex-1 text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"><button type="submit" class="px-2 py-1.5 bg-yellow-400 text-gray-900 text-xs rounded hover:bg-yellow-500">Add</button></div>
+            <div class="flex gap-1"><input type="number" step="0.01" name="return_percentage" placeholder="Return %" required min="0" max="100" class="flex-1 text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"><button type="submit" class="px-2 py-1.5 bg-yellow-400 text-white text-xs rounded hover:bg-yellow-500">Add</button></div>
           </form>
         </div>
 
@@ -114,7 +114,7 @@
             <input type="text" name="name" placeholder="Tier name" required class="text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
             <input type="text" name="product_scope_description" placeholder="Scope (e.g. All products)" required class="text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
             <input type="number" step="0.01" name="unlock_threshold_pct" placeholder="Unlock at %" required min="0" max="100" class="text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5">
-            <div class="flex gap-1"><input type="number" step="0.01" name="allocation_pct" placeholder="Alloc %" required min="0" max="100" class="flex-1 text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"><label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" name="approval_required" value="1"> Approval</label><button type="submit" class="px-2 py-1.5 bg-yellow-400 text-gray-900 text-xs rounded hover:bg-yellow-500">Add</button></div>
+            <div class="flex gap-1"><input type="number" step="0.01" name="allocation_pct" placeholder="Alloc %" required min="0" max="100" class="flex-1 text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"><label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" name="approval_required" value="1"> Approval</label><button type="submit" class="px-2 py-1.5 bg-yellow-400 text-white text-xs rounded hover:bg-yellow-500">Add</button></div>
           </form>
         </div>
       </div>
@@ -133,7 +133,7 @@
     <div class="divide-y divide-gray-700">
       @forelse($progressionRules as $rule)
       <div class="px-5 py-3 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 text-sm">
-        <div><span class="font-medium text-white">{{ $rule->label }}</span><span class="ml-3 text-gray-400">≤ {{ $rule->max_days_to_qualify }} days</span><span class="ml-3 text-green-400">+{{ $rule->progression_rate_pct }}%</span>@if($rule->is_suspension_trigger)<span class="ml-3 inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-900/30 text-red-400 border border-red-800">Suspension trigger</span>@endif</div>
+        <div><span class="font-medium text-white">{{ $rule->label }}</span><span class="ml-3 text-gray-400">≤ {{ $rule->max_days_to_qualify }} days</span><span class="ml-3 text-green-400">+{{ $rule->progression_rate_pct }}%</span>@if($rule->is_suspension_trigger)<span class="ml-3 inline-flex items-center px-2 py-0.5 rounded text-xs bg-red-900/30 text-red-400 border border-gray-700">Suspension trigger</span>@endif</div>
         <span class="text-xs text-gray-400">Order {{ $rule->sort_order }}</span>
       </div>
       @empty<div class="px-5 py-6 text-center text-sm text-gray-400">No rules defined.</div>@endforelse
@@ -144,7 +144,7 @@
         <div><label class="block text-xs text-gray-400 mb-1">Max days</label><input type="number" name="max_days_to_qualify" required min="1" class="w-full text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"></div>
         <div><label class="block text-xs text-gray-400 mb-1">Rate %</label><input type="number" step="0.01" name="progression_rate_pct" required min="0" max="100" class="w-full text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"></div>
         <div><label class="block text-xs text-gray-400 mb-1">Sort</label><input type="number" name="sort_order" value="0" class="w-full text-xs rounded border border-gray-600 bg-gray-800 px-2 py-1.5"></div>
-        <div class="flex items-center gap-2"><label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" name="is_suspension_trigger" value="1"> Suspension</label><button type="submit" class="px-3 py-1.5 bg-yellow-400 text-gray-900 text-xs rounded hover:bg-yellow-500">Add</button></div>
+        <div class="flex items-center gap-2"><label class="flex items-center gap-1 text-xs text-gray-400"><input type="checkbox" name="is_suspension_trigger" value="1"> Suspension</label><button type="submit" class="px-3 py-1.5 bg-yellow-400 text-white text-xs rounded hover:bg-yellow-500">Add</button></div>
       </form>
     </div>
   </div>

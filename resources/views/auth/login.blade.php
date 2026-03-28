@@ -140,7 +140,7 @@
                                required
                                autocomplete="email"
                                placeholder="you@example.com"
-                               class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('email') border-red-400 @enderror"/>
+                               class="h-11 w-full rounded-lg border border-gray-600 bg-transparent px-4 py-2.5 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('email') border-gray-700 @enderror"/>
                     </div>
 
                     {{-- Password with show/hide toggle --}}
@@ -156,7 +156,7 @@
                                    required
                                    autocomplete="current-password"
                                    placeholder="Enter your password"
-                                   class="h-11 w-full rounded-lg border border-gray-600 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('password') border-red-400 @enderror"/>
+                                   class="h-11 w-full rounded-lg border border-gray-600 bg-transparent py-2.5 pl-4 pr-11 text-sm text-gray-200 placeholder:text-gray-400 focus:border-yellow-400 focus:outline-none focus:ring-2 focus:ring-yellow-400/20 @error('password') border-gray-700 @enderror"/>
                             <button type="button"
                                     @click="showPassword = !showPassword"
                                     class="absolute top-1/2 right-3 -translate-y-1/2 text-gray-400 hover:text-gray-400">
@@ -201,8 +201,8 @@
                     {{-- Submit --}}
                     <button type="submit"
                             :disabled="loading"
-                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-gray-900 hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors disabled:opacity-70">
-                        <svg x-show="loading" class="animate-spin h-4 w-4 text-gray-900" fill="none" viewBox="0 0 24 24" style="display:none;">
+                            class="flex w-full items-center justify-center gap-2 rounded-lg bg-yellow-400 px-4 py-3 text-sm font-bold text-white hover:bg-yellow-500 focus:outline-none focus:ring-2 focus:ring-yellow-400 focus:ring-offset-2 transition-colors disabled:opacity-70">
+                        <svg x-show="loading" class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24" style="display:none;">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
                             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8z"/>
                         </svg>
@@ -235,7 +235,7 @@
                         <p class="text-xs text-gray-400 mt-0.5">For pharmacy owners &amp; operators</p>
                     </div>
                     <a href="{{ route('register.facility') }}"
-                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-lg transition-colors">
+                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-semibold rounded-lg transition-colors">
                         Get Started
                     </a>
                 </div>
@@ -249,8 +249,8 @@
                         <p class="font-bold text-sm text-white">I'm a Customer</p>
                         <p class="text-xs text-gray-400 mt-0.5">Order medicines from nearby pharmacies</p>
                     </div>
-                    <a href="{{ route('register.patient') }}"
-                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-lg transition-colors">
+                    <a href="{{ route('register.customer') }}"
+                       class="w-full py-2 mt-auto bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-semibold rounded-lg transition-colors">
                         Get Started
                     </a>
                 </div>
@@ -282,7 +282,7 @@
         <div class="relative z-10 flex flex-col items-center text-center px-12 max-w-sm">
 
             <div class="h-20 w-20 rounded-2xl bg-yellow-400 flex items-center justify-center mb-6 shadow-2xl">
-                <span class="text-gray-900 font-bold text-3xl tracking-tight">DM</span>
+                <span class="text-white font-bold text-3xl tracking-tight">DM</span>
             </div>
 
             <h2 class="text-3xl font-bold mb-1">
@@ -300,8 +300,8 @@
 {{-- Dark mode toggle --}}
 <div class="fixed right-6 bottom-6 z-50" x-data>
     <button @click.prevent="$store.theme.toggle()"
-            class="bg-yellow-400 hover:bg-yellow-500 inline-flex h-12 w-12 items-center justify-center rounded-full text-gray-900 shadow-lg transition-colors">
-        <svg class="hidden dark:block w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            class="bg-yellow-400 hover:bg-yellow-500 inline-flex h-12 w-12 items-center justify-center rounded-full text-white shadow-lg transition-colors">
+        <svg class="hidden w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707M17.657 17.657l-.707-.707M6.343 6.343l-.707-.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"/>
         </svg>
         <svg class="dark:hidden w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">

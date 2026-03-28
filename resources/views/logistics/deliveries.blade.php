@@ -114,7 +114,7 @@
             @endforeach
         </select>
         <button type="submit"
-                class="px-4 py-2.5 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+                class="px-4 py-2.5 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
             Filter
         </button>
         @if(request()->hasAny(['county', 'status']))
@@ -154,7 +154,7 @@
                             @endif
                         </td>
                         <td class="px-5 py-3">
-                            <p class="font-medium text-gray-200">{{ $delivery->patient_name ?? $delivery->facility_name }}</p>
+                            <p class="font-medium text-gray-200">{{ $delivery->customer_name ?? $delivery->facility_name }}</p>
                             @if($delivery->ward)
                                 <p class="text-xs text-gray-500 mt-0.5">{{ $delivery->ward }}</p>
                             @endif
@@ -191,7 +191,7 @@
                                     GPS
                                 </a>
                             @else
-                                <span class="text-gray-600 text-[10px]">No GPS</span>
+                                <span class="text-gray-300 text-[10px]">No GPS</span>
                             @endif
                         </td>
                     </tr>
@@ -243,7 +243,7 @@
                 </div>
                 <div class="flex gap-3">
                     <button type="submit"
-                            class="flex-1 px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500">
+                            class="flex-1 px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500">
                         Confirm Delivery
                     </button>
                     <button type="button" @click="confirmOpen = false"

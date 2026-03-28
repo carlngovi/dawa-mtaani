@@ -20,7 +20,7 @@
             <p class="text-white font-medium">Your basket is empty</p>
             <p class="text-gray-500 text-sm">Add medicines from the catalogue to place a B2B order</p>
             <a href="/retail/catalogue"
-               class="inline-block px-6 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-gray-900 text-sm font-semibold rounded-xl transition-colors">
+               class="inline-block px-6 py-2.5 bg-yellow-400 hover:bg-yellow-500 text-white text-sm font-semibold rounded-xl transition-colors">
                 Browse Catalogue →
             </a>
         </div>
@@ -105,7 +105,7 @@
 
                 @if($isNetworkMember && $creditAvailable > 0)
                 <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
-                       :class="paymentType === 'CREDIT' ? 'border-yellow-400 bg-yellow-400/5' : 'border-gray-600 hover:border-gray-500'">
+                       :class="paymentType === 'CREDIT' ? 'border-yellow-400 bg-yellow-400/5' : 'border-gray-600 hover:border-gray-700'">
                     <input type="radio" value="CREDIT" x-model="paymentType" class="mt-0.5 accent-yellow-400">
                     <div>
                         <p class="text-white text-sm font-medium">Credit Facility</p>
@@ -115,7 +115,7 @@
                 @endif
 
                 <label class="flex items-start gap-3 p-3 rounded-lg border cursor-pointer transition-colors"
-                       :class="paymentType === 'CASH' ? 'border-yellow-400 bg-yellow-400/5' : 'border-gray-600 hover:border-gray-500'">
+                       :class="paymentType === 'CASH' ? 'border-yellow-400 bg-yellow-400/5' : 'border-gray-600 hover:border-gray-700'">
                     <input type="radio" value="CASH" x-model="paymentType" class="mt-0.5 accent-yellow-400">
                     <div class="flex-1">
                         <p class="text-white text-sm font-medium">M-Pesa STK Push</p>
@@ -134,10 +134,10 @@
                               class="w-full bg-gray-900 border border-gray-600 text-white rounded-lg px-3 py-2.5 text-sm placeholder-gray-500 focus:ring-1 focus:ring-yellow-400 focus:border-yellow-400 outline-none resize-none"></textarea>
                 </div>
 
-                <div x-show="error" x-transition class="rounded-lg bg-red-900/20 border border-red-800 px-4 py-3 text-sm text-red-300" x-text="error"></div>
+                <div x-show="error" x-transition class="rounded-lg bg-red-900/20 border border-gray-700 px-4 py-3 text-sm text-red-300" x-text="error"></div>
 
                 <button @click="placeOrder()" :disabled="placing || items.length === 0"
-                        class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-gray-900 font-bold text-base rounded-xl transition-colors">
+                        class="w-full py-4 bg-yellow-400 hover:bg-yellow-500 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold text-base rounded-xl transition-colors">
                     <span x-show="!placing" x-text="paymentType === 'CASH' ? 'Pay {{ $currency['symbol'] }} ' + total.toFixed({{ $currency['decimal_places'] }}) + ' via M-Pesa' : 'Place Order — {{ $currency['symbol'] }} ' + total.toFixed({{ $currency['decimal_places'] }})"></span>
                     <span x-show="placing" class="flex items-center justify-center gap-2">
                         <svg class="h-5 w-5 animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path></svg>

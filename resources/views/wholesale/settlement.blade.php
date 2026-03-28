@@ -10,7 +10,7 @@
     </div>
 
     {{-- Info --}}
-    <div class="bg-blue-900/20 border border-blue-800 text-blue-300 text-sm px-4 py-3 rounded-lg">
+    <div class="bg-blue-900/20 border border-gray-700 text-blue-300 text-sm px-4 py-3 rounded-lg">
         Settlement runs weekly every Friday. Funds are transferred to your registered
         I&amp;M Bank account within 2 business days of settlement confirmation.
     </div>

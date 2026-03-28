@@ -28,7 +28,9 @@ class RoleRedirectController extends Controller
             $user->hasRole('network_field_agent')                 => redirect('/field/pharmacies'),
             $user->hasRole('county_coordinator')                  => redirect('/county'),
             $user->hasRole('sales_rep')                           => redirect('/sales'),
-            $user->hasRole('patient')                             => redirect('/store'),
+            $user->hasRole('customer')                            => redirect('/store'),
+            $user->hasRole('manufacturer')                        => redirect('/manufacturer'),
+            $user->hasRole('system')                              => redirect('/admin/dashboard'),
             default => redirect('/login'),
         };
     }

@@ -204,9 +204,9 @@ class TestUsersSeeder extends Seeder
 
             // ── External ──────────────────────────────────────────────────
             [
-                'email'       => 'patient@test.com',
-                'name'        => 'Patient (B2C)',
-                'role'        => 'patient',
+                'email'       => 'customer@test.com',
+                'name'        => 'Customer (B2C)',
+                'role'        => 'customer',
                 'facility_id' => null,
                 'portal'      => '/store',
             ],

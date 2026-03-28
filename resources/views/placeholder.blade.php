@@ -5,10 +5,10 @@
 @section('content')
 <div class="page-header">
     <div>
-        <h1 class="text-2xl font-bold text-gray-900 dark:text-white dark:text-white tracking-tight">
+        <h1 class="text-2xl font-bold text-white tracking-tight">
             {{ $portalTitle }}
         </h1>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p class="text-sm text-gray-500 mt-1">
             {{ $portalSubtitle ?? 'This module is being built by Datanav.' }}
         </p>
     </div>
@@ -25,10 +25,10 @@
         </svg>
     </div>
     <div>
-        <h2 class="text-lg font-semibold text-gray-900 dark:text-white dark:text-white">
+        <h2 class="text-lg font-semibold text-white">
             {{ $portalTitle }} is under construction
         </h2>
-        <p class="text-sm text-gray-500 dark:text-gray-400 mt-1 max-w-md mx-auto">
+        <p class="text-sm text-gray-500 mt-1 max-w-md mx-auto">
             Business logic for this portal is being wired by Datanav.
             The routes, middleware, role enforcement, and session security
             are all active — only the data layer is pending.

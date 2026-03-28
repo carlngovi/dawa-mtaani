@@ -24,7 +24,7 @@
                 {{ $stats['open'] }}
             </p>
         </div>
-        <div class="bg-gray-800 rounded-xl border border-green-800 p-5">
+        <div class="bg-gray-800 rounded-xl border border-gray-700 p-5">
             <p class="text-xs text-green-400">Resolved</p>
             <p class="text-3xl font-bold text-green-400 mt-1">{{ $stats['resolved'] }}</p>
         </div>
@@ -99,7 +99,7 @@
         </p>
         <div class="flex justify-center gap-4 pt-2">
             <a href="/support/facilities"
-               class="px-4 py-2 bg-yellow-400 text-gray-900 rounded-lg text-sm hover:bg-yellow-500 transition-colors">
+               class="px-4 py-2 bg-yellow-400 text-white rounded-lg text-sm hover:bg-yellow-500 transition-colors">
                 Facility Lookup →
             </a>
             <a href="/support/orders"

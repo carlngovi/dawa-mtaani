@@ -50,17 +50,17 @@
 
       {{-- Tab switcher --}}
       <div class="flex bg-gray-800 border border-gray-700 rounded-xl p-1 mb-6">
-        <button @click="loginTab = 'spotter'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'spotter' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'">Field Agent</button>
-        <button @click="loginTab = 'supervisor'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'supervisor' ? 'bg-yellow-400 text-gray-900' : 'text-gray-400'">Supervisor</button>
+        <button @click="loginTab = 'spotter'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'spotter' ? 'bg-yellow-400 text-white' : 'text-gray-400'">Field Agent</button>
+        <button @click="loginTab = 'supervisor'" class="flex-1 py-2 rounded-lg text-sm font-medium transition-all" :class="loginTab === 'supervisor' ? 'bg-yellow-400 text-white' : 'text-gray-400'">Supervisor</button>
       </div>
 
       {{-- SPOTTER TAB --}}
       <div x-show="loginTab === 'spotter'" class="bg-gray-800 border border-gray-700 rounded-2xl p-6">
         <h2 class="text-white text-lg font-medium mb-1">Enter Activation Code</h2>
         <p class="text-gray-400 text-sm mb-6">Provided by your Sales Rep or Admin</p>
-        <input type="text" x-model="activationCode" @input="formatActivationCode" @keydown.enter="handleActivate" placeholder="XXXX-XXXX-XXXX" maxlength="14" class="w-full bg-gray-900 border border-gray-700 text-white text-center text-xl tracking-widest rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none uppercase" :class="activationError ? 'border-red-400' : ''" autocomplete="off" spellcheck="false">
+        <input type="text" x-model="activationCode" @input="formatActivationCode" @keydown.enter="handleActivate" placeholder="XXXX-XXXX-XXXX" maxlength="14" class="w-full bg-gray-900 border border-gray-700 text-white text-center text-xl tracking-widest rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none uppercase" :class="activationError ? 'border-gray-700' : ''" autocomplete="off" spellcheck="false">
         <p x-show="activationError" x-text="activationError" class="text-red-400 text-sm mt-2 text-center"></p>
-        <button @click="handleActivate" :disabled="activationCode.replace(/-/g,'').length < 12 || activating" class="w-full mt-4 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
+        <button @click="handleActivate" :disabled="activationCode.replace(/-/g,'').length < 12 || activating" class="w-full mt-4 bg-yellow-400 text-white font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
           <span x-show="activating" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
           <span x-text="activating ? 'Activating...' : 'Activate Device'"></span>
         </button>
@@ -73,15 +73,15 @@
         <div class="space-y-4">
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Email</label>
-            <input type="email" x-model="supervisorEmail" @keydown.enter="handleSupervisorLogin" placeholder="you@example.com" autocomplete="email" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-red-400' : ''">
+            <input type="email" x-model="supervisorEmail" @keydown.enter="handleSupervisorLogin" placeholder="you@example.com" autocomplete="email" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-gray-700' : ''">
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Password</label>
-            <input type="password" x-model="supervisorPassword" @keydown.enter="handleSupervisorLogin" placeholder="••••••••" autocomplete="current-password" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-red-400' : ''">
+            <input type="password" x-model="supervisorPassword" @keydown.enter="handleSupervisorLogin" placeholder="••••••••" autocomplete="current-password" class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-4 py-3 focus:border-yellow-400 focus:outline-none" :class="supervisorError ? 'border-gray-700' : ''">
           </div>
         </div>
         <p x-show="supervisorError" x-text="supervisorError" class="text-red-400 text-sm mt-3 text-center"></p>
-        <button @click="handleSupervisorLogin" :disabled="!supervisorEmail || !supervisorPassword || supervisorLoggingIn" class="w-full mt-4 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
+        <button @click="handleSupervisorLogin" :disabled="!supervisorEmail || !supervisorPassword || supervisorLoggingIn" class="w-full mt-4 bg-yellow-400 text-white font-bold py-3 rounded-xl disabled:opacity-40 flex items-center justify-center gap-2">
           <span x-show="supervisorLoggingIn" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
           <span x-text="supervisorLoggingIn ? 'Signing in...' : 'Sign In'"></span>
         </button>
@@ -118,10 +118,10 @@
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>
               <span>Home</span>
             </button>
-            <button @click="clockedIn ? (navigate('submit'), sidebarOpen = false) : showClockInPrompt = true" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'submit' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : clockedIn ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' : 'text-gray-600 cursor-not-allowed'">
+            <button @click="clockedIn ? (navigate('submit'), sidebarOpen = false) : showClockInPrompt = true" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'submit' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : clockedIn ? 'text-gray-400 hover:text-white hover:bg-gray-700/50' : 'text-gray-300 cursor-not-allowed'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/></svg>
               <span>New Visit</span>
-              <svg x-show="!clockedIn" class="w-3 h-3 ml-auto text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
+              <svg x-show="!clockedIn" class="w-3 h-3 ml-auto text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"/></svg>
             </button>
             <button @click="navigate('submissions'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'submissions' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg>
@@ -130,7 +130,7 @@
             <button @click="navigate('tasks'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'tasks' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4"/></svg>
               <span>Follow-ups</span>
-              <span x-show="overdueCount() > 0" class="ml-auto bg-red-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="overdueCount()"></span>
+              <span x-show="overdueCount() > 0" class="ml-auto bg-red-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="overdueCount()"></span>
             </button>
             <button @click="navigate('ward'); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'ward' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/></svg>
@@ -157,12 +157,12 @@
             <button @click="navigate('supervisor_duplicates'); loadSupervisorDuplicates(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_duplicates' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
               <span>Reviews</span>
-              <span x-show="(supervisorStats.pendingDuplicates ?? 0) > 0" class="ml-auto bg-orange-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.pendingDuplicates"></span>
+              <span x-show="(supervisorStats.pendingDuplicates ?? 0) > 0" class="ml-auto bg-orange-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.pendingDuplicates"></span>
             </button>
             <button @click="navigate('supervisor_followups'); loadSupervisorFollowUps(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_followups' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2m-6 9l2 2 4-4"/></svg>
               <span>Follow-ups</span>
-              <span x-show="(supervisorStats.overdueFollowUps ?? 0) > 0" class="ml-auto bg-red-400 text-gray-900 text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.overdueFollowUps"></span>
+              <span x-show="(supervisorStats.overdueFollowUps ?? 0) > 0" class="ml-auto bg-red-400 text-white text-xs font-bold px-1.5 py-0.5 rounded-full" x-text="supervisorStats.overdueFollowUps"></span>
             </button>
             <button @click="navigate('supervisor_attendance'); loadSupervisorAttendance(); sidebarOpen = false" class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all" :class="currentView === 'supervisor_attendance' ? 'bg-yellow-400/10 text-yellow-400 border border-yellow-400/20' : 'text-gray-400 hover:text-white hover:bg-gray-700/50'">
               <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
@@ -181,13 +181,24 @@
 
       </nav>
 
-      {{-- Sidebar bottom: Sign Out only --}}
-      <div class="px-3 py-4 border-t border-gray-700 flex-shrink-0">
-        <button @click="confirmClearData = true"
-          class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all">
-          <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
-          <span x-text="isSupervisor() ? 'Sign Out' : 'Log Out'"></span>
-        </button>
+      {{-- Sidebar bottom: Sign Out with inline confirmation --}}
+      <div class="px-3 py-4 border-t border-gray-700 flex-shrink-0" x-data="{ confirmLogout: false }">
+        <template x-if="!confirmLogout">
+          <button @click="confirmLogout = true"
+            class="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium text-red-400 hover:bg-red-400/10 transition-all">
+            <svg class="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/></svg>
+            <span x-text="isSupervisor() ? 'Sign Out' : 'Log Out'"></span>
+          </button>
+        </template>
+        <template x-if="confirmLogout">
+          <div class="space-y-2">
+            <p class="text-gray-300 text-xs px-1" x-text="isSupervisor() ? 'Sign out of your supervisor session?' : 'This will log you out and clear all local data. You will need a new activation code to sign back in.'"></p>
+            <div class="flex gap-2">
+              <button @click="confirmLogout = false" class="flex-1 border border-gray-600 text-gray-400 py-2 rounded-lg text-xs">Cancel</button>
+              <button @click="clearAllData()" class="flex-1 bg-red-500 text-white font-bold py-2 rounded-lg text-xs">Log Out</button>
+            </div>
+          </div>
+        </template>
       </div>
     </aside>
 
@@ -243,7 +254,7 @@
                 <div class="text-gray-400 text-xs" x-text="profile.id ? 'ID: ' + profile.id : ''"></div>
               </div>
             </div>
-            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-green-400/30' : 'bg-gray-700 border-gray-600'">
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-gray-700/30' : 'bg-gray-700 border-gray-600'">
               <div class="w-2 h-2 rounded-full" :class="online ? 'bg-green-400' : 'bg-gray-500'"></div>
               <span class="text-xs font-medium" :class="online ? 'text-green-400' : 'text-gray-400'" x-text="online ? 'Online' : 'Offline'"></span>
             </div>
@@ -266,7 +277,7 @@
         </div>
 
         {{-- Clock status card --}}
-        <div class="bg-gray-800 border rounded-2xl p-4" :class="clockedIn ? 'border-green-400/30' : 'border-yellow-400/30'">
+        <div class="bg-gray-800 border rounded-2xl p-4" :class="clockedIn ? 'border-gray-700/30' : 'border-yellow-400/30'">
           <template x-if="!clockedIn">
             <div>
               <div class="flex items-center gap-2 mb-1">
@@ -274,7 +285,7 @@
                 <span class="text-white font-medium">Clock in to begin your day</span>
               </div>
               <p class="text-gray-400 text-sm mb-3">Submissions are locked until you clock in</p>
-              <button @click="navigate('clock')" class="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-lg text-sm">Clock In Now</button>
+              <button @click="navigate('clock')" class="bg-yellow-400 text-white font-bold px-4 py-2 rounded-lg text-sm">Clock In Now</button>
             </div>
           </template>
           <template x-if="clockedIn">
@@ -311,7 +322,7 @@
         <div>
           <div class="text-gray-400 text-xs uppercase tracking-widest mb-3">Quick Actions</div>
           <div class="space-y-3">
-            <button @click="clockedIn ? navigate('submit') : showClockInPrompt = true" class="w-full py-4 rounded-2xl font-bold text-center transition-all" :class="clockedIn ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed opacity-50'">+ New Submission</button>
+            <button @click="clockedIn ? navigate('submit') : showClockInPrompt = true" class="w-full py-4 rounded-2xl font-bold text-center transition-all" :class="clockedIn ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-500 cursor-not-allowed opacity-50'">+ New Submission</button>
             <div x-show="showClockInPrompt" x-transition class="mt-2 bg-yellow-400/10 border border-yellow-400/30 rounded-xl px-4 py-3">
               <p class="text-yellow-400 text-sm font-medium">You must clock in before submitting a visit.</p>
               <button @click="navigate('clock'); showClockInPrompt = false" class="text-yellow-400 text-xs underline mt-1">Clock in now →</button>
@@ -325,7 +336,7 @@
         <div x-show="overdueCount() > 0">
           <div class="text-red-400 text-xs uppercase tracking-widest mb-2">Overdue Follow-ups</div>
           <template x-for="task in overdueFollowups().slice(0,3)" :key="task.id">
-            <div class="bg-gray-800 border border-red-400/30 rounded-xl p-3 mb-2">
+            <div class="bg-gray-800 border border-gray-700/30 rounded-xl p-3 mb-2">
               <div class="text-white text-sm font-medium" x-text="task.pharmacyName"></div>
               <div class="text-red-400 text-xs" x-text="`${daysOverdue(task.followUpDate)} days overdue`"></div>
             </div>
@@ -342,7 +353,7 @@
               <h2 class="text-white text-2xl font-bold mb-1">Start Your Day</h2>
               <p class="text-gray-400 mb-2" x-text="todayDate()"></p>
               <p class="text-gray-500 text-sm mb-6" x-text="gpsStatus"></p>
-              <button @click="handleClockIn" :disabled="clockingIn" class="w-full bg-yellow-400 text-gray-900 font-bold py-4 rounded-xl disabled:opacity-50 flex items-center justify-center gap-2">
+              <button @click="handleClockIn" :disabled="clockingIn" class="w-full bg-yellow-400 text-white font-bold py-4 rounded-xl disabled:opacity-50 flex items-center justify-center gap-2">
                 <span x-show="clockingIn" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
                 <span x-text="clockingIn ? 'Getting location...' : 'Clock In'"></span>
               </button>
@@ -378,7 +389,7 @@
         <div class="flex items-center justify-between mb-6 px-2">
           <template x-for="n in [1,2,3,4,5]" :key="n">
             <div class="flex items-center">
-              <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all" :class="{'bg-yellow-400 text-gray-900': wizardStep === n, 'bg-green-400 text-gray-900': wizardStep > n, 'bg-gray-700 text-gray-500': wizardStep < n}" x-text="wizardStep > n ? '✓' : n"></div>
+              <div class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all" :class="{'bg-yellow-400 text-white': wizardStep === n, 'bg-green-400 text-white': wizardStep > n, 'bg-gray-700 text-gray-500': wizardStep < n}" x-text="wizardStep > n ? '✓' : n"></div>
               <div x-show="n < 5" class="h-0.5 w-8 mx-1" :class="wizardStep > n ? 'bg-green-400' : 'bg-gray-700'"></div>
             </div>
           </template>
@@ -414,7 +425,7 @@
             <label class="text-gray-400 text-xs mb-1 block">Pharmacy Name <span class="text-red-400">*</span></label>
             <input type="text" x-model="form.pharmacy" @blur="checkDuplicate" class="field-input" :style="formErrors.pharmacy ? 'border-color:#f87171' : ''">
             <p x-show="formErrors.pharmacy" class="text-red-400 text-xs mt-1" x-text="formErrors.pharmacy"></p>
-            <div x-show="duplicateWarning" class="mt-2 border rounded-lg px-3 py-2" :class="duplicateBlock ? 'bg-red-400/10 border-red-400/30' : 'bg-yellow-400/10 border-yellow-400/30'">
+            <div x-show="duplicateWarning" class="mt-2 border rounded-lg px-3 py-2" :class="duplicateBlock ? 'bg-red-400/10 border-gray-700/30' : 'bg-yellow-400/10 border-yellow-400/30'">
               <p class="text-sm" :class="duplicateBlock ? 'text-red-400' : 'text-yellow-400'" x-text="duplicateWarning"></p>
             </div>
           </div>
@@ -428,7 +439,7 @@
               <template x-if="!gpsCoords">
                 <div class="flex items-center justify-between">
                   <span class="text-gray-500 text-sm" x-text="gpsStatus"></span>
-                  <button @click="getGPS" :disabled="gettingGPS" class="bg-yellow-400 text-gray-900 font-bold px-3 py-1.5 rounded-lg text-sm disabled:opacity-50">
+                  <button @click="getGPS" :disabled="gettingGPS" class="bg-yellow-400 text-white font-bold px-3 py-1.5 rounded-lg text-sm disabled:opacity-50">
                     <span x-text="gettingGPS ? 'Getting...' : 'Get GPS'"></span>
                   </button>
                 </div>
@@ -496,8 +507,8 @@
           <div>
             <label class="text-gray-400 text-xs mb-1 block">Owner Present at Visit <span class="text-red-400">*</span></label>
             <div class="flex gap-3">
-              <button @click="form.ownerPresent = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.ownerPresent === 'Yes' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">Yes</button>
-              <button @click="form.ownerPresent = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.ownerPresent === 'No' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">No</button>
+              <button @click="form.ownerPresent = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.ownerPresent === 'Yes' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">Yes</button>
+              <button @click="form.ownerPresent = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.ownerPresent === 'No' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">No</button>
             </div>
           </div>
           <div x-show="form.ownerPresent === 'No'" class="bg-yellow-400/10 border border-yellow-400/30 rounded-xl px-4 py-3">
@@ -514,7 +525,7 @@
             <label class="text-gray-400 text-xs mb-2 block">Foot Traffic <span class="text-red-400">*</span></label>
             <div class="grid grid-cols-3 gap-2">
               <template x-for="opt in ['high','medium','low']" :key="opt">
-                <button @click="form.footTraffic = opt" class="py-3 rounded-xl font-medium capitalize transition-all" :class="form.footTraffic === opt ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'" x-text="opt"></button>
+                <button @click="form.footTraffic = opt" class="py-3 rounded-xl font-medium capitalize transition-all" :class="form.footTraffic === opt ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'" x-text="opt"></button>
               </template>
             </div>
           </div>
@@ -522,7 +533,7 @@
             <label class="text-gray-400 text-xs mb-2 block">Shelf Stock Observed <span class="text-red-400">*</span></label>
             <div class="grid grid-cols-2 gap-2">
               <template x-for="opt in [{v:'well_stocked',l:'Well Stocked'},{v:'moderate',l:'Moderate'},{v:'sparse',l:'Sparse'},{v:'not_observed',l:'Could Not Observe'}]" :key="opt.v">
-                <button @click="form.stockLevel = opt.v" class="py-3 rounded-xl font-medium text-sm transition-all" :class="form.stockLevel === opt.v ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'" x-text="opt.l"></button>
+                <button @click="form.stockLevel = opt.v" class="py-3 rounded-xl font-medium text-sm transition-all" :class="form.stockLevel === opt.v ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'" x-text="opt.l"></button>
               </template>
             </div>
           </div>
@@ -530,15 +541,15 @@
             <label class="text-gray-400 text-xs mb-2 block">Activation Potential <span class="text-red-400">*</span></label>
             <div class="grid grid-cols-3 gap-2">
               <template x-for="opt in ['high','medium','low']" :key="opt">
-                <button @click="form.potential = opt" class="py-3 rounded-xl font-medium capitalize transition-all" :class="{'bg-green-400 text-gray-900': form.potential === opt && opt === 'high', 'bg-yellow-400 text-gray-900': form.potential === opt && opt === 'medium', 'bg-red-400 text-gray-900': form.potential === opt && opt === 'low', 'bg-gray-700 text-gray-300': form.potential !== opt}" x-text="opt"></button>
+                <button @click="form.potential = opt" class="py-3 rounded-xl font-medium capitalize transition-all" :class="{'bg-green-400 text-white': form.potential === opt && opt === 'high', 'bg-yellow-400 text-white': form.potential === opt && opt === 'medium', 'bg-red-400 text-white': form.potential === opt && opt === 'low', 'bg-gray-700 text-gray-300': form.potential !== opt}" x-text="opt"></button>
               </template>
             </div>
           </div>
           <div>
             <label class="text-gray-400 text-xs mb-2 block">Willing to Receive Follow-up <span class="text-red-400">*</span></label>
             <div class="flex gap-3">
-              <button @click="form.followUp = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.followUp === 'Yes' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">Yes</button>
-              <button @click="form.followUp = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.followUp === 'No' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">No</button>
+              <button @click="form.followUp = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.followUp === 'Yes' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">Yes</button>
+              <button @click="form.followUp = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.followUp === 'No' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">No</button>
             </div>
           </div>
           <div x-show="form.followUp === 'Yes'">
@@ -557,7 +568,7 @@
             <label class="text-gray-400 text-xs mb-2 block">Recommended Next Step <span class="text-red-400">*</span></label>
             <div class="space-y-2">
               <template x-for="opt in [{v:'sales_rep',l:'Schedule Sales Rep Visit'},{v:'spotter_followup',l:'Spotter Follow-up Visit'},{v:'owner_absent',l:'Owner Absent — Return Visit'},{v:'no_action',l:'No Further Action'}]" :key="opt.v">
-                <button @click="form.nextStep = opt.v" class="w-full text-left px-4 py-3 rounded-xl font-medium text-sm transition-all" :class="form.nextStep === opt.v ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'" x-text="opt.l"></button>
+                <button @click="form.nextStep = opt.v" class="w-full text-left px-4 py-3 rounded-xl font-medium text-sm transition-all" :class="form.nextStep === opt.v ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'" x-text="opt.l"></button>
               </template>
             </div>
           </div>
@@ -573,8 +584,8 @@
           <div>
             <label class="text-gray-400 text-xs mb-2 block">Brochure and Card Left <span class="text-red-400">*</span></label>
             <div class="flex gap-3">
-              <button @click="form.brochure = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.brochure === 'Yes' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">Yes</button>
-              <button @click="form.brochure = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.brochure === 'No' ? 'bg-yellow-400 text-gray-900' : 'bg-gray-700 text-gray-300'">No</button>
+              <button @click="form.brochure = 'Yes'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.brochure === 'Yes' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">Yes</button>
+              <button @click="form.brochure = 'No'" class="flex-1 py-3 rounded-xl font-medium transition-all" :class="form.brochure === 'No' ? 'bg-yellow-400 text-white' : 'bg-gray-700 text-gray-300'">No</button>
             </div>
           </div>
         </div>
@@ -605,12 +616,12 @@
               </div>
             </div>
           </template>
-          <div x-show="submitSuccess" class="bg-green-400/10 border border-green-400/30 rounded-2xl p-6 text-center">
+          <div x-show="submitSuccess" class="bg-green-400/10 border border-gray-700/30 rounded-2xl p-6 text-center">
             <div class="text-green-400 text-4xl mb-2">✓</div>
             <div class="text-white font-bold">Submitted!</div>
             <div class="text-gray-400 text-sm">Pharmacy logged successfully.</div>
           </div>
-          <button x-show="!submitSuccess" @click="handleSubmitForm" :disabled="!canSubmit() || submitting" class="w-full bg-yellow-400 text-gray-900 font-bold py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
+          <button x-show="!submitSuccess" @click="handleSubmitForm" :disabled="!canSubmit() || submitting" class="w-full bg-yellow-400 text-white font-bold py-4 rounded-2xl disabled:opacity-40 disabled:cursor-not-allowed flex items-center justify-center gap-2">
             <span x-show="submitting" class="w-4 h-4 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
             <span x-text="submitting ? 'Saving...' : 'Submit Pharmacy'"></span>
           </button>
@@ -620,7 +631,7 @@
         {{-- Wizard nav buttons --}}
         <div class="flex gap-3 mt-6 pb-6" x-show="!submitSuccess">
           <button x-show="wizardStep > 1" @click="wizardStep--" class="flex-1 border border-gray-600 text-gray-300 py-3 rounded-xl">← Back</button>
-          <button x-show="wizardStep < 5" @click="validateAndNext" class="flex-1 bg-yellow-400 text-gray-900 font-bold py-3 rounded-xl">Next →</button>
+          <button x-show="wizardStep < 5" @click="validateAndNext" class="flex-1 bg-yellow-400 text-white font-bold py-3 rounded-xl">Next →</button>
           <button x-show="wizardStep < 5" @click="saveDraft" class="border border-gray-700 text-gray-500 px-4 py-3 rounded-xl text-sm">Draft</button>
         </div>
       </div>
@@ -629,7 +640,7 @@
       <div x-show="currentView === 'submissions'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
           <template x-for="tab in ['all','submitted','held','sr_reviewed','cc_verified','accepted','rejected','draft']" :key="tab">
-            <button @click="submissionFilter = tab" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="submissionFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+            <button @click="submissionFilter = tab" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="submissionFilter === tab ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
           </template>
         </div>
         <div x-show="filteredSubmissions().length === 0" class="text-center py-16">
@@ -666,12 +677,12 @@
       <div x-show="currentView === 'tasks'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
           <template x-for="tab in ['open','overdue','completed']" :key="tab">
-            <button @click="taskFilter = tab" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="taskFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+            <button @click="taskFilter = tab" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="taskFilter === tab ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
           </template>
         </div>
         <div x-show="filteredTasks().length === 0" class="text-center py-16"><p class="text-gray-500">No tasks</p></div>
         <template x-for="task in filteredTasks()" :key="task.id">
-          <div class="bg-gray-800 rounded-2xl p-4 mb-3 border" :class="{'border-red-400/50': task.status === 'overdue', 'border-gray-700': task.status === 'open', 'border-green-400/30': task.status === 'completed'}">
+          <div class="bg-gray-800 rounded-2xl p-4 mb-3 border" :class="{'border-gray-700/50': task.status === 'overdue', 'border-gray-700': task.status === 'open', 'border-gray-700/30': task.status === 'completed'}">
             <div class="flex items-start justify-between mb-2">
               <div class="flex-1">
                 <div class="text-white font-medium" x-text="task.pharmacyName"></div>
@@ -690,7 +701,7 @@
                     <textarea x-model="completionNote" rows="2" placeholder="Outcome note (optional)..." class="field-input" style="resize:none"></textarea>
                     <div class="flex gap-2">
                       <button @click="completingTaskId = null; completionNote = ''" class="flex-1 border border-gray-600 text-gray-400 py-2 rounded-lg text-sm">Cancel</button>
-                      <button @click="confirmComplete(task)" class="flex-1 bg-green-400 text-gray-900 font-bold py-2 rounded-lg text-sm">Confirm</button>
+                      <button @click="confirmComplete(task)" class="flex-1 bg-green-400 text-white font-bold py-2 rounded-lg text-sm">Confirm</button>
                     </div>
                   </div>
                 </template>
@@ -738,7 +749,7 @@
                 <div class="text-yellow-400 text-xs capitalize" x-text="profile.role?.replace(/_/g,' ')"></div>
               </div>
             </div>
-            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-green-400/30' : 'bg-gray-700 border-gray-600'">
+            <div class="flex items-center gap-1.5 px-3 py-1 rounded-full border" :class="online ? 'bg-green-400/10 border-gray-700/30' : 'bg-gray-700 border-gray-600'">
               <div class="w-2 h-2 rounded-full" :class="online ? 'bg-green-400' : 'bg-gray-500'"></div>
               <span class="text-xs font-medium" :class="online ? 'text-green-400' : 'text-gray-400'" x-text="online ? 'Online' : 'Offline'"></span>
             </div>
@@ -775,7 +786,7 @@
       <div x-show="currentView === 'supervisor_submissions'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
           <template x-for="tab in ['all','submitted','held','accepted','rejected']" :key="tab">
-            <button @click="supervisorSubmissionFilter = tab; loadSupervisorSubmissions()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="supervisorSubmissionFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+            <button @click="supervisorSubmissionFilter = tab; loadSupervisorSubmissions()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0 transition-all" :class="supervisorSubmissionFilter === tab ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab === 'all' ? 'All' : tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
           </template>
         </div>
         <div x-show="supervisorSubmissions.length === 0" class="text-center py-16"><p class="text-gray-500">No submissions found</p></div>
@@ -793,7 +804,7 @@
       <div x-show="currentView === 'supervisor_duplicates'" class="px-4 py-4">
         <div x-show="supervisorDuplicates.length === 0" class="text-center py-16"><div class="text-gray-500 text-sm">No pending duplicate reviews</div><div class="text-green-400 text-xs mt-2">All clear</div></div>
         <template x-for="review in supervisorDuplicates" :key="review.id">
-          <div class="bg-gray-800 border border-orange-400/30 rounded-2xl p-4 mb-4">
+          <div class="bg-gray-800 border border-gray-700/30 rounded-2xl p-4 mb-4">
             <div class="text-orange-400 text-xs uppercase tracking-widest mb-3">Duplicate Review</div>
             <div class="grid grid-cols-2 gap-3 mb-4">
               <div class="bg-gray-900 rounded-xl p-3"><div class="text-gray-400 text-xs mb-1">Submitted</div><div class="text-white text-sm font-medium" x-text="review.submission?.pharmacy"></div><div class="text-gray-500 text-xs" x-text="review.submission?.ward"></div></div>
@@ -805,8 +816,8 @@
             </div>
             <div x-show="!review._decided">
               <div x-show="!review._confirming" class="flex gap-3">
-                <button @click="review._confirming = 'duplicate'" class="flex-1 bg-red-500/20 border border-red-500/30 text-red-400 font-medium py-2.5 rounded-xl text-sm">Confirm Duplicate</button>
-                <button @click="decideDuplicate(review, 'not_duplicate')" class="flex-1 bg-green-400/20 border border-green-400/30 text-green-400 font-medium py-2.5 rounded-xl text-sm" x-text="profile.role === 'sales_rep' ? 'Not Dup → CC' : profile.role === 'county_coordinator' ? 'Verify → Admin' : 'Accept'"></button>
+                <button @click="review._confirming = 'duplicate'" class="flex-1 bg-red-500/20 border border-gray-700/30 text-red-400 font-medium py-2.5 rounded-xl text-sm">Confirm Duplicate</button>
+                <button @click="decideDuplicate(review, 'not_duplicate')" class="flex-1 bg-green-400/20 border border-gray-700/30 text-green-400 font-medium py-2.5 rounded-xl text-sm" x-text="profile.role === 'sales_rep' ? 'Not Dup → CC' : profile.role === 'county_coordinator' ? 'Verify → Admin' : 'Accept'"></button>
               </div>
               <div x-show="review._confirming === 'duplicate'" class="space-y-2">
                 <textarea x-model="review._notes" rows="2" placeholder="Reason (optional)..." class="w-full bg-gray-900 border border-gray-700 text-white rounded-xl px-3 py-2 text-sm resize-none focus:border-yellow-400 outline-none"></textarea>
@@ -822,7 +833,7 @@
       <div x-show="currentView === 'supervisor_leaderboard'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
           <template x-for="p in [{v:'programme',l:'All Time'},{v:'month',l:'This Month'},{v:'week',l:'This Week'}]" :key="p.v">
-            <button @click="leaderboardPeriod = p.v; loadLeaderboard()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="leaderboardPeriod === p.v ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="p.l"></button>
+            <button @click="leaderboardPeriod = p.v; loadLeaderboard()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="leaderboardPeriod === p.v ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="p.l"></button>
           </template>
         </div>
         <div class="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
@@ -842,11 +853,11 @@
       <div x-show="currentView === 'supervisor_followups'" class="px-4 py-4">
         <div class="flex gap-2 mb-4 overflow-x-auto no-scrollbar">
           <template x-for="tab in ['overdue','open','completed']" :key="tab">
-            <button @click="supervisorFollowUpFilter = tab; loadSupervisorFollowUps()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="supervisorFollowUpFilter === tab ? 'bg-yellow-400 text-gray-900' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
+            <button @click="supervisorFollowUpFilter = tab; loadSupervisorFollowUps()" class="px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap flex-shrink-0" :class="supervisorFollowUpFilter === tab ? 'bg-yellow-400 text-white' : 'bg-gray-800 border border-gray-700 text-gray-400'" x-text="tab.charAt(0).toUpperCase() + tab.slice(1)"></button>
           </template>
         </div>
         <template x-for="task in supervisorFollowUps" :key="task.id">
-          <div class="bg-gray-800 border rounded-2xl p-4 mb-3" :class="task.status === 'overdue' ? 'border-red-400/50' : 'border-gray-700'">
+          <div class="bg-gray-800 border rounded-2xl p-4 mb-3" :class="task.status === 'overdue' ? 'border-gray-700/50' : 'border-gray-700'">
             <div class="text-white font-medium" x-text="task.submission?.pharmacy ?? 'Unknown'"></div>
             <div class="text-gray-400 text-sm" x-text="nextStepLabel(task.next_step)"></div>
             <div class="text-sm mt-1" :class="task.status === 'overdue' ? 'text-red-400' : 'text-gray-500'" x-text="`Due: ${task.follow_up_date}${task.status === 'overdue' ? ' · ' + daysOverdue(task.follow_up_date) + ' days overdue' : ''}`"></div>
@@ -883,7 +894,7 @@
           </div>
           <div class="flex justify-between items-center px-4 py-3"><span class="text-gray-400 text-sm">Pending Records</span><span class="text-white text-sm" x-text="pendingCount"></span></div>
           <div class="px-4 py-3">
-            <button @click="handleSync" :disabled="!online || syncing || pendingCount === 0" class="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
+            <button @click="handleSync" :disabled="!online || syncing || pendingCount === 0" class="bg-yellow-400 text-white font-bold px-4 py-2 rounded-lg text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-2">
               <span x-show="syncing" class="w-3 h-3 border-2 border-gray-900 border-t-transparent rounded-full animate-spin"></span>
               <span x-text="syncing ? 'Syncing...' : 'Sync Now'"></span>
             </button>

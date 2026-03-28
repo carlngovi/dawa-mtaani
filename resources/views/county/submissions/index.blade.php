@@ -12,7 +12,7 @@
         </select>
         <input type="date" name="from" value="{{ request('from') }}" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none">
         <input type="date" name="to" value="{{ request('to') }}" class="bg-gray-800 border border-gray-700 text-white rounded-lg px-3 py-2 text-sm focus:border-yellow-400 focus:outline-none">
-        <button class="bg-yellow-400 text-gray-900 font-bold px-4 py-2 rounded-lg text-sm">Filter</button>
+        <button class="bg-yellow-400 text-white font-bold px-4 py-2 rounded-lg text-sm">Filter</button>
     </form>
     <div class="bg-gray-800 border border-gray-700 rounded-2xl overflow-hidden">
         <table class="w-full text-sm">
