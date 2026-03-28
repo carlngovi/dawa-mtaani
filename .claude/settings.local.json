@@ -96,7 +96,8 @@
       "Bash(cp -r spotter/spotter/* spotter/)",
       "Bash(rm -rf spotter/spotter)",
       "Bash(do)",
-      "Bash(__NEW_LINE_38ee7c6d7ad7a9fd__ echo:*)"
+      "Bash(__NEW_LINE_38ee7c6d7ad7a9fd__ echo:*)",
+      "Bash(pkill -f \"vite\")"
     ]
   }
 }
