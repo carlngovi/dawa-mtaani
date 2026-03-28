@@ -38,7 +38,7 @@
                          }
                          this.debounceTimer = setTimeout(() => {
                              this.loading = true;
-                             fetch('/admin/search?q=' + encodeURIComponent(this.query), {
+                             fetch('/search?q=' + encodeURIComponent(this.query), {
                                  credentials: 'same-origin',
                                  headers: {
                                      'X-Requested-With': 'XMLHttpRequest',

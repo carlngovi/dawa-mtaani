@@ -48,6 +48,11 @@ Route::get('/dashboard', function () {
     return App\Http\Controllers\Web\RoleRedirectController::redirectForUser(Auth::user());
 })->middleware('auth')->name('dashboard');
 
+// ── Global search — all authenticated roles ─────────────────────
+Route::middleware(['auth'])
+    ->get('/search', [\App\Http\Controllers\Web\GlobalSearchController::class, 'search'])
+    ->name('global.search');
+
 // -------------------------------------------------------
 // Admin portal — auth only, role checked in controller
 // -------------------------------------------------------
@@ -158,6 +163,7 @@ Route::middleware(['auth', 'portal', 'financial.timeout'])
         Route::post('/orders/bulk-dispatch', [\App\Http\Controllers\Web\WholesaleOrdersController::class, 'bulkDispatch']);
         Route::get('/price-lists', [\App\Http\Controllers\Web\WholesalePriceListsController::class, 'index']);
         Route::get('/stock', [\App\Http\Controllers\Web\WholesaleStockController::class, 'index']);
+        Route::get('/stock/{productId}', [\App\Http\Controllers\Web\WholesaleStockController::class, 'show']);
         Route::get('/performance', [\App\Http\Controllers\Web\WholesalePerformanceController::class, 'index']);
         Route::get('/dispatch', [\App\Http\Controllers\Web\WholesaleDispatchController::class, 'index']);
         Route::get('/disputes', [\App\Http\Controllers\Web\WholesaleDisputesController::class, 'index']);

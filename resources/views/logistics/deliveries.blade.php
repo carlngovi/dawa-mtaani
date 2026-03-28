@@ -148,7 +148,7 @@
                         </td>
                         <td class="px-5 py-3">
                             @if($delivery->order_type === 'B2C')
-                                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-yellow-900/30 text-yellow-400">Patient</span>
+                                <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-yellow-900/30 text-yellow-400">Customer</span>
                             @else
                                 <span class="inline-flex px-2 py-0.5 rounded text-xs font-medium bg-indigo-900/30 text-indigo-400">Retail</span>
                             @endif
